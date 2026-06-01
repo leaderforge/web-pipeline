@@ -1,6 +1,7 @@
 // =============================================================================
 // DeepSeek Service — Conversational AI for Hermes agent
 // Using DeepSeek v4-pro via OpenAI-compatible API
+// v2: Added reviewer layer (CAPA 3) — legal + human quality review
 // =============================================================================
 
 import OpenAI from "openai";
@@ -9,6 +10,7 @@ import { LEGAL_GUARDRAILS } from "../prompts/legal_guardrails.js";
 import { INTAKE_PROMPT } from "../prompts/intake_prompt.js";
 import { EDUCATOR_PROMPT } from "../prompts/educator_prompt.js";
 import { CLOSER_HOOK_PROMPT, CLOSER_DELIVERY_PROMPT } from "../prompts/closer_prompt.js";
+import { REVIEWER_PROMPT } from "../prompts/reviewer_prompt.js";
 
 class DeepSeekService {
   constructor() {
@@ -17,6 +19,7 @@ class DeepSeekService {
       baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
     });
     this.model = "deepseek-chat"; // v4-pro
+    this.reviewEnabled = true; // CAPA 3: Reviewer activo por defecto
   }
 
   // ---------------------------------------------------------------------------
@@ -55,7 +58,7 @@ class DeepSeekService {
   }
 
   // ---------------------------------------------------------------------------
-  // Send message to DeepSeek and get response
+  // Send message to DeepSeek and get response (WITH reviewer)
   // ---------------------------------------------------------------------------
   async chat(phase, history, userMessage, sessionContext = {}) {
     if (!process.env.DEEPSEEK_API_KEY) {
@@ -75,19 +78,98 @@ class DeepSeekService {
       const response = await this.client.chat.completions.create({
         model: this.model,
         messages,
-        max_tokens: 400,
-        temperature: 0.7,
-        presence_penalty: 0.1,
+        max_tokens: 600, // ⬆️ Subido de 400 para respuestas más humanas
+        temperature: 0.75, // ⬆️ Subido de 0.7 para más variación natural
+        presence_penalty: 0.15,
       });
 
-      const content = response.choices[0]?.message?.content || "";
-      console.log(`🧠 DeepSeek (${phase}): ${content.slice(0, 80)}...`);
+      const draft = response.choices[0]?.message?.content || "";
+      console.log(`🧠 DeepSeek (${phase}): ${draft.slice(0, 80)}...`);
 
-      return content;
+      // ── CAPA 3: Reviewer ──────────────────────────────────────────
+      if (this.reviewEnabled && phase !== "analyzer") {
+        const reviewed = await this._reviewResponse(phase, userMessage, draft, sessionContext);
+        return reviewed;
+      }
+
+      return draft;
     } catch (e) {
       console.error("❌ DeepSeek error:", e.message);
       // Fallback to simple responses
       return this._fallbackResponse(phase);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // CAPA 3 — Reviewer: Legal + Human Quality check
+  // ---------------------------------------------------------------------------
+  async _reviewResponse(phase, userMessage, draft, context = {}) {
+    try {
+      const reviewMessages = [
+        { role: "system", content: REVIEWER_PROMPT },
+        {
+          role: "user",
+          content: [
+            `FASE: ${phase}`,
+            `CONTEXTO: hospital=${context.hospital_name || "N/A"}, estado=${context.user_state || "N/A"}`,
+            ``,
+            `MENSAJE DEL USUARIO:`,
+            `"${userMessage}"`,
+            ``,
+            `RESPUESTA PROPUESTA POR EL AGENTE:`,
+            `"${draft}"`,
+            ``,
+            `Evalúa la respuesta según los criterios del revisor.`,
+            `Responde ÚNICAMENTE con JSON: {"accion": "aprobar"|"corregir"|"reescribir", "respuesta_final": "...", "problemas": [...], "nota_interna": "..."}`,
+          ].join("\n"),
+        },
+      ];
+
+      const reviewResponse = await this.client.chat.completions.create({
+        model: this.model,
+        messages: reviewMessages,
+        max_tokens: 500,
+        temperature: 0.3, // Determinista para revisión legal
+        response_format: { type: "json_object" },
+      });
+
+      const raw = reviewResponse.choices[0]?.message?.content || "{}";
+      let result;
+      try {
+        result = JSON.parse(raw);
+      } catch {
+        // Si el JSON no es válido, usar la respuesta original como fallback seguro
+        console.warn("⚠️ Reviewer returned invalid JSON — using draft as-is");
+        return draft;
+      }
+
+      const action = result.accion || "aprobar";
+      const final = result.respuesta_final || draft;
+
+      if (action === "aprobar") {
+        console.log(`✅ Reviewer: APROBADO — ${result.nota_interna || "sin problemas"}`);
+        return final;
+      }
+
+      if (action === "corregir") {
+        const problems = (result.problemas || []).join(", ");
+        console.log(`🔧 Reviewer: CORREGIDO — ${problems}`);
+        return final;
+      }
+
+      if (action === "reescribir") {
+        const problems = (result.problemas || []).join(", ");
+        console.warn(`🚨 Reviewer: REESCRITO (riesgo legal) — ${problems}`);
+        console.warn(`   Original: ${draft.slice(0, 100)}`);
+        console.warn(`   Nueva:    ${final.slice(0, 100)}`);
+        return final;
+      }
+
+      return final;
+    } catch (e) {
+      console.error("❌ Reviewer error:", e.message);
+      // Si el revisor falla, devolver el draft — mejor que no responder
+      return draft;
     }
   }
 
