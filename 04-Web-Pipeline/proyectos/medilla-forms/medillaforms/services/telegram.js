@@ -9,8 +9,8 @@
 
 class TelegramService {
   constructor() {
-    this.botToken = process.env.TELEGRAM_BOT_TOKEN || "";
-    this.chatId = process.env.TELEGRAM_CHAT_ID || "";
+    this.botToken = process.env.MEDILLA_TELEGRAM_BOT_TOKEN || "";
+    this.chatId = process.env.MEDILLA_TELEGRAM_CHAT_ID || "";
     this.enabled = !!(this.botToken && this.chatId);
 
     if (!this.enabled) {
