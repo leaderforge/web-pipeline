@@ -155,7 +155,7 @@ app.post("/telegram/webhook", async (req, res) => {
   if (!message) return res.status(200).json({ status: "no_message" });
 
   const chatId = String(message.chat?.id || "");
-  const expectedChatId = process.env.MEDILLA_TELEGRAM_CHAT_ID || "";
+  const expectedChatId = process.env.TELEGRAM_CHAT_ID || "";
   const text = message.text || "";
 
   // Verify it's from Daniel
