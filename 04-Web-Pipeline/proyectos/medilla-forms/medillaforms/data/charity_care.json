@@ -1,0 +1,114 @@
+{
+  "_description": "Charity care and financial assistance programs by hospital system. Public information — always verify with the hospital directly.",
+  "_disclaimer": "Verifique SIEMPRE con el hospital. Los programas cambian. Esto es referencia educativa, no garantía de elegibilidad. MedillaForms INFORMA sobre la existencia de estos programas — no asesora, no representa, no garantiza aprobación.",
+  "_updated": "2026-05-31",
+  "_sources": ["IRS Section 501(r)", "KFF Health News 2026", "Families USA", "Congress.gov", "Dollar For"],
+  "_legal_note": "Informar sobre charity care es información pública federal. NO es asesoría legal. Hermes NUNCA debe decir 'usted califica' o 'le van a aprobar'. Siempre: 'podría calificar', 'según datos públicos', 'pregunte en el hospital'.",
+
+  "federal_background": {
+    "law": "IRS Section 501(r)",
+    "requirement": "Todo hospital sin fines de lucro (nonprofit) en EE.UU. está obligado por ley federal a mantener un programa escrito de asistencia financiera (Financial Assistance Policy) y una política de emergencia médica.",
+    "coverage": "100 millones de personas en EE.UU. califican para atención gratuita o con descuento en hospitales nonprofit.",
+    "threshold_typical": "100% cobertura bajo 200% FPL. Descuentos parciales hasta 400% FPL. Algunos hospitales llegan hasta 600% FPL.",
+    "retroactive": "Se puede aplicar DESPUÉS de recibir la factura. Incluso después de que fue enviada a colecciones.",
+    "nonprofit_billing_scandal": "Hospitales nonprofit han cobrado al menos $2.7 billones de dólares a pacientes que calificaban para asistencia financiera pero nunca fueron informados.",
+    "dollar_for": "Dollar For (dollarfor.org) — organización que ayuda a pacientes a eliminar deuda médica vía charity care. Eliminaron $55+ millones en facturas en 2025.",
+    "example_ny": "En Nueva York, una familia de 3-4 personas con ingresos de $100,000 tiene derecho a atención gratuita en hospitales sin seguro."
+  },
+
+  "hermes_script": {
+    "es": "Además de los posibles errores que encontramos, {hospital_name} es un hospital sin fines de lucro. Por ley federal, estos hospitales deben ofrecer programas de asistencia financiera. Según datos públicos, el umbral de ingresos para calificar es de aproximadamente {threshold}. Esto significa que, dependiendo de su ingreso familiar, podría recibir un descuento parcial o incluso total de su factura. Le recomiendo preguntar en el departamento de facturación de {hospital_name} sobre 'charity care' o 'asistencia financiera'. Es un derecho que existe y muchos pacientes no lo saben.",
+    "en": "In addition to the potential errors we found, {hospital_name} is a nonprofit hospital. By federal law, these hospitals must offer financial assistance programs. Based on public data, the income threshold to qualify is approximately {threshold}. This means that, depending on your household income, you could receive a partial or even full discount on your bill. I recommend asking {hospital_name}'s billing department about 'charity care' or 'financial assistance'. It's an existing right that many patients don't know about."
+  },
+
+  "hermes_legal_guardrails": {
+    "CAN_SAY": [
+      "Este hospital tiene un programa de asistencia financiera.",
+      "Según datos públicos, el umbral es {threshold} FPL.",
+      "Podría calificar para un descuento o eliminación de su factura.",
+      "Aquí está el teléfono del departamento de facturación: {phone}.",
+      "Le recomiendo preguntar sobre charity care.",
+      "Muchos pacientes en situaciones similares han aplicado.",
+      "Puede aplicar incluso si ya pagó o si tiene seguro."
+    ],
+    "CANNOT_SAY": [
+      "Usted califica para charity care.",
+      "Le van a aprobar la asistencia.",
+      "No pague — espere a que le aprueben.",
+      "Yo le ayudo a llenar la solicitud.",
+      "Garantizo que su factura será reducida.",
+      "Tiene derecho legal a recibir charity care."
+    ]
+  },
+
+  "hospitals": {
+    "cedars-sinai": {
+      "name": "Cedars-Sinai Medical Center",
+      "state": "CA",
+      "program": "Financial Assistance Program",
+      "threshold_fpl": "400%",
+      "details": "Free care for patients under 200% FPL. Sliding scale 200-400% FPL.",
+      "phone": "310-423-3480",
+      "url": "https://www.cedars-sinai.org/billing-insurance/financial-assistance.html"
+    },
+    "kaiser permanente": {
+      "name": "Kaiser Permanente",
+      "state": "multi",
+      "program": "Medical Financial Assistance (MFA)",
+      "threshold_fpl": "350%",
+      "details": "Free care under 200% FPL. Reduced charges up to 350% FPL. Covers all Kaiser regions.",
+      "phone": "Varies by region — ask at billing department",
+      "url": "https://healthy.kaiserpermanente.org/medical-financial-assistance"
+    },
+    "dignity health": {
+      "name": "Dignity Health / CommonSpirit",
+      "state": "multi",
+      "program": "Financial Assistance Program",
+      "threshold_fpl": "400%",
+      "details": "Free care for patients under 200% FPL. Discounts 200-400% FPL. All Dignity Health hospitals participate.",
+      "phone": "Varies by hospital",
+      "url": "https://www.dignityhealth.org/patients-and-visitors/financial-assistance"
+    },
+    "hca healthcare": {
+      "name": "HCA Healthcare",
+      "state": "multi",
+      "program": "Charity Care / Uninsured Discount",
+      "threshold_fpl": "200%",
+      "details": "Discounts for uninsured. Charity care policies vary by individual HCA hospital. Ask specifically at your location.",
+      "phone": "Varies by hospital",
+      "url": "https://hcahealthcare.com"
+    },
+    "ucla health": {
+      "name": "UCLA Health",
+      "state": "CA",
+      "program": "Financial Assistance Program",
+      "threshold_fpl": "400%",
+      "details": "Free care for patients under 200% FPL. Sliding scale discounts up to 400% FPL.",
+      "phone": "310-794-1000",
+      "url": "https://www.uclahealth.org/billing-insurance/financial-assistance"
+    },
+    "nyu langone": {
+      "name": "NYU Langone Health",
+      "state": "NY",
+      "program": "Financial Assistance Program",
+      "threshold_fpl": "400%",
+      "details": "Free care at or below 200% FPL. Discounts up to 400% FPL.",
+      "phone": "877-648-2964",
+      "url": "https://nyulangone.org/patients-families/billing/financial-assistance"
+    },
+    "mount sinai": {
+      "name": "Mount Sinai Health System",
+      "state": "NY",
+      "program": "Financial Assistance Program",
+      "threshold_fpl": "400%",
+      "details": "Free care for patients at or below 200% FPL. Sliding scale up to 400% FPL.",
+      "phone": "212-731-3100",
+      "url": "https://www.mountsinai.org/about/billing/financial-assistance"
+    }
+  },
+
+  "general_advice": {
+    "es": "Todos los hospitales sin fines de lucro en EE.UU. están obligados por ley federal (IRS Sección 501(r)) a tener un programa de asistencia financiera por escrito. 100 millones de personas califican. Puede aplicar después de recibir la factura, incluso si ya pagó o si tiene seguro médico. Pregunte en el departamento de facturación por 'charity care' o 'asistencia financiera'. También puede visitar dollarfor.org — una organización sin fines de lucro que ayuda gratuitamente a pacientes a navegar este proceso. Han eliminado más de $55 millones en deuda médica.",
+    "en": "All nonprofit hospitals in the US are required by federal law (IRS Section 501(r)) to have a written financial assistance program. 100 million people qualify. You can apply after receiving the bill, even if you already paid or have insurance. Ask the billing department about 'charity care' or 'financial assistance'. You can also visit dollarfor.org — a nonprofit that helps patients navigate this process for free. They've eliminated over $55 million in medical debt."
+  }
+}

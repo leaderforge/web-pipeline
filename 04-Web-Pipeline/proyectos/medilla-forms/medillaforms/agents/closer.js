@@ -1,0 +1,205 @@
+// =============================================================================
+// Closer Agent — FASE 4: Generate letters, deliver, report to Sheets
+// MUST validate payment_confirmed = true before delivering
+// =============================================================================
+
+import { pool, appendToConversationLog, buildConversationHistory } from "../middleware/session.js";
+import { sanitizeAgentResponse, getLetterFooterDisclaimer } from "../middleware/legal.js";
+import { deepseek } from "../services/deepseek.js";
+import { generateLetters, generateTextLetters } from "../services/generator.js";
+import { sheets } from "../services/sheets.js";
+import { telegram } from "../services/telegram.js";
+
+export class CloserAgent {
+  constructor(whatsapp, deepseekSvc, stripeSvc, session) {
+    this.whatsapp = whatsapp;
+    this.deepseek = deepseekSvc || deepseek;
+    this.stripe = stripeSvc;
+    this.session = session;
+    this.phone = session.whatsapp_number;
+  }
+
+  // ===========================================================================
+  // FASE 4 — Generate and deliver dispute letters
+  // DOUBLE CHECK: payment_confirmed MUST be true
+  // ===========================================================================
+  async deliver() {
+    // GUARD: Never deliver without payment
+    if (!this.session.payment_confirmed) {
+      console.error(`❌ Attempted delivery without payment. Session: ${this.session.id.slice(0, 8)}`);
+      await this.whatsapp.sendText(this.phone,
+        "Para recibir sus cartas de disputa, es necesario completar el pago de $29 USD. " +
+        "¿Cómo prefiere realizar su pago?"
+      );
+      return;
+    }
+
+    try {
+      // Step 1: Notify user
+      await this.whatsapp.sendText(this.phone,
+        "¡Perfecto! Estoy preparando sus cartas de disputa personalizadas. " +
+        "Recibirá dos imágenes:\n" +
+        "📄 Una en español (para usted)\n" +
+        "📄 Una en inglés (para el hospital)\n\n" +
+        "Un momento por favor..."
+      );
+
+      await pool.query(
+        `UPDATE sessions SET state = 'delivering', updated_at = NOW() WHERE id = $1`,
+        [this.session.id]
+      );
+
+      // Step 2: Generate letters
+      const analysis = this.session.analysis_result || {};
+      const customerName = this.session.whatsapp_number || "Cliente";
+
+      let esBuffer, enBuffer;
+      try {
+        const letters = await generateLetters(analysis, customerName);
+        esBuffer = letters.es_bytes;
+        enBuffer = letters.en_bytes;
+        console.log(`📄 Letters generated: ES=${esBuffer.length}B, EN=${enBuffer.length}B`);
+      } catch (e) {
+        // Playwright not available — fallback to text
+        console.warn(`⚠️ Playwright failed, falling back to text: ${e.message}`);
+        const textLetters = generateTextLetters(analysis, customerName);
+
+        await this.whatsapp.sendText(this.phone,
+          `📄 *Carta en Español:*\n\n${textLetters.es_text.slice(0, 1500)}`
+        );
+        await this.whatsapp.sendText(this.phone,
+          `📄 *Carta en Inglés:*\n\n${textLetters.en_text.slice(0, 1500)}`
+        );
+
+        // Still give instructions
+        await this._sendInstructions();
+        await this._reportToSheets();
+        return;
+      }
+
+      // Step 3: Send Spanish letter
+      await this.whatsapp.sendImage(this.phone, esBuffer,
+        "📄 Carta de disputa en ESPAÑOL — para su referencia"
+      );
+
+      // Step 4: Send English letter
+      await this.whatsapp.sendImage(this.phone, enBuffer,
+        "📄 Dispute letter in ENGLISH — para enviar al hospital"
+      );
+
+      // Step 5: Send instructions
+      await this._sendInstructions();
+
+      // Step 6: Report to Google Sheets
+      await this._reportToSheets();
+
+      // Step 7: Update session state
+      await pool.query(
+        `UPDATE sessions
+         SET state = 'closed',
+             session_closed_at = NOW(),
+             sheets_reported = true,
+             updated_at = NOW()
+         WHERE id = $1`,
+        [this.session.id]
+      );
+      this.session.state = "closed";
+
+      console.log(`✅ Session ${this.session.id.slice(0, 8)} completed successfully`);
+
+    } catch (e) {
+      console.error("❌ Delivery error:", e);
+      await telegram.alertServerError(e);
+      await this.whatsapp.sendText(this.phone,
+        "Disculpe, tuve un problema técnico generando sus cartas. " +
+        "No se preocupe — estoy trabajando en resolverlo. Se las enviaré en unos minutos."
+      );
+    }
+  }
+
+  // ===========================================================================
+  // Send mailing instructions
+  // ===========================================================================
+  async _sendInstructions() {
+    const hospital = this.session.hospital_name || "el hospital";
+
+    await this.whatsapp.sendText(this.phone,
+      `📝 *Instrucciones para enviar su disputa:*\n\n` +
+      `1️⃣ Imprima la carta en INGLÉS (la segunda imagen)\n` +
+      `2️⃣ Fírmela con su nombre completo\n` +
+      `3️⃣ Envíela por *correo certificado* al departamento de facturación de *${hospital}*\n` +
+      `4️⃣ Guarde el recibo del correo certificado\n` +
+      `5️⃣ Conserve una copia de la carta firmada\n\n` +
+      `El hospital suele responder en un plazo de 30 días.\n\n` +
+      `¿Tiene alguna duda sobre el proceso?`
+    );
+  }
+
+  // ===========================================================================
+  // Report completed session to Google Sheets
+  // ===========================================================================
+  async _reportToSheets() {
+    if (this.session.sheets_reported) {
+      console.log("📊 Already reported — skipping");
+      return;
+    }
+
+    // Ensure headers exist
+    await sheets.ensureHeaders();
+
+    // Append session data
+    const success = await sheets.appendSession(this.session);
+    if (success) {
+      await pool.query(
+        `UPDATE sessions SET sheets_reported = true, updated_at = NOW() WHERE id = $1`,
+        [this.session.id]
+      );
+    }
+  }
+
+  // ===========================================================================
+  // Handle post-delivery messages
+  // ===========================================================================
+  async handlePostDelivery(text) {
+    const textLower = text.toLowerCase();
+
+    // Refund request
+    if (this._matches(textLower, [
+      "reembolso", "devolución", "refund", "cancelar", "regresar",
+      "dinero", "cancel", "money back", "return",
+    ])) {
+      await this.whatsapp.sendText(this.phone,
+        "Entiendo. Proceso su devolución sin problema — tiene 7 días de garantía.\n\n" +
+        "¿Me diría brevemente por qué el servicio no fue lo que esperaba? Me ayuda a mejorar."
+      );
+      // Refund would be processed manually or via Stripe API
+      await telegram.sendMessage(
+        `⚠️ <b>Solicitud de refund</b>\nSesión: <code>${this.session.id.slice(0, 8)}</code>\n` +
+        `WhatsApp: ***${this.phone.slice(-4)}\nHospital: ${this.session.hospital_name || "N/A"}\n` +
+        `Método de pago: ${this.session.payment_method}\n` +
+        `<i>Procesar manualmente si fue Zelle.</i>`
+      );
+      return;
+    }
+
+    // Follow-up questions
+    const history = buildConversationHistory(this.session.conversation_log);
+    const response = await this.deepseek.chat(
+      "closer_delivery",
+      history,
+      text,
+      { hospital_name: this.session.hospital_name || "" }
+    );
+    await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(response));
+    await appendToConversationLog(this.session.id, "assistant", response);
+  }
+
+  // ===========================================================================
+  // Helpers
+  // ===========================================================================
+  _matches(text, keywords) {
+    return keywords.some((kw) => text.includes(kw));
+  }
+}
+
+export default { CloserAgent };

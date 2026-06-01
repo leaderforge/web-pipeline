@@ -1,0 +1,10 @@
+{first_name},
+
+I found {business_name} on Google Maps in {city}. {website_observation}
+
+{I build websites for welding and fabrication shops. Actually just finished one for a shop here in Riverside — mobile-friendly, gets leads while they're under the hood.}
+
+Want me to send you the link? Takes 10 seconds to look — you tell me if it's worth a conversation or not.
+
+Daniel
+daniel@leaderforgeai.com

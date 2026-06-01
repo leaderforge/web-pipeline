@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedillaForms — Master Blueprint: Legal, Infrastructure, Operations & Hermes AI Brain</title>
+<style>
+  :root {
+    --bg: #0a0e17; --card: #131a2b; --card2: #182032; --border: #253349;
+    --text: #e2e8f0; --muted: #8899b4; --accent: #3b82f6; --accent2: #60a5fa;
+    --green: #22c55e; --amber: #f59e0b; --red: #ef4444; --purple: #a855f7;
+    --pink: #ec4899; --teal: #14b8a6; --orange: #f97316;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; line-height: 1.7; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  /* Header */
+  .master-header { background: linear-gradient(160deg, #0c1929 0%, #0f172a 40%, #1a1040 100%); padding: 4rem 2rem; text-align: center; border-bottom: 4px solid var(--accent); position: relative; overflow: hidden; }
+  .master-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.15), transparent 70%); pointer-events: none; }
+  .master-header h1 { font-size: 2.6rem; margin-bottom: 0.5rem; position: relative; z-index: 1; }
+  .master-header .subtitle { color: var(--muted); font-size: 1.15rem; max-width: 750px; margin: 0 auto; position: relative; z-index: 1; }
+  .master-header .badge-row { margin-top: 1.5rem; position: relative; z-index: 1; }
+  .badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin: 0 4px; }
+  .badge.legal { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .badge.infra { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .badge.ops { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .badge.ai { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+
+  /* Navigation */
+  .toc { background: var(--card); border-radius: 12px; padding: 2rem; margin: 2rem 0; border: 1px solid var(--border); }
+  .toc h3 { margin-bottom: 1rem; color: var(--accent2); }
+  .toc ol { columns: 2; column-gap: 2rem; margin-left: 1.5rem; }
+  @media (max-width: 768px) { .toc ol { columns: 1; } }
+  .toc li { margin: 0.4rem 0; color: var(--muted); }
+  .toc li a { color: var(--text); text-decoration: none; }
+  .toc li a:hover { color: var(--accent2); }
+
+  h2 { font-size: 1.7rem; margin: 3rem 0 1.2rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent); }
+  h2 .section-num { color: var(--accent); font-size: 0.9rem; margin-right: 0.5rem; }
+  h3 { font-size: 1.25rem; margin: 2rem 0 1rem; color: var(--accent2); }
+  h4 { margin: 1.2rem 0 0.6rem; font-size: 1.05rem; }
+
+  /* Cards */
+  .card { background: var(--card); border-radius: 10px; padding: 1.5rem; margin: 1rem 0; border: 1px solid var(--border); }
+  .card.highlight { border-left: 4px solid var(--accent); }
+  .card.green { border-left: 4px solid var(--green); }
+  .card.red { border-left: 4px solid var(--red); }
+  .card.amber { border-left: 4px solid var(--amber); }
+  .card.purple { border-left: 4px solid var(--purple); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.93rem; }
+  th { background: var(--card2); text-align: left; padding: 0.75rem 1rem; font-weight: 600; border-bottom: 2px solid var(--accent); color: var(--accent2); }
+  td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: rgba(19,26,43,0.5); }
+
+  /* Metric grid */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .metric { background: var(--card); border-radius: 10px; padding: 1.5rem; text-align: center; border: 1px solid var(--border); }
+  .metric .num { font-size: 1.8rem; font-weight: 800; color: var(--accent2); }
+  .metric .lbl { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
+
+  /* Architecture diagram */
+  .arch-diagram { background: var(--card); border-radius: 16px; padding: 2rem; margin: 2rem 0; border: 1px solid var(--border); overflow-x: auto; }
+  .arch-flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; min-width: 900px; padding: 1rem 0; }
+  .arch-node { background: var(--card2); border: 2px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; text-align: center; min-width: 110px; }
+  .arch-node.client { border-color: var(--green); }
+  .arch-node.wa { border-color: #25d366; }
+  .arch-node.railway { border-color: var(--purple); }
+  .arch-node.ai { border-color: var(--pink); }
+  .arch-node.stripe { border-color: #635bff; }
+  .arch-node label { display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.25rem; }
+  .arch-node small { font-size: 0.7rem; color: var(--muted); }
+  .arch-arrow { font-size: 1.5rem; color: var(--muted); margin: 0 0.5rem; flex-shrink: 0; }
+
+  /* Code blocks */
+  pre { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; overflow-x: auto; margin: 1rem 0; font-size: 0.85rem; line-height: 1.5; }
+  code { font-family: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace; font-size: 0.85rem; }
+  pre code { color: #c9d1d9; }
+
+  /* Callout */
+  .callout { padding: 1.2rem 1.5rem; border-radius: 10px; margin: 1.5rem 0; font-size: 0.95rem; }
+  .callout.warning { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-left: 4px solid var(--red); }
+  .callout.info { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); border-left: 4px solid var(--accent); }
+  .callout.success { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); border-left: 4px solid var(--green); }
+  .callout strong { display: block; margin-bottom: 0.3rem; }
+
+  /* Flow steps */
+  .flow-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .flow-step { background: var(--card); border-radius: 10px; padding: 1.2rem; text-align: center; border: 1px solid var(--border); position: relative; }
+  .flow-step .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-weight: 800; font-size: 0.9rem; }
+  .flow-step h4 { font-size: 0.9rem; margin: 0.5rem 0; }
+
+  /* Two column */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* Comparison panels */
+  .compare-panels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+  @media (max-width: 768px) { .compare-panels { grid-template-columns: 1fr; } }
+  .compare-panel { background: var(--card); border-radius: 10px; padding: 1.5rem; border: 2px solid var(--border); text-align: center; }
+  .compare-panel.selected { border-color: var(--green); box-shadow: 0 0 20px rgba(34,197,94,0.1); }
+  .compare-panel h4 { margin-bottom: 0.75rem; }
+  .compare-panel .price { font-size: 2.5rem; font-weight: 900; color: var(--accent2); }
+
+  /* Checklist */
+  .checklist { list-style: none; margin: 1rem 0; }
+  .checklist li { padding: 0.4rem 0; }
+  .checklist li::before { content: '☐ '; color: var(--muted); margin-right: 0.5rem; }
+
+  footer { text-align: center; color: var(--muted); padding: 3rem 2rem; border-top: 1px solid var(--border); margin-top: 3rem; font-size: 0.85rem; }
+
+  .page-break { border: none; border-top: 1px dashed var(--border); margin: 3rem 0; }
+</style>
+</head>
+<body>
+
+<div class="master-header">
+  <h1>MedillaForms — Master Blueprint</h1>
+  <p class="subtitle">Legal Framework · Infrastructure Architecture · WhatsApp Operations · Hermes AI Brain · Form Methodology · Pricing Strategy</p>
+  <div class="badge-row">
+    <span class="badge legal">Legal Framework</span>
+    <span class="badge infra">Infrastructure</span>
+    <span class="badge ops">WhatsApp Operations</span>
+    <span class="badge ai">Hermes AI Brain</span>
+  </div>
+  <p style="margin-top:1rem; color: var(--muted); font-size:0.85rem;">May 27, 2026 — Research-based blueprint with 70+ pages of Firecrawl data</p>
+</div>
+
+<div class="container">
+
+<!-- ====== TABLE OF CONTENTS ====== -->
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#s1">Executive Proposal & Service Definition</a></li>
+    <li><a href="#s2">Legal Framework & Compliance</a></li>
+    <li><a href="#s3">Medical Forms Landscape</a></li>
+    <li><a href="#s4">Form-Filling Methodology: The "Show, Don't Tell" System</a></li>
+    <li><a href="#s5">WhatsApp Conversational Architecture</a></li>
+    <li><a href="#s6">Hermes AI Brain: Autonomous Operations</a></li>
+    <li><a href="#s7">Infrastructure: Railway + Stripe + OpenAI + WhatsApp</a></li>
+    <li><a href="#s8">Pricing Strategy & A/B Testing Framework</a></li>
+    <li><a href="#s9">Customer Journey: End-to-End Flow</a></li>
+    <li><a href="#s10">Content & Marketing Integration</a></li>
+    <li><a href="#s11">Risk Mitigation & Compliance Checklist</a></li>
+    <li><a href="#s12">Launch Sequence: 6-Week Sprint</a></li>
+    <li><a href="#s13">Hermes Operations: Visual Architecture Diagram</a></li>
+  </ol>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 1: EXECUTIVE PROPOSAL -->
+<!-- ================================================================================= -->
+<h2 id="s1"><span class="section-num">01</span> Executive Proposal & Service Definition</h2>
+
+<div class="card highlight">
+  <h3>What MedillaForms IS</h3>
+  <p>MedillaForms is an <strong>AI-powered patient advocacy and medical bill review assistant</strong> delivered through WhatsApp in Spanish. We help Hispanic patients in the United States identify billing errors, understand their charges, and generate professional dispute letters — all without a lawyer and at a flat, affordable price.</p>
+</div>
+
+<div class="card red">
+  <h3>What MedillaForms IS NOT</h3>
+  <ul>
+    <li>We are NOT a law firm or legal service</li>
+    <li>We do NOT provide legal advice or predict case outcomes</li>
+    <li>We do NOT represent clients before any court or agency</li>
+    <li>We do NOT make decisions for the client — we educate and guide</li>
+    <li>We do NOT negotiate directly with hospitals or insurance companies on behalf of clients</li>
+  </ul>
+</div>
+
+<div class="card green">
+  <h3>Service Positioning Statement</h3>
+  <p style="font-size:1.1rem; font-style:italic;">"Somos un servicio educativo de análisis de facturas médicas. Te ayudamos a entender cada cargo, identificar posibles errores, y te damos las herramientas para disputarlos — como un amigo que sabe del tema, pero en WhatsApp."</p>
+  <p style="color:var(--muted); margin-top:0.5rem;">("We are an educational medical bill analysis service. We help you understand every charge, identify possible errors, and give you the tools to dispute them — like a knowledgeable friend, but on WhatsApp.")</p>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 2: LEGAL FRAMEWORK -->
+<!-- ================================================================================= -->
+<h2 id="s2"><span class="section-num">02</span> Legal Framework & Compliance</h2>
+
+<div class="callout warning">
+  <strong>CRITICAL: This section defines the legal boundaries of the entire operation. Violating these boundaries exposes the business to UPL (Unauthorized Practice of Law) charges, fines, and shutdown.</strong>
+  Every team member, every AI prompt, and every customer interaction must operate within this framework.
+</div>
+
+<h3>2.1 The Unauthorized Practice of Law (UPL) — The Bright Line</h3>
+
+<div class="card">
+  <p>UPL is defined state-by-state, but the core principle is universal: <strong>only licensed attorneys can give legal advice, represent clients in legal matters, or make legal decisions for a client.</strong></p>
+
+  <table>
+    <tr><th style="width:50%">PERMITTED (What We CAN Do)</th><th style="width:50%">PROHIBITED (What We CANNOT Do)</th></tr>
+    <tr>
+      <td style="color:var(--green);">✅ Explain what each line item on a bill means in plain language</td>
+      <td style="color:var(--red);">❌ Tell a client what amount they "legally owe" or "don't owe"</td>
+    </tr>
+    <tr>
+      <td style="color:var(--green);">✅ Show the client where to find the CPT code and what it represents</td>
+      <td style="color:var(--red);">❌ Recommend which specific legal argument to use in a dispute</td>
+    </tr>
+    <tr>
+      <td style="color:var(--green);">✅ Provide an educational template letter for disputing a bill</td>
+      <td style="color:var(--red);">❌ Fill out legal forms on behalf of the client</td>
+    </tr>
+    <tr>
+      <td style="color:var(--green);">✅ Point out that "80% of medical bills contain errors" (public fact)</td>
+      <td style="color:var(--red);">❌ Say "this bill is fraudulent" or "they're overcharging you illegally"</td>
+    </tr>
+    <tr>
+      <td style="color:var(--green);">✅ Guide the client on how to request an itemized bill under HIPAA</td>
+      <td style="color:var(--red);">❌ Contact the hospital or insurance company on the client's behalf</td>
+    </tr>
+    <tr>
+      <td style="color:var(--green);">✅ Flag common billing patterns: "This code is often used for a 15-min visit but your record shows a 60-min visit"</td>
+      <td style="color:var(--red);">❌ "You've been a victim of upcoding — that's illegal and you should sue"</td>
+    </tr>
+    <tr>
+      <td style="color:var(--green);">✅ Educate about charity care policies and where to find applications</td>
+      <td style="color:var(--red);">❌ Guarantee or predict charity care approval</td>
+    </tr>
+  </table>
+</div>
+
+<h3>2.2 Legal Precedent: Fill-in-the-Blank Forms Are Protected</h3>
+
+<div class="card amber">
+  <p>Multiple court rulings and legal analyses support that providing "fill in the blanks" forms and general instructions is NOT UPL. Key precedents:</p>
+  <ul>
+    <li><strong>Upsolve v. James (2023):</strong> A nonprofit providing free bankruptcy form assistance won against UPL charges. The court recognized that self-help tools are protected speech, not legal practice.</li>
+    <li><strong>ABA Model Guidelines:</strong> "Filling in the blanks" on standard forms with information provided by the client does not constitute UPL when it involves no legal judgment.</li>
+    <li><strong>Legal Document Assistants (LDAs):</strong> California and several other states specifically license non-lawyers to help consumers fill out legal forms — proving the distinction between "legal advice" and "form assistance" is legally recognized.</li>
+    <li><strong>TurboTax model:</strong> Intuit provides tax form assistance to millions without being a law firm. The key: they guide you through YOUR information, they don't make legal judgments for you.</li>
+  </ul>
+</div>
+
+<h3>2.3 Disclaimer Architecture — Multi-Layer Protection</h3>
+
+<div class="card highlight">
+  <h4>Layer 1: Permanent Website Disclaimer (Footer)</h4>
+  <pre><code>MedillaForms NO es un bufete de abogados. NO damos asesoría legal. Nuestro
+servicio es EDUCATIVO: analizamos tu factura médica, identificamos posibles
+errores usando inteligencia artificial, y te proporcionamos plantillas educativas
+para que TÚ puedas disputar los cargos. No te representamos ante ningún
+tribunal, hospital, o aseguradora. Si necesitas asesoría legal, contacta a un
+abogado licenciado en tu estado.</code></pre>
+
+  <h4>Layer 2: WhatsApp Welcome Message (Before Any Analysis)</h4>
+  <pre><code>¡Hola! 👋 Bienvenido/a a MedillaForms. Antes de empezar, queremos que sepas:
+
+⚡ Somos un servicio EDUCATIVO de análisis de facturas médicas.
+⚡ NO somos abogados. NO damos asesoría legal.
+⚡ Te ayudamos a ENTENDER tu factura y encontrar posibles errores.
+⚡ TÚ decides qué hacer con esa información.
+
+¿Tienes tu factura médica a la mano? Envíame una foto y comenzamos. 📄</code></pre>
+
+  <h4>Layer 3: On Every Dispute Letter Generated</h4>
+  <pre><code>--- DISCLAIMER ---
+Esta plantilla fue generada con fines EDUCATIVOS por MedillaForms. No constituye
+asesoría legal. Revísala cuidadosamente y modifícala según tu situación personal.
+Si tienes dudas legales, consulta con un abogado licenciado en tu estado.
+MedillaForms no es un bufete de abogados.</code></pre>
+
+  <h4>Layer 4: Before Purchase Confirmation</h4>
+  <pre><code>Al continuar con tu compra, confirmas que entiendes y aceptas que:
+• MedillaForms es un servicio EDUCATIVO de análisis de facturas.
+• NO somos abogados y NO proporcionamos asesoría legal.
+• Los resultados son sugerencias basadas en patrones comunes de errores.
+• Tú eres responsable de revisar y enviar cualquier disputa.
+• Este servicio no garantiza resultados específicos.
+
+[✓] Entiendo y acepto — Continuar al pago ($29 USD)</code></pre>
+</div>
+
+<h3>2.4 Patient Advocacy — Legal Standing</h3>
+
+<div class="card green">
+  <p><strong>Patient Advocacy is NOT the practice of law.</strong> It is a recognized profession with its own certification (Patient Advocate Certification Board — PACB) and no state requires a law license to be a patient advocate.</p>
+  <p>Key facts:</p>
+  <ul>
+    <li>No formal licensing requirements to become a patient advocate in any U.S. state (WGU, 2025)</li>
+    <li>PACB offers Board Certified Patient Advocate (BCPA) credential — voluntary, not legally required</li>
+    <li>Patient advocates routinely help patients understand bills, navigate hospital systems, and apply for financial assistance — all without being lawyers</li>
+    <li>Our service fits squarely within the patient advocacy framework: we educate, inform, and empower — we don't represent</li>
+  </ul>
+</div>
+
+<h3>2.5 HIPAA Considerations</h3>
+
+<div class="card">
+  <p>HIPAA gives patients the legal right to access their own medical and billing records. Under HIPAA:</p>
+  <ul>
+    <li>Patients have the RIGHT to request and receive their itemized bills and medical records from providers (HHS.gov)</li>
+    <li>We can guide clients on HOW to request these records (this is patient education, not legal advice)</li>
+    <li>If a client sends us their bill, they are voluntarily sharing their own data — we're not requesting it from a provider</li>
+    <li>We should implement strong data handling: encrypt bills at rest, delete after analysis complete (or offer opt-in retention), never share or sell client data</li>
+    <li>We are NOT a "covered entity" under HIPAA (we're not a healthcare provider, insurer, or clearinghouse), but we should follow HIPAA-level data security as best practice</li>
+  </ul>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 3: MEDICAL FORMS LANDSCAPE -->
+<!-- ================================================================================= -->
+<h2 id="s3"><span class="section-num">03</span> Medical Forms Landscape — What We're Working With</h2>
+
+<h3>3.1 Types of Documents Clients Will Send Us</h3>
+
+<table>
+  <tr><th>Document</th><th>What It Is</th><th>Key Fields We Analyze</th><th>Our Approach</th></tr>
+  <tr>
+    <td><strong>Itemized Bill</strong><br>(Estado de Cuenta Detallado)</td>
+    <td>The detailed hospital bill listing every charge: room, medications, procedures, supplies, lab work. Usually 3-20 pages.</td>
+    <td>CPT codes, dates of service, duplicate charges, quantity discrepancies, chargemaster rates vs. insurance allowed amounts, "miscellaneous" charges</td>
+    <td>OCR → AI analysis → highlight suspect charges with arrows/annotations on the image</td>
+  </tr>
+  <tr>
+    <td><strong>Explanation of Benefits (EOB)</strong><br>(Explicación de Beneficios)</td>
+    <td>Insurance company's breakdown of what was billed, what was covered, what patient owes. NOT a bill.</td>
+    <td>Billed amount vs. allowed amount, denied line items, deductible/copay calculations, out-of-network charges labeled as in-network</td>
+    <td>Cross-reference EOB amounts with itemized bill to find discrepancies</td>
+  </tr>
+  <tr>
+    <td><strong>UB-04 (CMS-1450)</strong><br>(Formulario de Reclamo Institucional)</td>
+    <td>Standard institutional claim form used by hospitals. Contains ICD-10 diagnosis codes, procedure codes, revenue codes.</td>
+    <td>Revenue codes, diagnosis-related group (DRG), admission/discharge dates (for length-of-stay billing errors), condition codes</td>
+    <td>Guide client on where to find this form. Analyze field-by-field if provided.</td>
+  </tr>
+  <tr>
+    <td><strong>CMS-1500</strong><br>(Formulario de Reclamo Profesional)</td>
+    <td>Professional claim form for individual doctors/specialists. Contains CPT/HCPCS codes per service.</td>
+    <td>CPT codes, units billed, modifier codes, place of service codes, referring provider</td>
+    <td>Same as UB-04 — guide to obtain, then analyze.</td>
+  </tr>
+  <tr>
+    <td><strong>Charity Care Application</strong><br>(Solicitud de Asistencia Financiera/Caridad)</td>
+    <td>Hospital-specific form to apply for free or reduced-cost care. Required by law for nonprofit hospitals (IRS 501(r)).</td>
+    <td>Income thresholds (usually 200-400% FPL), asset tests, required documentation, submission deadlines</td>
+    <td>We fill in their financial data they tell us into an annotated guide of the form. They sign and submit.</td>
+  </tr>
+  <tr>
+    <td><strong>Good Faith Estimate</strong><br>(Presupuesto Estimado)</td>
+    <td>For uninsured/self-pay patients. Provider must give cost estimate before service under No Surprises Act.</td>
+    <td>Compare GFE to final bill — if final is $400+ more than estimate, patient can dispute</td>
+    <td>Flag this as a potential dispute trigger.</td>
+  </tr>
+</table>
+
+<h3>3.2 Can We Download and Share These Forms?</h3>
+
+<div class="callout success">
+  <strong>YES — with proper handling.</strong>
+  <ul>
+    <li><strong>Standard government forms (UB-04, CMS-1500):</strong> Public domain. Freely available from CMS.gov. We CAN download, annotate, and share screenshots/guides of these forms.</li>
+    <li><strong>Hospital charity care applications:</strong> Available on each hospital's website. We CAN download and annotate as guides for clients. Each hospital has its own form.</li>
+    <li><strong>HIPAA release forms:</strong> Generic templates are public. Hospital-specific ones are available from each hospital.</li>
+    <li><strong>The client's own bill/EOB:</strong> The client sends it to us. They own this data. We analyze and return annotated versions back to them.</li>
+  </ul>
+</div>
+
+<div class="callout warning">
+  <strong>What we CANNOT do:</strong>
+  <ul>
+    <li>Sign any form on behalf of a client</li>
+    <li>Submit any form to a hospital, insurer, or government agency on behalf of a client</li>
+    <li>Fill in fields that require legal judgment (we can suggest, they decide)</li>
+    <li>Represent ourselves as the client or as their legal representative</li>
+  </ul>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 4: FORM-FILLING METHODOLOGY -->
+<!-- ================================================================================= -->
+<h2 id="s4"><span class="section-num">04</span> Form-Filling Methodology: The "Show, Don't Tell" System</h2>
+
+<div class="card highlight">
+  <p>This is the OPERATIONAL CORE of MedillaForms. How exactly do we help a Spanish-speaking client fill out complex medical forms through WhatsApp — using ONLY images, text, and voice notes?</p>
+</div>
+
+<h3>4.1 The Progressive Disclosure Method</h3>
+
+<p>We never dump a full form on the client. We use a 3-layer progressive system:</p>
+
+<div class="flow-steps">
+  <div class="flow-step">
+    <div class="step-num">1</div>
+    <h4>Layer 1: Overview Shot</h4>
+    <p>Full form image with numbered sections circled. "Esta es la solicitud de charity care. Tiene 5 secciones. Vamos una por una."</p>
+    <small style="color:var(--muted);">Client sees the whole map first — reduces anxiety</small>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">2</div>
+    <h4>Layer 2: Section Close-Up</h4>
+    <p>Zoomed-in crop of ONE section. Arrows pointing to each field. "Sección 1: Información Personal. Solo necesitas: nombre, dirección, fecha de nacimiento."</p>
+    <small style="color:var(--muted);">One section at a time — no overwhelm</small>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">3</div>
+    <h4>Layer 3: Field-by-Field Guide</h4>
+    <p>Individual field image with annotation: "Aquí pon tu ingreso mensual bruto. En tu caso, basado en lo que me dijiste ($2,400/mes), escribe '2,400'."</p>
+    <small style="color:var(--muted);">Specific instruction per field — with THEIR data</small>
+  </div>
+</div>
+
+<h3>4.2 Image Annotation Protocol</h3>
+
+<table>
+  <tr><th>Annotation Type</th><th>Use Case</th><th>Visual Style</th><th>Example</th></tr>
+  <tr>
+    <td><span style="color:#22c55e;">🟢 Green Arrow + Text</span></td>
+    <td>"Fill this field like this" — straightforward fields</td>
+    <td>Green arrow pointing to field + text box with suggested value</td>
+    <td>"Escribe tu nombre completo: Juan Pérez García"</td>
+  </tr>
+  <tr>
+    <td><span style="color:#f59e0b;">🟡 Yellow Highlight</span></td>
+    <td>"Pay attention — this is tricky" — fields that commonly cause errors</td>
+    <td>Yellow highlight over field + warning icon + explanation</td>
+    <td>"Cuidado: aquí preguntan ingreso NETO, no bruto. Después de impuestos."</td>
+  </tr>
+  <tr>
+    <td><span style="color:#ef4444;">🔴 Red Circle</span></td>
+    <td>"Critical error alert on your bill" — pointing out billing problems</td>
+    <td>Red circle around the suspect charge + text explaining the issue</td>
+    <td>"Este cargo de $4,200 por 'sala de operaciones' aparece duplicado (línea 12 y línea 31)"</td>
+  </tr>
+  <tr>
+    <td><span style="color:#3b82f6;">🔵 Blue Box</span></td>
+    <td>Educational context — explaining what a term or code means</td>
+    <td>Blue box with definition/explanation near the relevant field</td>
+    <td>"CPT 99285 = visita de emergencia nivel 5 (la más cara). Debe cumplir criterios específicos."</td>
+  </tr>
+</table>
+
+<h3>4.3 The Question-Based Data Collection</h3>
+
+<p>Instead of showing a form and saying "fill it out," Hermes asks questions conversationally and populates an internal data model. THEN shows the form with their data pre-filled in the guide images.</p>
+
+<div class="card">
+  <h4>Example: Charity Care Application Data Collection</h4>
+  <pre><code>HERMES: "Vamos a llenar tu solicitud de asistencia financiera.
+Te voy a hacer unas preguntas simples."
+
+HERMES: "¿Cuántas personas viven en tu hogar, incluyéndote?"
+CLIENT: "4"
+
+HERMES: "¿Cuál es el ingreso mensual total de tu hogar?
+Suma todos los ingresos: trabajo, ayuda del gobierno, todo."
+CLIENT: "Unos $2,800 al mes"
+
+HERMES: "¿Tienes algún ahorro en el banco?
+No te preocupes, esto es confidencial."
+CLIENT: "Como $500"
+
+[30 seconds later — Hermes generates annotated form images]
+
+HERMES: "📄 Listo. Preparé tu solicitud. Mira:
+[IMAGE: Sección 1 con datos del cliente anotados]
+En la Sección 1 ya puse tus datos. Revisa que estén bien.
+
+[IMAGE: Sección 2 — ingresos]
+En la Sección 2, basado en $2,800/mes para 4 personas,
+posiblemente calificas para 100% de descuento.
+Escribe '$2,800' donde señala la flecha verde. ✅
+
+[IMAGE: Sección 3 — firmas]
+NO firmes todavía. Esta sección la firmas frente al notario
+del hospital. Déjala en blanco por ahora. ⚠️
+
+¿Todo claro hasta aquí? Pregúntame cualquier duda."</code></pre>
+</div>
+
+<h3>4.4 Voice Notes — The Human Touch</h3>
+
+<div class="card green">
+  <p>For complex explanations, Hermes can send voice notes in Spanish (via TTS or pre-recorded snippets). Voice notes:</p>
+  <ul>
+    <li><strong>Build trust faster</strong> — hearing a voice makes the service feel human</li>
+    <li><strong>Are better for complex explanations</strong> — some things take too many text messages</li>
+    <li><strong>Accommodate lower literacy</strong> — some clients may struggle with reading Spanish</li>
+    <li><strong>Can use ElevenLabs/OpenAI TTS</strong> with a warm, friendly Spanish voice</li>
+  </ul>
+  <p style="color:var(--muted); margin-top:0.5rem;">Strategy: Text for quick instructions. Voice for explanations over 30 seconds. Images for showing forms. The three work together.</p>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 5: WHATSAPP ARCHITECTURE -->
+<!-- ================================================================================= -->
+<h2 id="s5"><span class="section-num">05</span> WhatsApp Conversational Architecture</h2>
+
+<h3>5.1 WhatsApp Business API — Technical Setup</h3>
+
+<div class="metric-grid">
+  <div class="metric"><div class="num">$0</div><div class="lbl">WhatsApp Cloud API (free tier: 1,000 service convos/mo free)</div></div>
+  <div class="metric"><div class="num">~$0.01-0.05</div><div class="lbl">Per utility message (varies by country)</div></div>
+  <div class="metric"><div class="num">~$0.07-0.14</div><div class="lbl">Per marketing message (outbound templates)</div></div>
+  <div class="metric"><div class="num">24hr</div><div class="lbl">Free reply window after user messages us</div></div>
+</div>
+
+<div class="card">
+  <h4>Message Type Strategy</h4>
+  <table>
+    <tr><th>Type</th><th>Cost</th><th>When We Use It</th></tr>
+    <tr><td>Service (user initiates)</td><td>~$0.01/msg (first 1K free/mo)</td><td>Client sends us a bill, asks a question, requests help — 90% of our interactions fall here</td></tr>
+    <tr><td>Utility (we initiate, transactional)</td><td>~$0.02-0.05/msg</td><td>Payment confirmation, "your analysis is ready," "your dispute letter is generated"</td></tr>
+    <tr><td>Marketing (we initiate, promotional)</td><td>~$0.07-0.14/msg</td><td>Follow-up after 7 days: "¿Pudiste resolver tu factura? Podemos ayudar con otra." Used sparingly.</td></tr>
+  </table>
+</div>
+
+<h3>5.2 Conversation Flow Design</h3>
+
+<div class="card">
+  <h4>Phase 1: Welcome & Intake (Automated)</h4>
+  <pre><code>USER: [Sends photo of medical bill]
+HERMES: "¡Gracias! 📄 Ya recibí tu factura.
+Déjame analizarla. Antes de empezar: [disclaimer legal]
+¿Me confirmas que quieres que analice esta factura por $29 USD?"</code></pre>
+</div>
+
+<div class="card">
+  <h4>Phase 2: Analysis (AI Processing — 30-90 seconds)</h4>
+  <pre><code>HERMES: "Estoy analizando tu factura... 🔍"
+HERMES: "Procesando 47 cargos individuales..."
+HERMES: "Comparando con bases de datos de precios justos..."
+HERMES: "Revisando códigos CPT y patrones de facturación..."
+
+[Behind the scenes: OCR → GPT-4 analysis → annotation generation]</code></pre>
+</div>
+
+<div class="card">
+  <h4>Phase 3: Stripe Payment Link</h4>
+  <pre><code>HERMES: "✅ Análisis completado. Encontré varias cosas que revisar.
+Para ver el informe completo, el pago es de $29 USD.
+[Stripe Payment Link]
+¿Quieres proceder?"</code></pre>
+</div>
+
+<div class="card">
+  <h4>Phase 4: Results Delivery (Post-Payment)</h4>
+  <pre><code>HERMES: "¡Gracias por tu pago! 🙌 Aquí está tu análisis:
+
+📊 RESUMEN:
+• Cargos totales: $12,847
+• Posibles errores: 4
+• Ahorro potencial estimado: $3,200-$4,800
+
+🔴 ERROR #1: Cargo duplicado — Sala de Operaciones
+[IMAGE: Red-circled duplicate charge]
+Monto: $4,200 | Este cargo aparece en línea 12 y línea 31
+
+🟡 ALERTA #2: Código de sala equivocado
+[IMAGE: CPT code with explanation]
+
+[... more findings ...]
+
+📝 PLANTILLA DE DISPUTA:
+[PDF: Customized dispute letter in Spanish]
+
+⚠️ RECUERDA: No somos abogados. Revisa la carta y
+modifícala como necesites. Envíala al hospital por correo
+certificado. Guarda copia de todo.
+
+¿Necesitas ayuda para entender algún punto?"</code></pre>
+</div>
+
+<h3>5.3 Conversation States & Escalation</h3>
+
+<table>
+  <tr><th>State</th><th>Hermes Handles?</th><th>Escalation Trigger</th></tr>
+  <tr><td>Welcome & disclaimer</td><td>✅ Fully automated</td><td>Client refuses disclaimer → human reviews</td></tr>
+  <tr><td>Bill intake (photo receipt)</td><td>✅ Fully automated</td><td>Image too blurry → ask for retake. After 3 attempts → human</td></tr>
+  <tr><td>OCR processing</td><td>✅ Fully automated</td><td>OCR confidence <80% → flag for human review</td></tr>
+  <tr><td>AI analysis & error detection</td><td>✅ Fully automated</td><td>Complex case detected (15+ flagged items) → human review</td></tr>
+  <tr><td>Payment collection</td><td>✅ Fully automated (Stripe)</td><td>Payment fails 3x → offer alternative</td></tr>
+  <tr><td>Results delivery</td><td>✅ Fully automated</td><td>Client expresses confusion → Hermes re-explains. If still confused → human</td></tr>
+  <tr><td>Post-service questions</td><td>⚠️ Hybrid</td><td>"¿Me pueden ayudar a llamar al hospital?" → human responds explaining we can't call but can guide</td></tr>
+  <tr><td>Refund request</td><td>❌ Human only</td><td>Any refund request → human reviews and handles</td></tr>
+</table>
+
+<!-- ================================================================================= -->
+<!-- SECTION 6: HERMES AI BRAIN -->
+<!-- ================================================================================= -->
+<h2 id="s6"><span class="section-num">06</span> Hermes AI Brain: Autonomous Operations</h2>
+
+<div class="card purple">
+  <h3>The Concept: Hermes as the Operating System</h3>
+  <p>Hermes is not just a chatbot. Hermes is the <strong>central operating system</strong> of MedillaForms. A single AI brain running on Railway that:</p>
+  <ol>
+    <li><strong>Receives</strong> all WhatsApp messages via webhook</li>
+    <li><strong>Understands</strong> context with GPT-4-level intelligence</li>
+    <li><strong>Routes</strong> to the right sub-system (analysis, payment, support)</li>
+    <li><strong>Generates</strong> annotated images on-the-fly for form guidance</li>
+    <li><strong>Coordinates</strong> with Stripe for payments</li>
+    <li><strong>Manages state</strong> across multi-session conversations (client comes back days later, Hermes remembers)</li>
+    <li><strong>Escalates</strong> to human when confidence is low</li>
+    <li><strong>Logs</strong> everything for quality control and improvement</li>
+  </ol>
+</div>
+
+<h3>6.1 Hermes System Architecture</h3>
+
+<pre><code>┌─────────────────────────────────────────────────────┐
+│                   HERMES BRAIN                        │
+│                 (Railway Node.js)                     │
+├─────────────────────────────────────────────────────┤
+│                                                       │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────┐   │
+│  │ WHATSAPP │  │  STRIPE  │  │   OPENAI API     │   │
+│  │ HANDLER  │  │ HANDLER  │  │   (GPT-4o)       │   │
+│  │          │  │          │  │                  │   │
+│  │ Webhook  │  │ Payment  │  │ • OCR Processing │   │
+│  │ Receive  │  │ Links    │  │ • Bill Analysis  │   │
+│  │ Send Msg │  │ Confirm  │  │ • Anomaly Detect │   │
+│  └────┬─────┘  └────┬─────┘  │ • Letter Gen     │   │
+│       │             │         │ • Form Guidance  │   │
+│       └──────┬──────┘         └────────┬─────────┘   │
+│              │                         │              │
+│       ┌──────▼─────────────────────────▼──────┐       │
+│       │         ORCHESTRATOR                   │       │
+│       │  • Conversation State Machine          │       │
+│       │  • Intent Router                       │       │
+│       │  • Context Memory (Redis)              │       │
+│       │  • Escalation Engine                   │       │
+│       └──────┬─────────────────────────────────┘       │
+│              │                                         │
+│       ┌──────▼──────────┐  ┌──────────────────┐       │
+│       │  IMAGE SERVICE  │  │  ANALYTICS LOG   │       │
+│       │  • Sharp/Canvas │  │  • Event Tracking │       │
+│       │  • Annotation   │  │  • Cost Per Serve │       │
+│       │  • PDF Gen      │  │  • Error Rates    │       │
+│       └─────────────────┘  └──────────────────┘       │
+│                                                       │
+└─────────────────────────────────────────────────────┘</code></pre>
+
+<h3>6.2 The Prompt Engineering Architecture</h3>
+
+<div class="card">
+  <h4>System Prompt Layers (Composed at Runtime)</h4>
+  <table>
+    <tr><th>Layer</th><th>Content</th><th>Purpose</th></tr>
+    <tr><td>Base Persona</td><td>"Eres Hermes, un asistente experto en facturación médica que ayuda a pacientes hispanohablantes en EE.UU. Eres amable, paciente y hablas español claro y sencillo. NUNCA das asesoría legal..."</td><td>Defines tone, role, language, and legal boundaries</td></tr>
+    <tr><td>Legal Guardrails</td><td>Injected at top: "CRITICAL: You are NOT a lawyer... [full legal boundaries from Section 2]"</td><td>Prevents UPL violations at the model level</td></tr>
+    <tr><td>Medical Billing Knowledge</td><td>CPT code reference, common billing errors, UB-04/CMS-1500 field definitions, charity care rules by state, negotiation scripts</td><td>Domain expertise. Uploaded as context in each analysis request.</td></tr>
+    <tr><td>Conversation Context</td><td>Previous messages in this session, client name, bill details already collected, current state in the flow</td><td>Session continuity</td></tr>
+    <tr><td>Task-Specific Instructions</td><td>"You are now analyzing an itemized bill. Find: duplicate charges, upcoding indicators, unbundled services, incorrect quantities..."</td><td>Precise instructions for the current task</td></tr>
+  </table>
+</div>
+
+<h3>6.3 How Hermes Generates Annotated Form Images</h3>
+
+<div class="card">
+  <h4>Technical Pipeline</h4>
+  <ol>
+    <li><strong>Input:</strong> Client sends photo of bill/form via WhatsApp</li>
+    <li><strong>OCR:</strong> GPT-4o (Vision) extracts all text, codes, amounts into structured JSON</li>
+    <li><strong>Analysis:</strong> GPT-4o compares extracted data against billing knowledge base. Flags anomalies.</li>
+    <li><strong>Annotation Generation:</strong> Node.js Sharp library takes the original image + analysis coordinates and overlays colored arrows, circles, text annotations</li>
+    <li><strong>Output:</strong> Annotated image sent back to WhatsApp + structured report as text</li>
+    <li><strong>For form guides:</strong> Hermes starts with a blank/clean form PDF, converts to image, overlays field-specific instructions based on client's data</li>
+  </ol>
+</div>
+
+<h3>6.4 Hermes Self-Monitoring & Quality Control</h3>
+
+<div class="card green">
+  <p>Hermes maintains a quality control loop:</p>
+  <ul>
+    <li><strong>Confidence scoring:</strong> Every AI output has a confidence score. Below threshold → flagged for human review.</li>
+    <li><strong>Error logging:</strong> All customer complaints, refunds, and escalations are logged and analyzed. Patterns → prompt improvements.</li>
+    <li><strong>A/B testing:</strong> Hermes can run A/B tests on explanation styles, pricing presentations, and follow-up timing.</li>
+    <li><strong>Weekly review:</strong> Human reviews 5% of all automated interactions for quality assurance.</li>
+    <li><strong>Continuous learning:</strong> Common billing error patterns fed back into knowledge base. New hospital charity care forms added as discovered.</li>
+  </ul>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 7: INFRASTRUCTURE -->
+<!-- ================================================================================= -->
+<h2 id="s7"><span class="section-num">07</span> Infrastructure: The Complete Stack</h2>
+
+<table>
+  <tr><th>Component</th><th>Technology</th><th>Cost</th><th>What It Does</th></tr>
+  <tr><td>Frontend</td><td>Static HTML/CSS/JS → Vercel</td><td>$0</td><td>Landing page, pricing, FAQ, blog. medillaforms.com</td></tr>
+  <tr><td>Backend</td><td>Node.js (Express) → Railway</td><td>~$5/mo</td><td>Hermes brain: WhatsApp webhook handler, Stripe integration, AI orchestration, image processing</td></tr>
+  <tr><td>WhatsApp API</td><td>WhatsApp Cloud API (Meta)</td><td>$0/mo + per-msg (~$0.01-0.05)</td><td>Send/receive messages, images, voice notes. Webhook to Railway.</td></tr>
+  <tr><td>AI Engine</td><td>OpenAI GPT-4o + GPT-4o Vision</td><td>~$0.50-2/client</td><td>Bill OCR, error analysis, letter generation, conversational responses</td></tr>
+  <tr><td>Payments</td><td>Stripe (Checkout + Webhooks)</td><td>2.9% + $0.30/txn</td><td>One-time payment collection ($29). Webhook → Railway → unlock results</td></tr>
+  <tr><td>Image Processing</td><td>Sharp (Node.js) + Canvas</td><td>$0 (included)</td><td>Annotated form images: arrows, highlights, circles on client bills</td></tr>
+  <tr><td>Database</td><td>SQLite (dev) → PostgreSQL (prod)</td><td>$0-5/mo (Railway addon)</td><td>Client sessions, conversation history, analysis results, Stripe txns</td></tr>
+  <tr><td>Cache / Session Memory</td><td>Redis (Railway addon)</td><td>$0-3/mo</td><td>Conversation state, rate limiting, temporary file storage</td></tr>
+  <tr><td>Email</td><td>Resend or SendGrid</td><td>$0 (free tier)</td><td>Transactional emails, dispute letter PDF delivery as backup to WhatsApp</td></tr>
+  <tr><td>Monitoring</td><td>Railway Logs + Custom Webhook to Telegram</td><td>$0</td><td>Error alerts, payment notifications, daily stats to Daniel's Telegram</td></tr>
+  <tr><td>Domain</td><td>Porkbun</td><td>$10-15/yr</td><td>medillaforms.com</td></tr>
+</table>
+
+<div class="card highlight">
+  <h4>Total Monthly Operational Cost</h4>
+  <p style="font-size:1.5rem; font-weight:900; color:var(--green);">~$10-15/month fixed + $4-6/client variable</p>
+  <p style="color:var(--muted);">At 100 clients/month: ~$500 variable cost. At $29/client: ~$2,900 revenue. 83% gross margin.</p>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 8: PRICING STRATEGY -->
+<!-- ================================================================================= -->
+<h2 id="s8"><span class="section-num">08</span> Pricing Strategy & Recommendation</h2>
+
+<h3>8.1 Price Analysis</h3>
+
+<table>
+  <tr><th>Option</th><th>Price</th><th>Pros</th><th>Cons</th><th>Verdict</th></tr>
+  <tr>
+    <td>A: Single price</td><td>$29</td><td>Simple, predictable, already in landing page</td><td>No fallback for price-sensitive visitors</td><td>Solid baseline</td>
+  </tr>
+  <tr>
+    <td>B: With exit-intent downsell</td><td>$29 → $24</td><td>Captures price-sensitive segment (~15% additional conversions). Tested pattern in digital products.</td><td>Slight margin reduction. Perceived discount may reduce perceived value.</td><td class="win" style="color:var(--green); font-weight:700;">RECOMMENDED</td>
+  </tr>
+  <tr>
+    <td>C: Lower base price</td><td>$24 flat</td><td>Higher conversion rate</td><td>Need 21% more customers for same revenue. Devalues service. Too close to "cheap."</td><td>Not recommended</td>
+  </tr>
+</table>
+
+<h3>8.2 Recommendation: Keep $29, Add $24 Exit-Intent</h3>
+
+<div class="card green">
+  <p><strong>Why this works:</strong></p>
+  <ul>
+    <li><strong>$29 is already extremely affordable</strong> — competitors charge 25-35% of savings ($300-$1,200+). $29 is a "no-brainer" price.</li>
+    <li><strong>$24 exit intent captures the fence-sitters</strong> without devaluing the main offer. People who see the $29 and hesitate get a second chance at $24. This is standard e-commerce optimization, not desperation pricing.</li>
+    <li><strong>Data collection:</strong> Running both prices gives us conversion data at each price point. After 100+ sales, we'll know the optimal price.</li>
+    <li><strong>Psychology:</strong> The $5 difference ($29→$24) is small enough that the main-price buyer doesn't feel cheated, but meaningful enough to convert the hesitant.</li>
+  </ul>
+</div>
+
+<h3>8.3 Future Pricing Tiers (Month 3+)</h3>
+
+<table>
+  <tr><th>Tier</th><th>Price</th><th>Includes</th><th>Launch Timing</th></tr>
+  <tr><td>Basic (current)</td><td>$29</td><td>Single bill analysis + dispute letter</td><td>Day 1</td></tr>
+  <tr><td>Family Pack</td><td>$59</td><td>Up to 3 bills (same household)</td><td>Month 3</td></tr>
+  <tr><td>Premium</td><td>$79</td><td>Human review + phone consultation (30 min)</td><td>Month 4</td></tr>
+  <tr><td>Annual Membership</td><td>$99/yr</td><td>Unlimited bill reviews for 12 months</td><td>Month 5</td></tr>
+</table>
+
+<div class="callout info">
+  <strong>Implementation Note:</strong> The exit-intent popup on the landing page triggers when the mouse cursor leaves the viewport (desktop) or scrolls back up (mobile). It shows: "Espera — obtén $5 de descuento. Completa tu análisis de factura médica por solo $24 USD. [Continuar por $24]". The Stripe payment link switches to a $24 price variant. Both prices are tracked separately in analytics.
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 9: CUSTOMER JOURNEY -->
+<!-- ================================================================================= -->
+<h2 id="s9"><span class="section-num">09</span> Customer Journey: End-to-End Flow</h2>
+
+<div class="flow-steps">
+  <div class="flow-step">
+    <div class="step-num">1</div>
+    <h4>Discovery</h4>
+    <p>TikTok/IG Reel → "¿Tienes una factura médica? Puede tener errores" → Link in bio → Landing page o WhatsApp directo.</p>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">2</div>
+    <h4>Landing Page</h4>
+    <p>medillaforms.com — explicación del servicio, precio $29, testimonios, FAQ, botón de WhatsApp: "Analiza tu factura por WhatsApp".</p>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">3</div>
+    <h4>WhatsApp Welcome</h4>
+    <p>Disclaimer legal automático. "Envíame una foto de tu factura." Cliente envía foto. Hermes confirma recepción.</p>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">4</div>
+    <h4>AI Analysis</h4>
+    <p>30-90 seg. OCR + GPT-4o. Hermes identifica errores, duplicados, sobrecargos. Genera imágenes anotadas.</p>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">5</div>
+    <h4>Payment</h4>
+    <p>Stripe payment link. $29 (o $24 si vino de exit-intent). Cliente paga con tarjeta. Webhook confirma.</p>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">6</div>
+    <h4>Results Delivery</h4>
+    <p>Informe completo: resumen, errores encontrados (con imágenes), carta de disputa en PDF, instrucciones de envío.</p>
+  </div>
+  <div class="flow-step">
+    <div class="step-num">7</div>
+    <h4>Follow-Up</h4>
+    <p>Día 7: "¿Pudiste enviar la carta? ¿Necesitas ayuda?" Día 30: "¿Tienes otra factura? Tenemos Family Pack."</p>
+  </div>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 10: CONTENT & MARKETING -->
+<!-- ================================================================================= -->
+<h2 id="s10"><span class="section-num">10</span> Content & Marketing Integration</h2>
+
+<h3>10.1 Content Pillars (Social Media)</h3>
+
+<table>
+  <tr><th>Pillar</th><th>% of Content</th><th>Example Hooks (Spanish)</th></tr>
+  <tr><td>Educational</td><td>40%</td><td>"3 errores que los hospitales NO quieren que encuentres en tu factura", "¿Qué es el CPT 99285 y por qué te cobraron $3,000 por él?"</td></tr>
+  <tr><td>Testimonials</td><td>20%</td><td>"María ahorró $4,200 en su factura del hospital — así lo hizo", screenshots de chats reales (anonimizados)</td></tr>
+  <tr><td>Behind the Scenes</td><td>15%</td><td>"Así analizamos una factura médica en 60 segundos", mostrar el proceso, la IA trabajando</td></tr>
+  <tr><td>Emotional/Story</td><td>15%</td><td>"Cuando recibí una factura de $18,000 que no podía pagar" — historias reales que generan conexión</td></tr>
+  <tr><td>Call to Action</td><td>10%</td><td>"¿Tienes una factura médica? Mándamela por WhatsApp y te digo si tiene errores GRATIS" (lead magnet)</td></tr>
+</table>
+
+<h3>10.2 Free Lead Funnel</h3>
+
+<div class="card highlight">
+  <p>Before the $29 purchase, we offer a FREE "quick scan":</p>
+  <ol>
+    <li>Client sends bill photo via WhatsApp</li>
+    <li>Hermes does a quick surface scan (30 seconds, minimal AI cost)</li>
+    <li>Response: "Encontré 3 cosas sospechosas en tu factura. Para el análisis completo con carta de disputa incluida: $29."</li>
+    <li>This is our lead magnet — it builds trust and demonstrates value before asking for money</li>
+    <li>Cost to us: ~$0.02 in AI + ~$0.01 in WhatsApp = $0.03 per lead</li>
+  </ol>
+</div>
+
+<!-- ================================================================================= -->
+<!-- SECTION 11: RISK MITIGATION -->
+<!-- ================================================================================= -->
+<h2 id="s11"><span class="section-num">11</span> Risk Mitigation & Compliance Checklist</h2>
+
+<table>
+  <tr><th>#</th><th>Risk Item</th><th>Status</th><th>Mitigation</th><th>Owner</th></tr>
+  <tr><td>1</td><td>UPL — Unauthorized Practice of Law</td><td style="color:var(--red);">CRITICAL</td><td>4-layer disclaimer system (site, WA welcome, letters, pre-purchase). Never claim legal expertise. "Educational service" positioning.</td><td>Must be audited monthly</td></tr>
+  <tr><td>2</td><td>HIPAA data handling</td><td style="color:var(--amber);">HIGH</td><td>Encrypt at rest. Auto-delete bills after 7 days (unless client opts in to save). Never share data. Railway env vars for all secrets.</td><td>Technical implementation</td></tr>
+  <tr><td>3</td><td>AI hallucination / wrong analysis</td><td style="color:var(--amber);">HIGH</td><td>Confidence scoring. Human QA on 5% of analyses. Refund policy (100% satisfaction guarantee). Prompt testing with real bills before launch.</td><td>Prompt engineering + QA process</td></tr>
+  <tr><td>4</td><td>Stripe disputes / chargebacks</td><td style="color:var(--amber);">MEDIUM</td><td>Clear refund policy. Auto-refund for unsatisfied clients (no questions asked). Stay below 1% dispute rate.</td><td>Daniel approval for refunds > 5/mo</td></tr>
+  <tr><td>5</td><td>WhatsApp account ban</td><td style="color:var(--amber);">MEDIUM</td><td>Stay within WhatsApp commerce policy. Don't send unsolicited marketing. Use approved templates only. Have email backup channel.</td><td>Monitor weekly</td></tr>
+  <tr><td>6</td><td>Negative reviews / reputation</td><td style="color:var(--green);">LOW</td><td>Proactive customer satisfaction follow-up. Fast refunds. Build positive reviews early. Address complaints within 24 hours.</td><td>Ongoing</td></tr>
+  <tr><td>7</td><td>Competitor copies model</td><td style="color:var(--green);">LOW</td><td>First mover advantage. Build brand + trust fast. Content moat (massive Spanish content). Technical moat (annotated form system).</td><td>Speed of execution</td></tr>
+  <tr><td>8</td><td>OpenAI API cost overruns</td><td style="color:var(--green);">LOW</td><td>Set monthly API budget cap ($50-200). Monitor cost per analysis. Optimize prompts for token efficiency. Cache common responses.</td><td>Monitor weekly</td></tr>
+</table>
+
+<!-- ================================================================================= -->
+<!-- SECTION 12: LAUNCH SEQUENCE -->
+<!-- ================================================================================= -->
+<h2 id="s12"><span class="section-num">12</span> Launch Sequence: 6-Week Sprint to MVP</h2>
+
+<table>
+  <tr><th>Week</th><th>Focus</th><th>Deliverables</th></tr>
+  <tr>
+    <td><strong>Week 1</strong><br>Foundation</td>
+    <td>Domains, accounts, infrastructure setup</td>
+    <td>
+      ✅ Buy medillaforms.com (Porkbun)<br>
+      ✅ Deploy landing page to Vercel<br>
+      ✅ Create Stripe account + $29 product + $24 product<br>
+      ✅ Create WhatsApp Business App (Meta Developer)<br>
+      ✅ Create OpenAI API account<br>
+      ✅ Deploy Railway "hello world" + repo setup
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Week 2</strong><br>Core Backend</td>
+    <td>Hermes brain MVP</td>
+    <td>
+      ✅ WhatsApp webhook → Railway → message handler<br>
+      ✅ GPT-4o integration for bill OCR & analysis<br>
+      ✅ Stripe payment link generation & webhook handler<br>
+      ✅ Conversation state machine (welcome → analyze → pay → deliver)<br>
+      ✅ Legal disclaimer injection at all layers
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Week 3</strong><br>Image & Forms</td>
+    <td>Annotated image generation, form library</td>
+    <td>
+      ✅ Sharp/Canvas image annotation service<br>
+      ✅ Download & template: UB-04, CMS-1500, sample charity care forms<br>
+      ✅ Build form guide image templates (overview shots, section close-ups)<br>
+      ✅ PDF dispute letter generation<br>
+      ✅ Test with 10 real/sample medical bills
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Week 4</strong><br>Polish & QA</td>
+    <td>Testing, edge cases, quality</td>
+    <td>
+      ✅ End-to-end test: photo → analysis → payment → delivery<br>
+      ✅ Test edge cases: blurry images, non-Spanish speakers, refund flow<br>
+      ✅ Human QA review on 20 test analyses<br>
+      ✅ Landing page A/B variants ready<br>
+      ✅ Exit-intent popup implementation
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Week 5</strong><br>Content Prep</td>
+    <td>Social media content creation</td>
+    <td>
+      ✅ Create 6 social accounts (2 FB + 2 IG + 2 TikTok)<br>
+      ✅ Film & edit 20 videos (educational + testimonial + CTA)<br>
+      ✅ Schedule Week 1 content (4 videos/day across accounts)<br>
+      ✅ Blog: 5 SEO articles in Spanish on medical billing topics<br>
+      ✅ Google Analytics + Facebook Pixel verification
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Week 6</strong><br>LAUNCH</td>
+    <td>Soft launch + monitor</td>
+    <td>
+      ✅ Go live: change WhatsApp number to public<br>
+      ✅ Start content posting schedule<br>
+      ✅ $50 Google Ads budget (test keywords)<br>
+      ✅ Daily monitoring: messages, payments, errors<br>
+      ✅ First 7 days: manual review of every interaction<br>
+      ✅ Day 7 retrospective: fix issues, optimize prompts
+    </td>
+  </tr>
+</table>
+
+<!-- ================================================================================= -->
+<!-- SECTION 13: VISUAL ARCHITECTURE -->
+<!-- ================================================================================= -->
+<h2 id="s13"><span class="section-num">13</span> Hermes Operations: Visual Architecture Diagram</h2>
+
+<div class="arch-diagram">
+  <h4 style="text-align:center; margin-bottom:1.5rem;">MedillaForms Complete System Architecture</h4>
+
+  <div class="arch-flow" style="flex-direction:column; gap:1.5rem;">
+
+    <!-- Row 1: Entry Points -->
+    <div style="display:flex; align-items:center; justify-content:center; gap:1.5rem; flex-wrap:wrap;">
+      <div class="arch-node client"><label>👤 Cliente</label><small>Envía foto de factura</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node wa" style="border-color:#25d366;"><label>💬 WhatsApp</label><small>Cloud API</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node" style="border-color:var(--border);"><label>🔗 Webhook</label><small>POST /webhook</small></div>
+    </div>
+
+    <div class="arch-arrow" style="text-align:center;">↓</div>
+
+    <!-- Row 2: Railway Core -->
+    <div style="background:rgba(168,85,247,0.08); border:2px solid var(--purple); border-radius:16px; padding:1.5rem; width:100%;">
+      <h4 style="text-align:center; color:var(--purple); margin-bottom:1rem;">🚂 Railway Backend — Hermes Brain</h4>
+      <div style="display:flex; align-items:center; justify-content:center; gap:1rem; flex-wrap:wrap;">
+
+        <div class="arch-node railway"><label>📨 Message Router</label><small>Express.js</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node railway"><label>🧠 Orchestrator</label><small>State Machine</small></div>
+        <div class="arch-arrow">→</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+          <div class="arch-node ai"><label>🤖 GPT-4o</label><small>OCR + Analysis</small></div>
+          <div class="arch-node" style="border-color:var(--teal);"><label>🖼️ Image Service</label><small>Sharp + Canvas</small></div>
+          <div class="arch-node stripe"><label>💳 Stripe Handler</label><small>Payments</small></div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node railway"><label>📤 Response Builder</label><small>API → WhatsApp</small></div>
+
+      </div>
+    </div>
+
+    <div class="arch-arrow" style="text-align:center;">↓</div>
+
+    <!-- Row 3: Data Layer -->
+    <div style="display:flex; align-items:center; justify-content:center; gap:1.5rem; flex-wrap:wrap;">
+      <div class="arch-node" style="border-color:var(--amber);"><label>🗄️ PostgreSQL</label><small>Sessions, Clients, Txns</small></div>
+      <div class="arch-node" style="border-color:var(--red);"><label>⚡ Redis</label><small>State Cache</small></div>
+      <div class="arch-node" style="border-color:var(--green);"><label>📊 Analytics</label><small>Events + Metrics</small></div>
+    </div>
+
+    <div class="arch-arrow" style="text-align:center;">↓</div>
+
+    <!-- Row 4: External services -->
+    <div style="display:flex; align-items:center; justify-content:center; gap:1.5rem; flex-wrap:wrap;">
+      <div class="arch-node ai"><label>🔮 OpenAI</label><small>GPT-4o API</small></div>
+      <div class="arch-node stripe"><label>💳 Stripe</label><small>Checkout API</small></div>
+      <div class="arch-node wa"><label>📱 WhatsApp</label><small>Send/Receive</small></div>
+      <div class="arch-node" style="border-color:var(--teal);"><label>📧 Resend</label><small>Email Backup</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="arch-diagram" style="margin-top:2rem;">
+  <h4 style="text-align:center; margin-bottom:1.5rem;">WhatsApp Conversation Flow (Happy Path)</h4>
+  <pre style="max-height:500px; overflow-y:auto;"><code>CLIENTE                     WHATSAPP API                    HERMES (RAILWAY)               STRIPE
+   │                            │                               │                            │
+   │──"Hola"───────────────────▶│                               │                            │
+   │                            │──webhook─────────────────────▶│                            │
+   │                            │                               │──load session state        │
+   │                            │                               │──inject legal disclaimer   │
+   │                            │◀──send msg───────────────────│                            │
+   │◀──"¡Bienvenido! [legal]"──│                               │                            │
+   │                            │                               │                            │
+   │──[Photo of bill]──────────▶│                               │                            │
+   │                            │──webhook (media)─────────────▶│                            │
+   │                            │                               │──download image            │
+   │                            │                               │──GPT-4o Vision OCR         │
+   │                            │                               │──extract charges → JSON     │
+   │                            │                               │──analyze for errors        │
+   │                            │                               │──generate annotated img    │
+   │                            │                               │──create Stripe link        │
+   │                            │◀──send msg───────────────────│                            │
+   │◀──"Listo. $29 para ver───│                               │                            │
+   │    resultados: [link]"     │                               │                            │
+   │                            │                               │                            │
+   │──[Clicks link, pays]───────│                               │                            │
+   │                            │                               │                            │──webhook payment OK
+   │                            │                               │◀──payment_confirmed────────│
+   │                            │                               │──unlock results            │
+   │                            │◀──send results───────────────│                            │
+   │◀──"📊 Análisis: [images]──│                               │                            │
+   │    [PDF carta disputa]"    │                               │                            │
+   │                            │                               │                            │</code></pre>
+</div>
+
+<!-- ================================================================================= -->
+<!-- FINAL SUMMARY -->
+<!-- ================================================================================= -->
+<h2 style="margin-top:3rem;">Summary: The Complete Picture</h2>
+
+<div class="card green" style="margin-top:1rem;">
+  <p>MedillaForms is an <strong>AI-powered patient advocacy service delivered through WhatsApp in Spanish</strong> that helps Hispanics in the US identify billing errors and generate dispute letters — for $29 flat.</p>
+
+  <p style="margin-top:1rem;"><strong>The moat is three-layered:</strong></p>
+  <ol>
+    <li><strong>Language + Channel:</strong> Spanish WhatsApp — zero competitors. The combination no one else is doing.</li>
+    <li><strong>Legal Safety:</strong> Patient advocacy positioning, not legal services. Four-layer disclaimer system. TurboTax model applied to medical bills.</li>
+    <li><strong>AI Operations:</strong> Hermes brain autonomously handles intake → analysis → payment → delivery. Human only for escalations. 85%+ gross margins at scale.</li>
+  </ol>
+
+  <p style="margin-top:1rem;"><strong>Revenue Path:</strong></p>
+  <ul>
+    <li>Month 1: $140-364 net (organic only, 10-16 clients)</li>
+    <li>Month 3: $1,400-2,600 net (ads + organic, 75-125 clients)</li>
+    <li>Month 6: $6,500-12,260 net (300-540 clients)</li>
+    <li>Add MedillaDisability at Month 2-3 for combined $13K-33K/month by Month 6</li>
+  </ul>
+
+  <p style="margin-top:1rem;"><strong>Total Investment to Launch:</strong> Under $50 + 6 weeks of focused development time.</p>
+</div>
+
+<div class="card purple" style="margin-top:1rem;">
+  <h4>Next Action: Begin Week 1 Sprint</h4>
+  <p style="font-size:1rem;">1. Buy medillaforms.com domain<br>2. Set up Railway project + repo<br>3. Create Meta Developer App for WhatsApp<br>4. Configure Stripe products ($29 + $24)<br>5. Deploy landing page to Vercel</p>
+</div>
+
+</div>
+
+<footer>
+  <p>MedillaForms Master Blueprint — v1.0 — May 27, 2026<br>
+  Research: 70+ Firecrawl pages · 16 search queries · 6 page scrapes · 8+ data sources<br>
+  Legal framework, operational methodology, infrastructure architecture, and AI brain design by Hermes</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+{
+  "_description": "State-level patient protections and billing regulations. Reference only — never cite as legal authority. Always recommend consulting a licensed attorney.",
+  "_disclaimer": "Esta información es EDUCATIVA únicamente. No constituye asesoría legal.",
+  "_updated": "2026-05-25",
+  "states": {
+    "CA": {
+      "name": "California",
+      "protections": [
+        "Hospital Fair Pricing Act — hospitals must offer financial assistance to uninsured and underinsured patients earning up to 400% FPL",
+        "No Surprises Act (federal) applies to all emergency services",
+        "Balance billing prohibited for in-network hospital emergency services",
+        "Itemized bill must be provided upon request within 30 days"
+      ],
+      "charity_care_threshold": "400% FPL",
+      "key_agency": "Department of Health Care Access and Information (HCAI)",
+      "complaint_url": "https://hcai.ca.gov/consumer"
+    },
+    "TX": {
+      "name": "Texas",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Texas Balance Billing Law (SB 1264) — protects against surprise bills in emergencies and at in-network facilities",
+        "Itemized bill available upon request",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)"
+      ],
+      "charity_care_threshold": "Varies by hospital",
+      "key_agency": "Texas Department of Insurance",
+      "complaint_url": "https://www.tdi.texas.gov/consumer/surprise-balance-billing.html"
+    },
+    "FL": {
+      "name": "Florida",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Florida Patient Protection Act — requires price transparency from hospitals",
+        "Itemized bill must be provided upon request",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)"
+      ],
+      "charity_care_threshold": "Varies by hospital",
+      "key_agency": "Florida Agency for Health Care Administration (AHCA)",
+      "complaint_url": "https://ahca.myflorida.com"
+    },
+    "AZ": {
+      "name": "Arizona",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Arizona Surprise Billing Law requires dispute resolution for out-of-network bills",
+        "Itemized bill available upon request",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)"
+      ],
+      "charity_care_threshold": "Varies by hospital",
+      "key_agency": "Arizona Department of Insurance and Financial Institutions",
+      "complaint_url": "https://difi.az.gov"
+    },
+    "NY": {
+      "name": "New York",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "New York Surprise Bill Law — comprehensive protections including independent dispute resolution",
+        "Hospital Financial Assistance Law — mandatory charity care for patients under 300% FPL",
+        "Itemized bill must be provided upon request"
+      ],
+      "charity_care_threshold": "300% FPL (some hospitals up to 400%)",
+      "key_agency": "New York State Department of Financial Services",
+      "complaint_url": "https://www.dfs.ny.gov/complaint"
+    },
+    "NV": {
+      "name": "Nevada",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Nevada requires hospitals to post chargemaster prices online",
+        "Itemized bill available upon request",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)"
+      ],
+      "charity_care_threshold": "Varies by hospital",
+      "key_agency": "Nevada Division of Insurance",
+      "complaint_url": "https://doi.nv.gov"
+    },
+    "IL": {
+      "name": "Illinois",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Illinois Hospital Uninsured Patient Discount Act — uninsured patients receive substantial discounts",
+        "Community Benefits Act — nonprofit hospitals must provide charity care",
+        "Itemized bill available upon request"
+      ],
+      "charity_care_threshold": "Varies by hospital (many at 200-300% FPL)",
+      "key_agency": "Illinois Department of Public Health",
+      "complaint_url": "https://dph.illinois.gov"
+    },
+    "TX": {
+      "name": "Texas",
+      "protections": [
+        "No Surprises Act (federal) for emergency services",
+        "SB 1264 protects against surprise medical bills",
+        "Hospital price transparency required"
+      ],
+      "charity_care_threshold": "Varies by hospital",
+      "key_agency": "Texas Department of Insurance"
+    }
+  }
+}

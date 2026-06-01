@@ -1,0 +1,28 @@
+{
+  "name": "medillaforms",
+  "version": "1.0.0",
+  "description": "MedillaForms — Servicio educativo de análisis de facturas médicas vía WhatsApp",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --env-file=.env --watch index.js",
+    "deploy": "railway up --service=medilla-forms"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "cron": "^4.1.0",
+    "dotenv": "^16.4.0",
+    "express": "^4.21.0",
+    "googleapis": "^144.0.0",
+    "ioredis": "^5.4.0",
+    "openai": "^4.70.0",
+    "pg": "^8.13.0",
+    "playwright": "^1.48.0",
+    "sharp": "^0.33.0",
+    "stripe": "^17.0.0",
+    "uuid": "^10.0.0"
+  }
+}

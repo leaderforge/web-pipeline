@@ -1,0 +1,47 @@
+{
+  "_description": "CPT codes reference with Medicare reimbursement rates. Rates are approximate national averages (2025). Multiply by 2-3x for typical hospital chargemaster rates.",
+  "_source": "CMS Physician Fee Schedule 2025",
+  "_updated": "2026-05-25",
+  "codes": {
+    "99281": { "description": "Emergency dept visit, level 1", "medicare_rate": 30, "category": "emergency" },
+    "99282": { "description": "Emergency dept visit, level 2", "medicare_rate": 65, "category": "emergency" },
+    "99283": { "description": "Emergency dept visit, level 3", "medicare_rate": 110, "category": "emergency" },
+    "99284": { "description": "Emergency dept visit, level 4", "medicare_rate": 210, "category": "emergency" },
+    "99285": { "description": "Emergency dept visit, level 5", "medicare_rate": 340, "category": "emergency" },
+    "99213": { "description": "Office visit established, level 3", "medicare_rate": 90, "category": "outpatient" },
+    "99214": { "description": "Office visit established, level 4", "medicare_rate": 130, "category": "outpatient" },
+    "99215": { "description": "Office visit established, level 5", "medicare_rate": 180, "category": "outpatient" },
+    "99203": { "description": "Office visit new patient, level 3", "medicare_rate": 115, "category": "outpatient" },
+    "99204": { "description": "Office visit new patient, level 4", "medicare_rate": 175, "category": "outpatient" },
+    "99205": { "description": "Office visit new patient, level 5", "medicare_rate": 230, "category": "outpatient" },
+    "99222": { "description": "Initial hospital care, level 2", "medicare_rate": 145, "category": "inpatient" },
+    "99223": { "description": "Initial hospital care, level 3", "medicare_rate": 215, "category": "inpatient" },
+    "99233": { "description": "Subsequent hospital care, level 3", "medicare_rate": 120, "category": "inpatient" },
+    "80048": { "description": "Basic metabolic panel", "medicare_rate": 12, "category": "lab" },
+    "80053": { "description": "Comprehensive metabolic panel", "medicare_rate": 15, "category": "lab" },
+    "80061": { "description": "Lipid panel", "medicare_rate": 19, "category": "lab" },
+    "85025": { "description": "CBC with differential", "medicare_rate": 11, "category": "lab" },
+    "87070": { "description": "Blood culture, bacterial", "medicare_rate": 35, "category": "lab" },
+    "71045": { "description": "Chest X-ray, single view", "medicare_rate": 35, "category": "radiology" },
+    "71046": { "description": "Chest X-ray, 2 views", "medicare_rate": 45, "category": "radiology" },
+    "74177": { "description": "CT abdomen/pelvis with contrast", "medicare_rate": 350, "category": "radiology" },
+    "70450": { "description": "CT head without contrast", "medicare_rate": 180, "category": "radiology" },
+    "73721": { "description": "MRI any joint, with contrast", "medicare_rate": 450, "category": "radiology" },
+    "93005": { "description": "Electrocardiogram, tracing only", "medicare_rate": 16, "category": "cardiology" },
+    "93306": { "description": "Echocardiogram, complete", "medicare_rate": 250, "category": "cardiology" },
+    "97110": { "description": "Therapeutic exercise, 15 min", "medicare_rate": 35, "category": "therapy" },
+    "97530": { "description": "Therapeutic activities, 15 min", "medicare_rate": 38, "category": "therapy" },
+    "36415": { "description": "Venipuncture (blood draw)", "medicare_rate": 3, "category": "lab" },
+    "96372": { "description": "Therapeutic injection, subq/IM", "medicare_rate": 25, "category": "medication" }
+  },
+  "bundled_sets": {
+    "80053": ["80048"],
+    "80061": ["80048"],
+    "71046": ["71045"]
+  },
+  "billing_frequency": {
+    "99285": "Once per emergency visit",
+    "99233": "Once per day max for same specialty",
+    "97110": "Up to 4 units/day typical"
+  }
+}

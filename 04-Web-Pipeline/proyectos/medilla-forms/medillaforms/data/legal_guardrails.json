@@ -1,0 +1,47 @@
+{
+  "_description": "Legal guardrails — words and phrases that trigger automatic blocking or redirection. NEVER cross these lines.",
+  "_updated": "2026-05-25",
+  "blocked_phrases": {
+    "lawsuit": {
+      "trigger": ["demanda", "demandar", "corte", "juez", "tribunal", "ilegal", "lawsuit", "sue", "court", "judge", "illegal"],
+      "response_es": "Eso está fuera del alcance de MedillaForms como servicio educativo. Le recomiendo consultar con un abogado especializado en salud en {state}. ¿Hay algo más sobre su factura en lo que pueda ayudarle?",
+      "response_en": "That is outside the scope of MedillaForms as an educational service. I recommend consulting with a healthcare attorney in {state}. Is there anything else about your bill I can help with?"
+    },
+    "legal_advice": {
+      "trigger": ["abogado", "legalmente", "asesoría legal", "representación", "attorney", "legally", "legal advice", "representation"],
+      "response_es": "MedillaForms es un servicio educativo, no un despacho de abogados. Para asesoría legal específica sobre su situación, le recomiendo consultar con un abogado licenciado en {state}.",
+      "response_en": "MedillaForms is an educational service, not a law firm. For specific legal advice about your situation, I recommend consulting with a licensed attorney in {state}."
+    },
+    "guarantee": {
+      "trigger": ["garantiza", "garantizar", "seguro que", "100%", "guarantee", "guaranteed", "for sure", "definitely will"],
+      "response_es": "No puedo garantizar resultados. Lo que sí puedo asegurarle es que le proporcionaré información basada en datos públicos de facturación médica para que tome decisiones informadas.",
+      "response_en": "I cannot guarantee results. What I can assure you is that I'll provide information based on public medical billing data so you can make informed decisions."
+    }
+  },
+  "prohibited_statements": [
+    "Es ilegal que le cobren eso",
+    "Tiene derecho legal a...",
+    "Le garantizo que...",
+    "Debería demandar al hospital",
+    "Soy abogado",
+    "Represento a...",
+    "MedillaForms es un despacho",
+    "Usted va a ganar este caso",
+    "No pague esta factura"
+  ],
+  "safe_alternatives": [
+    "Según información pública de facturación médica...",
+    "En situaciones similares, muchos pacientes...",
+    "Podría considerar preguntar al hospital sobre...",
+    "Los datos de referencia indican que...",
+    "Para una opinión legal específica, le recomiendo consultar con un abogado licenciado en {state}"
+  ],
+  "required_disclaimers": {
+    "first_message_es": "Importante: MedillaForms es un servicio educativo. No somos abogados y no proporcionamos asesoría legal.",
+    "first_message_en": "Important: MedillaForms is an educational service. We are not lawyers and do not provide legal advice.",
+    "letter_footer_es": "Esta carta fue generada con asistencia educativa de MedillaForms. No constituye asesoría legal.",
+    "letter_footer_en": "This letter was generated with educational assistance from MedillaForms. It does not constitute legal advice.",
+    "payment_es": "Recordatorio: Esto es un servicio educativo. No soy abogado. Las cartas son guías informativas para ayudarle en su comunicación con el hospital.",
+    "payment_en": "Reminder: This is an educational service. I am not a lawyer. The letters are informational guides to help you communicate with the hospital."
+  }
+}

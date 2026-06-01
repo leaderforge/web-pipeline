@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRS Roofing Co. — Top Roofing Solutions | Licensed California</title>
+<meta name="description" content="TRS Roofing Co. — Top Roofing Solutions. Licensed in California. Roofing installments, repairs, inspections, maintenance & more. Free estimates.">
+
+<meta property="og:title" content="TRS Roofing Co. — Top Roofing Solutions | Licensed California">
+<meta property="og:description" content="Licensed California roofing contractor. Roofing installments, repairs, inspections, maintenance & more. Free estimates.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://trsroofingco.netlify.app">
+<meta property="og:image" content="https://trsroofingco.netlify.app/assets/images/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: '#000000',
+        'brand-dark': '#0A0A0A',
+        'brand-light': '#1A1A1A',
+        orange: '#FF6200',
+        'orange-dark': '#CC4F00',
+      },
+      fontFamily: { sans: ['Outfit', 'system-ui', 'sans-serif'] },
+    }
+  }
+}
+</script>
+
+<style>
+  :root {
+    --brand: #000000;
+    --orange: #FF6200;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: #000; color: #fff; }
+
+  .display-text {
+    font-size: clamp(2.8rem, 6vw, 5.2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+  }
+  .heading-text {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+
+  .reveal { opacity: 1; transform: none; transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo); }
+  .js-ready .reveal { opacity: 0; transform: translateY(50px); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  .hero-stage {
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+  }
+  .hero-video-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    mask-image: radial-gradient(ellipse 96% 94% at 50% 35%, black 78%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 96% 94% at 50% 35%, black 78%, transparent 100%);
+  }
+  .hero-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 82% 75% at 50% 33%, transparent 65%, rgba(255,255,255,0.25) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .hero-video-desktop { display: block; }
+  .hero-video-mobile { display: none; }
+  @media (max-width: 768px) {
+    .hero-video-wrapper { top: 0; }
+    .hero-video-desktop { display: none; }
+    .hero-video-mobile { display: block; }
+    .hero-video {
+      mask-image: radial-gradient(ellipse 96% 94% at 50% 38%, black 78%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 96% 94% at 50% 38%, black 78%, transparent 100%);
+    }
+    .hero-stage::after {
+      background: radial-gradient(ellipse 82% 75% at 50% 36%, transparent 65%, rgba(255,255,255,0.25) 100%);
+    }
+  }
+
+  /* Sticky contact button */
+  .whatsapp-sticky {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 40;
+    opacity: 0;
+    transform: translateY(24px) scale(0.85);
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--spring);
+  }
+  .whatsapp-sticky.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  .wa-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 9999px;
+    background: #25D366;
+    color: #fff;
+    box-shadow: 0 8px 30px rgba(37,211,102,0.35);
+    transition: transform 0.3s var(--spring), box-shadow 0.3s var(--spring);
+  }
+  .wa-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 36px rgba(37,211,102,0.45);
+  }
+  .wa-btn:active { transform: scale(0.96); }
+  @keyframes wa-heartbeat {
+    0%, 100% { transform: scale(1); }
+    8% { transform: scale(1.12); }
+    16% { transform: scale(1); }
+    24% { transform: scale(1.08); }
+    32% { transform: scale(1); }
+  }
+  .wa-animate .wa-btn {
+    animation: wa-heartbeat 3.2s ease-in-out infinite;
+  }
+
+  .card-white {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.4);
+    transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+  }
+  .card-white:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3), 0 16px 40px rgba(0,0,0,0.5);
+  }
+
+  .btn-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: 9999px;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.4s var(--spring);
+  }
+  .btn-pill:active { transform: scale(0.96); }
+  .btn-pill-lg {
+    padding: 1.15rem 2.5rem;
+    font-size: 1.2rem;
+  }
+
+  .upload-zone {
+    border: 2px dashed rgba(0,0,0,0.1);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--orange);
+    background: rgba(255,98,0,0.05);
+  }
+  .photo-thumb {
+    width: 80px; height: 80px;
+    border-radius: 0.75rem;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .anim-placeholder {
+    background: rgba(255,255,255,0.03);
+    border: 2px dashed rgba(255,255,255,0.08);
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(11,26,46,0.25);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .anim-stage { aspect-ratio: 16/9; }
+  .anim-video-desktop { display: block; }
+  .anim-video-mobile { display: none; }
+  @media (max-width: 768px) {
+    .anim-stage { aspect-ratio: 9/16; max-height: 85vh; }
+    .anim-video-desktop { display: none; }
+    .anim-video-mobile { display: block; }
+  }
+
+  .license-badge {
+    background: linear-gradient(135deg, #FF6200, #CC4F00);
+    color: #fff;
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(255,98,0,0.25);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  .license-badge .icon { font-size: 1.2rem; }
+
+  .faq-toggle { display: none; }
+  .faq-toggle + label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  .faq-toggle + label:hover { border-color: rgba(255,98,0,0.3); background: #1a1a1a; }
+  .faq-toggle + label .faq-chevron { transition: transform 0.35s var(--spring); }
+  .faq-toggle:checked + label .faq-chevron { transform: rotate(180deg); }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.5s var(--ease-out-expo); }
+  .faq-toggle:checked + label + .faq-answer { max-height: 40rem; }
+  .faq-answer-inner { padding: 0 1.5rem 1.5rem 1.5rem; font-size: 1.05rem; line-height: 1.7; color: #555; }
+
+  @media (min-width: 1024px) {
+    html { font-size: 17.5px; }
+  }
+  @media (max-width: 768px) {
+    html { font-size: 17.5px; }
+    .btn-pill { padding: 0.85rem 1.5rem; font-size: 1rem; }
+    .btn-pill-lg { padding: 1rem 2rem; font-size: 1.1rem; }
+    .card-white { padding: 1.5rem; }
+    .faq-toggle + label { padding: 1.25rem; font-size: 1rem; }
+    .faq-answer-inner { font-size: 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .wa-animate { animation: none; }
+  }
+</style>
+</head>
+<body class="font-sans text-gray-800 antialiased">
+
+<!-- ============================================================ -->
+<!-- NAV -->
+<!-- ============================================================ -->
+<header id="nav" class="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-b border-gray-800 transition-shadow duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20 md:h-24">
+
+      <a href="#" class="flex items-center gap-3 shrink-0">
+        <img src="assets/images/logo.jpg" alt="TRS Roofing Co." class="h-20 md:h-20 w-auto">
+      </a>
+
+      <a href="tel:+17142586261" class="hidden sm:flex items-center gap-2.5 text-white hover:text-white transition-colors duration-300 group">
+        <i class="ph ph-phone-call text-orange text-2xl group-hover:scale-110 transition-transform duration-300"></i>
+        <span class="font-extrabold text-xl md:text-2xl tracking-tight">(714) 258-6261</span>
+      </a>
+
+      <div class="flex items-center gap-3 md:gap-4">
+        <div class="license-badge">
+          <i class="ph ph-shield-check icon"></i>
+          <span>Licensed</span>
+          <span class="text-white/80 font-extrabold">California</span>
+        </div>
+
+        <a href="#quote" class="btn-pill bg-orange hover:bg-orange-dark text-white shadow-xl shadow-orange/20 hidden sm:inline-flex">
+          <span>Free Quote</span>
+          <i class="ph ph-arrow-right text-lg"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<!-- HERO -->
+<!-- ============================================================ -->
+<section class="hero-stage min-h-[100dvh]">
+  <div class="hero-video-wrapper">
+    <video class="hero-video hero-video-desktop" autoplay muted loop playsinline preload="auto" poster="assets/video/hero-poster.jpg">
+      <source src="assets/video/herodesktop1.mp4" type="video/mp4">
+    </video>
+    <video class="hero-video hero-video-mobile" autoplay muted loop playsinline preload="auto" poster="assets/video/hero-poster-mobile.jpg">
+      <source src="assets/video/mobilevideo1.mp4" type="video/mp4">
+    </video>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- HERO TEXT -->
+<!-- ============================================================ -->
+<section class="py-16 md:py-24 bg-black">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2.5 mb-6 text-base font-semibold">
+      <i class="ph ph-map-pin text-orange text-lg"></i>
+      <span>Proudly Serving California — Licensed & Insured</span>
+    </div>
+    <h1 class="display-text text-white max-w-5xl mx-auto mb-6">
+      Top Roofing Solutions —<br>TRS Roofing Co.
+    </h1>
+    <p class="text-gray-300 text-xl md:text-2xl max-w-3xl mx-auto mb-8 leading-relaxed">
+      Licensed California roofing contractor. Expert roof installments, repairs, inspections, and maintenance — backed by quality materials, fair pricing, and workmanship built to last.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-5 justify-center">
+      <a href="tel:+17142586261" class="btn-pill btn-pill-lg bg-orange hover:bg-orange-dark text-white shadow-2xl shadow-orange/25">
+        <i class="ph ph-phone-call text-2xl"></i>
+        <span class="font-bold">(714) 258-6261</span>
+      </a>
+      <a href="#quote" class="btn-pill btn-pill-lg bg-transparent hover:bg-white/10 text-white border-2 border-gray-500 shadow-sm">Get a Free Estimate</a>
+    </div>
+    <div class="flex flex-wrap justify-center gap-8 mt-10 text-gray-400 text-base font-medium">
+      <span class="flex items-center gap-2"><i class="ph ph-shield-check text-green-500 text-xl"></i> Licensed California</span>
+      <span class="flex items-center gap-2"><i class="ph ph-clock text-orange text-xl"></i> 15+ Years</span>
+      <span class="flex items-center gap-2"><i class="ph ph-check-circle text-green-500 text-xl"></i> 250+ Projects</span>
+      <span class="flex items-center gap-2"><i class="ph ph-star text-yellow-500 text-xl"></i> 100% Satisfaction</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SERVICES -->
+<!-- ============================================================ -->
+<section id="services" class="py-24 md:py-32 bg-black">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="mb-16 reveal">
+      <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-buildings text-lg"></i>
+        <span>Our Services</span>
+      </div>
+      <h2 class="heading-text text-white mb-5">Top Roofing Services for Homes & Businesses in California</h2>
+      <p class="text-xl text-gray-300 max-w-3xl leading-relaxed mb-4">From emergency repairs to full replacements — we handle every roofing project with honest communication, efficient service, and results that last.</p>
+    </div>
+
+    <!-- Commercial -->
+    <div class="mb-16 reveal">
+      <h3 class="text-2xl font-extrabold text-white mb-10 flex items-center gap-4">
+        <span class="w-3 h-10 bg-orange rounded-full inline-block"></span>
+        <span>Commercial Roofing</span>
+      </h3>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card-white">
+          <i class="ph ph-drop text-white text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">TPO & PVC Systems</h4>
+          <p class="text-gray-300 leading-relaxed">Energy-efficient single-ply membranes built for California's climate. UV-reflective, weather-resistant, backed by warranties up to 30 years.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-hard-drives text-white text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Metal Roofing</h4>
+          <p class="text-gray-300 leading-relaxed">Standing seam and corrugated metal systems with 50+ year lifespan. Steel and aluminum resist high winds, heat, and hail with minimal upkeep.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-flame text-white text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Modified Bitumen</h4>
+          <p class="text-gray-300 leading-relaxed">Multi-layer torch-down and self-adhered systems for flat and low-slope commercial roofs. Combines asphalt waterproofing with polymer reinforcement.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-paint-brush text-white text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Coatings & Waterproofing</h4>
+          <p class="text-gray-300 leading-relaxed">Silicone and acrylic coatings that extend your roof's life 10-15 years. Seamless waterproof membrane stops leaks and reflects up to 85% of UV rays.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-warning text-orange text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">24/7 Emergency Repair</h4>
+          <p class="text-gray-300 leading-relaxed">Fast, reliable emergency repair — day or night. Two-hour commercial response. One call dispatches a certified technician to your location.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-clipboard-text text-white text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Inspections & Maintenance</h4>
+          <p class="text-gray-300 leading-relaxed">Scheduled maintenance that catches small issues before they become expensive repairs. Each visit includes inspection, photo documentation, and a detailed report.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Residential -->
+    <div class="reveal">
+      <h3 class="text-2xl font-extrabold text-white mb-10 flex items-center gap-4">
+        <span class="w-3 h-10 bg-orange rounded-full inline-block"></span>
+        <span>Residential Roofing</span>
+      </h3>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card-white">
+          <i class="ph ph-house-line text-orange text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Full Roof Replacement</h4>
+          <p class="text-gray-300 leading-relaxed">Complete tear-off and replacement with GAF, Owens Corning, and CertainTeed materials. Manufacturer-spec installation with warranty registration included.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-magnifying-glass text-orange text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Roof Leak Repair</h4>
+          <p class="text-gray-300 leading-relaxed">Same-day or next-day inspection. We identify root causes and present a transparent written repair plan. Temporary protection provided if needed.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-gutter text-orange text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Gutter & Downspout Repair</h4>
+          <p class="text-gray-300 leading-relaxed">Seamless gutter installation, guard systems, and downspout service. Prevents water damage, fascia rot, and attic moisture.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-sun text-orange text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Skylight Installation & Repair</h4>
+          <p class="text-gray-300 leading-relaxed">New skylight installations, replacements, and leak repairs with proper flashing and weathertight warranty. Solar tubes available.</p>
+        </div>
+        <div class="card-white">
+          <i class="ph ph-thermometer text-orange text-3xl mb-4 block"></i>
+          <h4 class="font-extrabold text-white text-lg mb-2">Roof Insulation</h4>
+          <p class="text-gray-300 leading-relaxed">Attic insulation analysis and upgrades that may qualify for rebates. Reduces heat transfer, lowers energy bills, and prevents moisture buildup.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-14 reveal">
+      <a href="#quote" class="btn-pill btn-pill-lg bg-orange hover:bg-orange-dark text-white shadow-2xl shadow-orange/25">Get a Free Quote for Your Roof <i class="ph ph-arrow-right text-xl"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ABOUT US -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-neutral-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      <div class="reveal">
+        <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+          <i class="ph ph-users-three text-lg"></i>
+          <span>About Us</span>
+        </div>
+        <h2 class="heading-text text-white mb-6">California's Trusted Roofing Experts</h2>
+        <p class="text-xl text-gray-300 leading-relaxed mb-5">TRS Roofing Co. provides top roofing solutions across California. From TPO flat roofs on commercial buildings to tile roofing on residential estates, we deliver tailored solutions with honest communication and craftsmanship that lasts.</p>
+        <p class="text-xl text-gray-300 leading-relaxed mb-5">Fully licensed in California and backed by top manufacturers: GAF, CertainTeed, Owens Corning, Malarkey, and Polyglass. Every project gets precision, care, and clear communication from first call to final cleanup.</p>
+        <div class="flex flex-wrap gap-4 mt-8">
+          <div class="flex items-center gap-2 bg-transparent border border-gray-600 rounded-full px-5 py-3 text-base font-semibold text-white">
+            <i class="ph ph-shield-check text-green-500 text-xl"></i> Licensed California
+          </div>
+          <div class="flex items-center gap-2 bg-transparent border border-gray-600 rounded-full px-5 py-3 text-base font-semibold text-white">
+            <i class="ph ph-medal text-orange text-xl"></i> 15+ Years Experience
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-10 shadow-sm">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-orange/10 rounded-xl p-6 text-center">
+              <div class="text-4xl md:text-5xl font-black text-white mb-2">250<span class="text-orange">+</span></div>
+              <div class="text-gray-400 font-semibold text-base">Projects Completed</div>
+            </div>
+            <div class="bg-orange/10 rounded-xl p-6 text-center">
+              <div class="text-4xl md:text-5xl font-black text-orange mb-2">15<span class="text-white">+</span></div>
+              <div class="text-gray-400 font-semibold text-base">Years Experience</div>
+            </div>
+            <div class="bg-orange/10 rounded-xl p-6 text-center">
+              <div class="text-4xl md:text-5xl font-black text-orange mb-2">100<span class="text-white">%</span></div>
+              <div class="text-gray-400 font-semibold text-base">Satisfaction</div>
+            </div>
+            <div class="bg-orange/10 rounded-xl p-6 text-center">
+              <div class="text-4xl md:text-5xl font-black text-white mb-2">10</div>
+              <div class="text-gray-400 font-semibold text-base">Year Warranty</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- BEFORE & AFTER -->
+<!-- ============================================================ -->
+<section class="py-20 md:py-28 bg-black">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-12 reveal">
+      <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-image text-lg"></i>
+        <span>Before & After</span>
+      </div>
+      <h2 class="heading-text text-white mb-4">See the TRS Roofing Difference</h2>
+      <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">Real transformations from commercial and residential projects across California.</p>
+    </div>
+
+    <div class="max-w-4xl mx-auto reveal">
+      <div class="anim-stage w-full rounded-2xl overflow-hidden bg-black" style="min-height: 300px;">
+        <video class="anim-video-desktop w-full h-full object-cover" autoplay muted loop playsinline preload="auto" poster="">
+          <source src="assets/video/landing2video.mp4" type="video/mp4">
+        </video>
+        <video class="anim-video-mobile w-full h-full object-cover" autoplay muted loop playsinline preload="auto" poster="">
+          <source src="assets/video/mobile2video.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHY CHOOSE US -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-black relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+    <div class="text-center mb-16 reveal">
+      <div class="inline-flex items-center gap-2 bg-white/10 text-white rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-shield text-lg"></i>
+        <span>Why Choose Us</span>
+      </div>
+      <h2 class="heading-text text-white mb-4">Your Certified Roofing Specialist in California</h2>
+      <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">We earn your trust through quality, transparency, and a relentless commitment to getting the job done right.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+      <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+        <div class="w-14 h-14 bg-orange/20 rounded-2xl flex items-center justify-center mb-5">
+          <i class="ph ph-hard-hat text-orange text-2xl"></i>
+        </div>
+        <h4 class="text-white font-extrabold text-lg mb-3">Expert Craftsmanship</h4>
+        <p class="text-white/55 leading-relaxed">Licensed, experienced crews with ongoing manufacturer training. Every detail matters — from fasteners to the final ridge cap.</p>
+      </div>
+      <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+        <div class="w-14 h-14 bg-orange/20 rounded-2xl flex items-center justify-center mb-5">
+          <i class="ph ph-package text-orange text-2xl"></i>
+        </div>
+        <h4 class="text-white font-extrabold text-lg mb-3">Top-Quality Materials</h4>
+        <p class="text-white/55 leading-relaxed">Premium materials from GAF, CertainTeed, Owens Corning, Malarkey, and Polyglass. Selected for durability in California's climate. Real warranties.</p>
+      </div>
+      <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+        <div class="w-14 h-14 bg-orange/20 rounded-2xl flex items-center justify-center mb-5">
+          <i class="ph ph-currency-dollar text-orange text-2xl"></i>
+        </div>
+        <h4 class="text-white font-extrabold text-lg mb-3">Transparent Pricing</h4>
+        <p class="text-white/55 leading-relaxed">Detailed, line-by-line estimates. You know exactly what you're paying for — materials, labor, timeline, and warranty. No surprises.</p>
+      </div>
+      <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+        <div class="w-14 h-14 bg-orange/20 rounded-2xl flex items-center justify-center mb-5">
+          <i class="ph ph-shield-check text-orange text-2xl"></i>
+        </div>
+        <h4 class="text-white font-extrabold text-lg mb-3">Fully Licensed & Insured</h4>
+        <p class="text-white/55 leading-relaxed">Licensed in California — active and verified. Full liability insurance and workers' compensation. Proof of coverage available anytime.</p>
+      </div>
+      <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+        <div class="w-14 h-14 bg-orange/20 rounded-2xl flex items-center justify-center mb-5">
+          <i class="ph ph-timer text-orange text-2xl"></i>
+        </div>
+        <h4 class="text-white font-extrabold text-lg mb-3">Fast & Reliable Service</h4>
+        <p class="text-white/55 leading-relaxed">We stick to deadlines and communicate clearly. Accelerated timelines and after-hours work available for commercial clients.</p>
+      </div>
+      <div class="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+        <div class="w-14 h-14 bg-orange/20 rounded-2xl flex items-center justify-center mb-5">
+          <i class="ph ph-smiley text-orange text-2xl"></i>
+        </div>
+        <h4 class="text-white font-extrabold text-lg mb-3">Satisfaction Guaranteed</h4>
+        <p class="text-white/55 leading-relaxed">10-year workmanship warranty on top of manufacturer warranties. Scheduled check-ins at 6 and 12 months. If something isn't right, we make it right.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PROCESS -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-black">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-16 reveal">
+      <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-path text-lg"></i>
+        <span>How We Work</span>
+      </div>
+      <h2 class="heading-text text-white mb-4">Easy Steps to Book California's Best Roofing</h2>
+      <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">Top-quality roofing, one step at a time. A proven process refined across 250+ projects — no surprises, no shortcuts.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div class="reveal text-center">
+        <div class="card-white">
+          <div class="w-16 h-16 bg-brand rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand/20">
+            <span class="text-white font-black text-2xl">1</span>
+          </div>
+          <h4 class="font-extrabold text-white text-lg mb-2">Initial Inquiry</h4>
+          <p class="text-gray-300 leading-relaxed">Call, email, or fill out our quote form. We listen, ask the right questions, and understand your situation — no pressure.</p>
+        </div>
+      </div>
+      <div class="reveal text-center">
+        <div class="card-white">
+          <div class="w-16 h-16 bg-brand rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand/20">
+            <span class="text-white font-black text-2xl">2</span>
+          </div>
+          <h4 class="font-extrabold text-white text-lg mb-2">Free Inspection</h4>
+          <p class="text-gray-300 leading-relaxed">Free, no-obligation inspection — often same or next day. Thorough assessment with photo documentation and an honest condition report.</p>
+        </div>
+      </div>
+      <div class="reveal text-center">
+        <div class="card-white">
+          <div class="w-16 h-16 bg-orange rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange/20">
+            <span class="text-white font-black text-2xl">3</span>
+          </div>
+          <h4 class="font-extrabold text-white text-lg mb-2">Detailed Estimate</h4>
+          <p class="text-gray-300 leading-relaxed">Transparent, line-by-line written estimate. Materials, labor, timeline, and warranty — all spelled out clearly. No hidden costs.</p>
+        </div>
+      </div>
+      <div class="reveal text-center">
+        <div class="card-white">
+          <div class="w-16 h-16 bg-orange rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange/20">
+            <span class="text-white font-black text-2xl">4</span>
+          </div>
+          <h4 class="font-extrabold text-white text-lg mb-2">Expert Installation</h4>
+          <p class="text-gray-300 leading-relaxed">Certified crew, premium materials, manufacturer-spec installation. Daily updates, clean site, total respect for your property.</p>
+        </div>
+      </div>
+      <div class="reveal text-center">
+        <div class="card-white">
+          <div class="w-16 h-16 bg-orange rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange/20">
+            <span class="text-white font-black text-2xl">5</span>
+          </div>
+          <h4 class="font-extrabold text-white text-lg mb-2">Warranty & Follow-Up</h4>
+          <p class="text-gray-300 leading-relaxed">10-year workmanship warranty plus manufacturer warranties. Follow-up check-ins at 6 and 12 months. We stand behind our work.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TRUST — Stats + Certifications -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-black relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+    <div class="text-center mb-16 reveal">
+      <div class="inline-flex items-center gap-2 bg-white/10 text-white rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-chart-bar text-lg"></i>
+        <span>Our Track Record</span>
+      </div>
+      <h2 class="heading-text text-white">The Numbers Speak for Themselves</h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-16 reveal">
+      <div class="text-center p-10 bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl">
+        <div class="text-5xl md:text-7xl font-black text-orange mb-3 stat-number" data-target="250">0</div>
+        <div class="text-gray-300 font-semibold text-lg">Projects Completed</div>
+      </div>
+      <div class="text-center p-10 bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl">
+        <div class="text-5xl md:text-7xl font-black text-orange mb-3 stat-number" data-target="15">0</div>
+        <div class="text-gray-300 font-semibold text-lg">Years Experience</div>
+      </div>
+      <div class="text-center p-10 bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl">
+        <div class="text-5xl md:text-7xl font-black text-orange mb-3 stat-number" data-target="10">0</div>
+        <div class="text-gray-300 font-semibold text-lg">Year Warranty</div>
+      </div>
+      <div class="text-center p-10 bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl">
+        <div class="text-5xl md:text-7xl font-black text-orange mb-3 stat-number" data-target="100">0</div>
+        <div class="text-gray-300 font-semibold text-lg">% Satisfaction</div>
+      </div>
+    </div>
+
+    <div class="text-center reveal">
+      <p class="text-gray-500 text-base font-semibold uppercase tracking-[0.2em] mb-10">Certified by Industry Leaders</p>
+      <div class="flex flex-wrap justify-center gap-x-12 gap-y-5 text-gray-500 font-bold text-xl tracking-tight">
+        <span>CERTAINTEED</span><span>GAF</span><span>OWENS CORNING</span><span>MALARKEY</span><span>POLYGLASS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- GALLERY -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-black">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-14 reveal">
+      <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-image text-lg"></i>
+        <span>Recent Projects</span>
+      </div>
+      <h2 class="heading-text text-white mb-4">Our Work Across California</h2>
+      <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">Commercial and residential projects completed with precision and care.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 reveal">
+      <div class="md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden bg-neutral-800">
+        <img src="assets/images/hf_20260516_063948_61ced174-8722-47a7-8be3-42d2a5f48eff.png" alt="Commercial TPO roof installation" class="w-full h-full object-cover" loading="lazy">
+      </div>
+      <div class="rounded-2xl overflow-hidden bg-neutral-800 aspect-square">
+        <img src="assets/images/hf_20260515_210109_5d62f9fa-5e8a-4f8e-b293-005982b011c9.png" alt="Roof replacement project" class="w-full h-full object-cover" loading="lazy">
+      </div>
+      <div class="rounded-2xl overflow-hidden bg-neutral-800 aspect-square">
+        <img src="assets/images/hf_20260516_063336_1b5299ba-7ee4-48a9-863f-08ac6b72cd6f.png" alt="Metal roofing installation" class="w-full h-full object-cover" loading="lazy">
+      </div>
+      <div class="rounded-2xl overflow-hidden bg-neutral-800 aspect-square">
+        <img src="assets/images/hf_20260516_063429_2ab0565c-6816-4aeb-944c-eb9b194da075.png" alt="Commercial flat roof coating" class="w-full h-full object-cover" loading="lazy">
+      </div>
+      <div class="rounded-2xl overflow-hidden bg-neutral-800 aspect-square">
+        <img src="assets/images/hf_20260516_063447_bc71f7ba-7201-4b2a-9022-daa9a8f153d3.png" alt="Residential tile roofing" class="w-full h-full object-cover" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FAQ -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-neutral-950">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-16 reveal">
+      <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-question text-lg"></i>
+        <span>FAQ</span>
+      </div>
+      <h2 class="heading-text text-white mb-4">Frequently Asked Questions</h2>
+      <p class="text-xl text-gray-300 leading-relaxed">Quick, straightforward answers to common questions about our roofing services.</p>
+    </div>
+
+    <div class="space-y-4 reveal">
+
+      <div>
+        <input type="checkbox" id="faq1" class="faq-toggle">
+        <label for="faq1">
+          <span>What roofing services can I book for a home repair?</span>
+          <i class="ph ph-caret-down faq-chevron text-orange text-xl"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner">Homeowners can book a full range of residential services including: roof inspection and condition assessment (checking for missing shingles, flashing issues, water intrusion, granule loss); localized repairs (patching leaks, replacing damaged shingles or tiles, repairing flashing, vent boots, gutters, downspouts); partial re-roofing or roof deck repair; full roof replacement; and roof maintenance plans (annual cleaning, debris removal, gutter clearing, ventilation checks).</div></div>
+      </div>
+
+      <div>
+        <input type="checkbox" id="faq2" class="faq-toggle">
+        <label for="faq2">
+          <span>Who offers emergency roof repair near me?</span>
+          <i class="ph ph-caret-down faq-chevron text-orange text-xl"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner">TRS Roofing Co. provides emergency roof repair throughout our California service area for sudden issues like storm-damage leaks, falling tree branches, missing shingles after high winds, or water intrusion during heavy rain. We're available 24/7 for emergency response. When you call, we dispatch a certified technician quickly, secure the site, provide a written estimate, handle safe cleanup, and document the issue for insurance claims.</div></div>
+      </div>
+
+      <div>
+        <input type="checkbox" id="faq3" class="faq-toggle">
+        <label for="faq3">
+          <span>What roofing companies provide free roof inspections?</span>
+          <i class="ph ph-caret-down faq-chevron text-orange text-xl"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner">TRS Roofing Co. offers a free, no-obligation roof inspection as part of our commitment to transparency. During the inspection we: assess the roof's current condition, note visible damage, identify potential leak points, check flashing and ventilation, and document findings with photos. You'll then receive a detailed, no-pressure quote for any necessary repair or replacement work.</div></div>
+      </div>
+
+      <div>
+        <input type="checkbox" id="faq4" class="faq-toggle">
+        <label for="faq4">
+          <span>Which roofing contractors handle insurance claims?</span>
+          <i class="ph ph-caret-down faq-chevron text-orange text-xl"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner">TRS Roofing Co. has extensive experience working with homeowners' insurance claims for roof damage (hail, wind, fallen debris, fire-damaged roofing). We assist by: documenting damage with photos and detailed reports; supporting claim preparation and coordinating with adjusters if needed; advising on building code upgrades and material replacements insurers may require; and providing the invoice, warranty information, and project scope for the claim file.</div></div>
+      </div>
+
+      <div>
+        <input type="checkbox" id="faq5" class="faq-toggle">
+        <label for="faq5">
+          <span>Where can I get a roof leak repaired quickly?</span>
+          <i class="ph ph-caret-down faq-chevron text-orange text-xl"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner">TRS Roofing Co. offers rapid-response roof-leak repair across our California service area. Upon contact we: schedule same-day or next-day inspection depending on urgency; provide temporary fixes (tarpaulins, emergency flashing, water removal) if necessary; identify root causes (shingle damage, flashing failure, vent boot leak, gutter blockage); and present a written repair plan and cost estimate. We recommend contacting us at the first sign of a leak.</div></div>
+      </div>
+
+    </div>
+
+    <div class="text-center mt-14 reveal">
+      <p class="text-xl text-gray-300 mb-6 font-semibold">Ready to discuss your roofing project?</p>
+      <a href="#quote" class="btn-pill btn-pill-lg bg-orange hover:bg-orange-dark text-white shadow-2xl shadow-orange/25">Request a Roof Assessment Today <i class="ph ph-arrow-right text-xl"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ANIMATION #3 -->
+<!-- ============================================================ -->
+<section class="py-20 md:py-28 bg-black">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
+    <div class="anim-stage w-full rounded-2xl overflow-hidden bg-black" style="min-height: 280px;">
+      <video class="anim-video-desktop w-full h-full object-cover" autoplay muted loop playsinline preload="auto" poster="">
+        <source src="assets/video/desktopvideo3.mp4" type="video/mp4">
+      </video>
+      <video class="anim-video-mobile w-full h-full object-cover" autoplay muted loop playsinline preload="auto" poster="">
+        <source src="assets/video/video3mobil.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SOCIAL PROOF -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-neutral-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-14 reveal">
+      <div class="inline-flex items-center gap-2 bg-green-900/30 text-green-400 rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-star text-lg"></i>
+        <span>Client Reviews</span>
+      </div>
+      <h2 class="heading-text text-white mb-5">Trusted Across California</h2>
+      <div class="flex flex-wrap justify-center gap-10 mt-8">
+        <div class="text-center">
+          <div class="text-yellow-500 text-2xl mb-2">★★★★★</div>
+          <div class="font-extrabold text-white text-3xl">4.9</div>
+          <div class="text-base text-gray-400 font-medium">Google</div>
+        </div>
+        <div class="text-center">
+          <div class="text-yellow-500 text-2xl mb-2">★★★★★</div>
+          <div class="font-extrabold text-white text-3xl">4.7</div>
+          <div class="text-base text-gray-400 font-medium">Yelp</div>
+        </div>
+        <div class="text-center">
+          <div class="text-yellow-500 text-2xl mb-2">★★★★★</div>
+          <div class="font-extrabold text-white text-3xl">5.0</div>
+          <div class="text-base text-gray-400 font-medium">Facebook</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+
+      <div class="card-white overflow-hidden flex flex-col !p-0">
+        <div class="relative bg-black aspect-[16/10]">
+          <video controls preload="auto" class="w-full h-full object-cover" poster="">
+            <source src="assets/video/video youtube 1.mp4" type="video/mp4">
+          </video>
+          <div class="absolute top-4 left-4 bg-orange text-white rounded-full px-4 py-1.5 text-sm font-extrabold shadow-lg flex items-center gap-1.5">
+            <i class="ph ph-play-circle text-lg"></i> Video Testimonial
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="text-yellow-500 text-xl mb-2">★★★★★</div>
+          <p class="text-gray-300 text-lg leading-relaxed mb-4 font-medium">"Hear directly from our clients about their experience working with TRS Roofing Co. on their commercial and residential roofing projects."</p>
+          <div><div class="font-extrabold text-white text-lg">Video Testimonial</div><div class="text-gray-400 text-base">TRS Roofing Co. Client</div></div>
+        </div>
+      </div>
+
+      <div class="card-white overflow-hidden flex flex-col !p-0">
+        <div class="relative bg-black aspect-[16/10]">
+          <video controls preload="auto" class="w-full h-full object-cover" poster="">
+            <source src="assets/video/videoyoutube2.mp4" type="video/mp4">
+          </video>
+          <div class="absolute top-4 left-4 bg-orange text-white rounded-full px-4 py-1.5 text-sm font-extrabold shadow-lg flex items-center gap-1.5">
+            <i class="ph ph-play-circle text-lg"></i> Video Testimonial
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="text-yellow-500 text-xl mb-2">★★★★★</div>
+          <p class="text-gray-300 text-lg leading-relaxed mb-4 font-medium">"Another satisfied client shares their story — from the free inspection through installation and final walkthrough with our California team."</p>
+          <div><div class="font-extrabold text-white text-lg">Video Testimonial</div><div class="text-gray-400 text-base">TRS Roofing Co. Client</div></div>
+        </div>
+      </div>
+
+      <div class="card-white flex flex-col">
+        <div class="text-yellow-500 text-xl mb-3">★★★★★</div>
+        <p class="text-gray-300 text-lg leading-relaxed mb-5 flex-1">"We manage 12 commercial properties. TRS Roofing handles all our TPO and flat roof needs on time and within budget. They've earned our trust over multiple large projects."</p>
+        <div><div class="font-extrabold text-white text-lg">Michael T.</div><div class="text-gray-400 text-base">Property Manager</div></div>
+      </div>
+      <div class="card-white flex flex-col">
+        <div class="text-yellow-500 text-xl mb-3">★★★★★</div>
+        <p class="text-gray-300 text-lg leading-relaxed mb-5 flex-1">"Emergency leak at our restaurant at 9pm — crew on-site by 10:30pm. That responsiveness is rare. Highly recommend for commercial emergency work."</p>
+        <div><div class="font-extrabold text-white text-lg">Elena R.</div><div class="text-gray-400 text-base">Restaurant Owner</div></div>
+      </div>
+      <div class="card-white flex flex-col">
+        <div class="text-yellow-500 text-xl mb-3">★★★★★</div>
+        <p class="text-gray-300 text-lg leading-relaxed mb-5 flex-1">"They replaced the roof on our home impeccably. The crew was respectful and cleaned up everything. 100% recommended — TRS Roofing Co. is the real deal."</p>
+        <div><div class="font-extrabold text-white text-lg">Roberto G.</div><div class="text-gray-400 text-base">Homeowner</div></div>
+      </div>
+      <div class="card-white flex flex-col">
+        <div class="text-yellow-500 text-xl mb-3">★★★★★</div>
+        <p class="text-gray-300 text-lg leading-relaxed mb-5 flex-1">"Full re-roof on our medical office. They worked weekends to avoid disrupting patients. Clean, professional, and the new TPO roof looks flawless."</p>
+        <div><div class="font-extrabold text-white text-lg">Dr. James K.</div><div class="text-gray-400 text-base">Medical Practice</div></div>
+      </div>
+      <div class="card-white flex flex-col">
+        <div class="text-yellow-500 text-xl mb-3">★★★★★</div>
+        <p class="text-gray-300 text-lg leading-relaxed mb-5 flex-1">"Quoted 5 companies for our HOA. TRS Roofing gave the most detailed proposal and best value. Finished ahead of schedule — the board was genuinely impressed."</p>
+        <div><div class="font-extrabold text-white text-lg">Susan P.</div><div class="text-gray-400 text-base">HOA President</div></div>
+      </div>
+      <div class="card-white flex flex-col">
+        <div class="text-yellow-500 text-xl mb-3">★★★★★</div>
+        <p class="text-gray-300 text-lg leading-relaxed mb-5 flex-1">"Skylights and full roof replacement. The attention to detail was extraordinary. The 10-year warranty gives us real peace of mind."</p>
+        <div><div class="font-extrabold text-white text-lg">David & Mary L.</div><div class="text-gray-400 text-base">Homeowners</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- QUOTE FORM -->
+<!-- ============================================================ -->
+<section id="quote" class="py-24 md:py-32 bg-black relative">
+  <div class="absolute inset-0 bg-gradient-to-b from-orange/5 to-transparent pointer-events-none"></div>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-14 reveal">
+      <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-chat-circle-text text-lg"></i>
+        <span>Get a Quote</span>
+      </div>
+      <h2 class="heading-text text-white mb-4">Request Your Free Roof Assessment</h2>
+      <p class="text-xl text-gray-300 leading-relaxed">Fill out the form or call (714) 258-6261. We respond within 2 hours.</p>
+    </div>
+
+    <form id="quoteForm" class="reveal relative z-10">
+      <div class="bg-neutral-900 border border-orange/20 rounded-[2rem] p-8 md:p-10 shadow-[0_8px_40px_-10px_rgba(255,98,0,0.15)] ring-1 ring-orange/5">
+        <div class="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-base font-bold text-white mb-2">Full Name *</label>
+            <input type="text" name="name" required class="w-full bg-neutral-900 border border-gray-700 rounded-xl px-5 py-4 text-white text-lg placeholder:text-gray-400 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/5 transition-all duration-300" placeholder="Your full name">
+          </div>
+          <div>
+            <label class="block text-base font-bold text-white mb-2">Phone *</label>
+            <input type="tel" name="phone" required class="w-full bg-neutral-900 border border-gray-700 rounded-xl px-5 py-4 text-white text-lg placeholder:text-gray-400 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/5 transition-all duration-300" placeholder="(951) 555-0123">
+          </div>
+          <div>
+            <label class="block text-base font-bold text-white mb-2">Email *</label>
+            <input type="email" name="email" required class="w-full bg-neutral-900 border border-gray-700 rounded-xl px-5 py-4 text-white text-lg placeholder:text-gray-400 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/5 transition-all duration-300" placeholder="you@email.com">
+          </div>
+          <div>
+            <label class="block text-base font-bold text-white mb-2">Service Type</label>
+            <select name="service" class="w-full bg-neutral-900 border border-gray-700 rounded-xl px-5 py-4 text-white text-lg focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/5 transition-all duration-300">
+              <option value="">Select a service...</option>
+              <optgroup label="Commercial"><option>TPO / PVC Roofing</option><option>Modified Bitumen</option><option>Metal Roofing</option><option>Coatings & Waterproofing</option><option>Emergency Repair</option><option>Inspection / Maintenance</option></optgroup>
+              <optgroup label="Residential"><option>Full Roof Replacement</option><option>Leak Repair</option><option>Gutters & Downspouts</option><option>Skylights & Solar Tubes</option><option>Attic Insulation</option></optgroup>
+              <option value="other">Other / Not Sure</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-base font-bold text-white mb-2">Best Time to Contact</label>
+            <input type="text" name="bestTime" class="w-full bg-neutral-900 border border-gray-700 rounded-xl px-5 py-4 text-white text-lg placeholder:text-gray-400 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/5 transition-all duration-300" placeholder="e.g. Weekday mornings, after 3pm">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-base font-bold text-white mb-2">Message (optional)</label>
+            <textarea name="message" rows="4" class="w-full bg-neutral-900 border border-gray-700 rounded-xl px-5 py-4 text-white text-lg placeholder:text-gray-400 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/5 transition-all duration-300 resize-none" placeholder="Briefly describe your roofing needs..."></textarea>
+          </div>
+
+          <div class="sm:col-span-2">
+            <button type="button" id="photoToggle" onclick="togglePhotoUpload()" class="flex items-center gap-4 text-white hover:text-orange transition-colors duration-300 group w-full">
+              <div class="w-14 h-14 rounded-2xl bg-orange/10 flex items-center justify-center group-hover:bg-orange/20 transition-colors shrink-0">
+                <i class="ph ph-camera text-orange text-2xl"></i>
+              </div>
+              <div class="text-left">
+                <span class="font-bold text-lg">Do you have photos of your roof?</span>
+                <span class="text-gray-400 text-base block">Attach up to 5 photos for a faster estimate</span>
+              </div>
+              <i id="photoChevron" class="ph ph-caret-down text-gray-400 text-xl transition-transform duration-400 ml-auto shrink-0"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="uploadZone" class="mt-6 hidden overflow-hidden transition-all duration-500">
+          <div class="upload-zone p-8 text-center cursor-pointer" id="dropZone" onclick="document.getElementById('photoInput').click()">
+            <input type="file" id="photoInput" name="photos" accept="image/*" multiple class="hidden" onchange="handleFiles(this.files)">
+            <i class="ph ph-image text-3xl text-gray-300 mx-auto mb-3"></i>
+            <p class="text-gray-400 text-lg font-semibold">Drag & drop photos here, or click to browse</p>
+            <p class="text-gray-400 text-base mt-2">Up to 5 photos — JPG, PNG, or HEIC</p>
+          </div>
+          <div id="photoPreviews" class="flex flex-wrap gap-4 mt-5"></div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-pill w-full justify-center bg-orange hover:bg-orange-dark text-white text-xl mt-6 py-5 shadow-2xl shadow-orange/25 !rounded-2xl font-extrabold">
+        Request Free Estimate
+        <i class="ph ph-arrow-right text-2xl"></i>
+      </button>
+      <p class="text-gray-400 text-base text-center mt-4 font-medium">We respect your privacy. Your information is never shared.</p>
+    </form>
+
+    <div id="formSuccess" class="hidden reveal text-center py-20">
+      <div class="w-24 h-24 bg-green-900/30 rounded-[3rem] flex items-center justify-center mx-auto mb-8"><i class="ph ph-check-circle text-green-500 text-5xl"></i></div>
+      <h3 class="text-3xl font-black text-white mb-4">Thank You — We'll Be in Touch!</h3>
+      <p class="text-xl text-gray-300 mb-10 max-w-lg mx-auto leading-relaxed">Your request has been received. We'll contact you within 2 hours. Need immediate help? Call (714) 258-6261.</p>
+      <a href="tel:+17142586261" class="btn-pill btn-pill-lg bg-orange hover:bg-orange-dark text-white shadow-2xl shadow-orange/25"><i class="ph ph-phone-call text-2xl"></i><span class="font-extrabold text-xl">(714) 258-6261</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- AREAS WE SERVE -->
+<!-- ============================================================ -->
+<section class="py-24 md:py-32 bg-neutral-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-14 reveal">
+      <div class="inline-flex items-center gap-2 bg-orange/10 text-orange rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-[0.15em] mb-5">
+        <i class="ph ph-map-pin-area text-lg"></i>
+        <span>Areas We Serve</span>
+      </div>
+      <h2 class="heading-text text-white mb-4">Proudly Serving California</h2>
+      <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">Commercial and residential roofing across California — from coastal communities to inland valleys.</p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 reveal">
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-wave-sine text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Riverside</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-buildings text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">San Bernardino</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-mountains text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Ontario</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-tree text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Corona</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-wave-sine text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Moreno Valley</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-buildings text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Fontana</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-mountains text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Rancho Cucamonga</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-tree text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Palm Springs</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-wave-sine text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Temecula</span>
+      </div>
+      <div class="bg-neutral-900 border border-gray-700 rounded-2xl p-6 text-center shadow-sm">
+        <i class="ph ph-city text-orange text-2xl mb-3 block mx-auto"></i>
+        <span class="font-extrabold text-white text-lg">Los Angeles</span>
+      </div>
+    </div>
+
+    <div class="text-center mt-14 reveal">
+      <p class="text-xl text-gray-300 mb-6 font-semibold">Don't see your city? Give us a call — we likely serve your area.</p>
+      <a href="tel:+17142586261" class="btn-pill btn-pill-lg bg-orange hover:bg-orange-dark text-white shadow-2xl shadow-orange/25">
+        <i class="ph ph-phone-call text-2xl"></i>
+        <span class="font-extrabold text-xl">(714) 258-6261</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FOOTER -->
+<!-- ============================================================ -->
+<footer class="bg-brand py-16 md:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
+
+      <div>
+        <div class="bg-neutral-900 rounded-2xl p-3 mb-5 shadow-lg">
+          <img src="assets/images/hf_20260516_063849_d33dbf50-9404-40ab-99d4-4f4d379a21e6.png" alt="TRS Roofing Co. work truck" class="w-full h-auto rounded-xl">
+        </div>
+        <div class="bg-neutral-900 rounded-2xl p-6 shadow-lg">
+          <img src="assets/images/logo.jpg" alt="TRS Roofing Co." class="h-20 w-auto mb-5">
+          <p class="text-gray-300 text-lg leading-relaxed mb-4">California's trusted commercial and residential roofing contractor. Licensed, insured, committed to quality.</p>
+          <div class="flex items-center gap-2 text-white text-lg font-semibold"><i class="ph ph-shield-check text-green-500 text-xl"></i> Licensed California</div>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-white font-extrabold text-lg mb-5">Contact</h4>
+        <div class="space-y-4 text-lg">
+          <a href="tel:+17142586261" class="flex items-center gap-3 text-gray-300 hover:text-orange transition-colors"><i class="ph ph-phone-call text-orange text-xl"></i> <span class="font-bold">(714) 258-6261</span></a>
+          <a href="mailto:info@trsroofingco.com" class="flex items-center gap-3 text-gray-300 hover:text-orange transition-colors"><i class="ph ph-envelope text-orange text-xl"></i> info@trsroofingco.com</a>
+          <div class="flex items-start gap-3 text-gray-300"><i class="ph ph-map-pin text-orange text-xl shrink-0 mt-0.5"></i><span>California, USA</span></div>
+          <div class="flex items-start gap-3 text-gray-300"><i class="ph ph-clock text-orange text-xl shrink-0 mt-0.5"></i><span>Mon-Sat: 7:00 am - 6:00 pm<br>Sun: Closed</span></div>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-white font-extrabold text-lg mb-5">Service Areas</h4>
+        <ul class="grid grid-cols-2 gap-2 text-lg text-gray-400">
+          <li>Riverside</li><li>San Bernardino</li><li>Ontario</li><li>Corona</li><li>Moreno Valley</li><li>Fontana</li><li>Rancho Cucamonga</li><li>Palm Springs</li><li>Temecula</li><li>Los Angeles</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-extrabold text-lg mb-5">Follow Us</h4>
+        <div class="flex flex-wrap gap-3 mb-6">
+          <a href="#" class="w-11 h-11 bg-white/10 hover:bg-[#1877F2] rounded-xl flex items-center justify-center transition-colors group" aria-label="Facebook"><i class="ph ph-facebook-logo text-[#1877F2] group-hover:text-white text-xl transition-colors"></i></a>
+          <a href="#" class="w-11 h-11 bg-white/10 hover:bg-[#E4405F] rounded-xl flex items-center justify-center transition-colors group" aria-label="Instagram"><i class="ph ph-instagram-logo text-[#E4405F] group-hover:text-white text-xl transition-colors"></i></a>
+          <a href="#" class="w-11 h-11 bg-white/10 hover:bg-[#FF0050] rounded-xl flex items-center justify-center transition-colors group" aria-label="TikTok"><i class="ph ph-tiktok-logo text-[#FF0050] group-hover:text-white text-xl transition-colors"></i></a>
+          <a href="#" class="w-11 h-11 bg-white/10 hover:bg-[#FF1A1A] rounded-xl flex items-center justify-center transition-colors group" aria-label="Yelp"><img src="assets/images/yelp-icon.svg" class="w-5 h-5 group-hover:brightness-0 group-hover:invert transition-all" style="filter: brightness(0) saturate(100%) invert(19%) sepia(88%) saturate(4976%) hue-rotate(343deg) brightness(101%) contrast(101%);" alt="Yelp"></a>
+          <a href="#" class="w-11 h-11 bg-white/10 hover:bg-[#4285F4] rounded-xl flex items-center justify-center transition-colors group" aria-label="Google Reviews"><i class="ph ph-google-logo text-[#4285F4] group-hover:text-white text-xl transition-colors"></i></a>
+        </div>
+        <a href="#quote" class="btn-pill bg-orange hover:bg-orange-dark text-white text-lg shadow-xl shadow-orange/20">Get a Free Quote <i class="ph ph-arrow-right text-xl"></i></a>
+      </div>
+    </div>
+    <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between gap-4 text-base text-gray-500">
+      <p>&copy; 2026 TRS Roofing Co. All rights reserved.</p>
+      <p>Proudly serving California — Licensed & Insured</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================ -->
+<!-- BOTTOM LOGO -->
+<!-- ============================================================ -->
+<section class="bg-black py-12 md:py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <img src="assets/images/logo.jpg" alt="TRS Roofing Co." class="h-28 md:h-36 w-auto mx-auto">
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHATSAPP STICKY -->
+<!-- ============================================================ -->
+<div id="whatsappBtn" class="whatsapp-sticky wa-animate">
+  <a href="https://wa.me/17142586261" target="_blank" rel="noopener" class="wa-btn" aria-label="Chat on WhatsApp">
+    <i class="ph ph-whatsapp-logo text-white text-3xl"></i>
+  </a>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+function togglePhotoUpload() {
+  const zone = document.getElementById('uploadZone');
+  const chevron = document.getElementById('photoChevron');
+  const open = !zone.classList.contains('hidden');
+  zone.classList.toggle('hidden');
+  chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+let uploadedFiles = [];
+function handleFiles(files) {
+  const previews = document.getElementById('photoPreviews');
+  for (let f of files) {
+    if (uploadedFiles.length >= 5) break;
+    if (!f.type.startsWith('image/')) continue;
+    uploadedFiles.push(f);
+    const r = new FileReader();
+    r.onload = e => { const img = document.createElement('img'); img.src = e.target.result; img.className = 'photo-thumb'; previews.appendChild(img); };
+    r.readAsDataURL(f);
+  }
+}
+
+const dz = document.getElementById('dropZone');
+if (dz) {
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('js-ready');
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.querySelectorAll('.reveal').forEach(el => {
+    ScrollTrigger.create({ trigger: el, start: 'top 88%', onEnter: () => el.classList.add('visible'), once: true });
+  });
+  setTimeout(() => {
+    document.querySelectorAll('.reveal').forEach(el => {
+      if (el.getBoundingClientRect().top < window.innerHeight * 1.1) el.classList.add('visible');
+    });
+  }, 800);
+  setTimeout(() => {
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
+  }, 3000);
+
+  document.querySelectorAll('.stat-number').forEach(el => {
+    const t = parseInt(el.dataset.target);
+    if (!t) return;
+    ScrollTrigger.create({ trigger: el, start: 'top 85%', onEnter: () => {
+      const isPercent = t === 100;
+      gsap.to(el, { innerText: t, duration: 2, ease: 'power2.out', snap: { innerText: 1 }, onUpdate: function() {
+        this.targets()[0].innerText = Math.round(this.targets()[0].innerText) + (isPercent ? '%' : '+');
+      }});
+    }, once: true });
+  });
+
+  ScrollTrigger.create({
+    trigger: '#services',
+    start: 'bottom 60%',
+    onEnter: () => document.getElementById('whatsappBtn').classList.add('visible'),
+    onLeaveBack: () => document.getElementById('whatsappBtn').classList.remove('visible'),
+  });
+
+  document.querySelectorAll('video.anim-video-desktop, video.anim-video-mobile').forEach(v => {
+    const src = v.querySelector('source').getAttribute('src') || '';
+    v.playbackRate = src.includes('2video') || src.includes('landing2') ? 0.9 : 1.0;
+  });
+});
+
+function trackConversion(n, p = {}) {
+  try { if (typeof gtag !== 'undefined') gtag('event', n, p); } catch(e) {}
+  try { if (typeof fbq !== 'undefined') fbq('track', n, p); } catch(e) {}
+}
+document.querySelectorAll('a[href^="tel:"]').forEach(l => {
+  l.addEventListener('click', () => trackConversion('Contact', { method: 'phone' }));
+});
+</script>
+<script src="js/api-integration.js"></script>
+</body>
+</html>

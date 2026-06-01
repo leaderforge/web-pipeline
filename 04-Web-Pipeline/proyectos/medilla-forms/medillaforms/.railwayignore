@@ -1,0 +1,7 @@
+.env.example
+.env
+*.md
+.git
+node_modules/
+brain/
+research/

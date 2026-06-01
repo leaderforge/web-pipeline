@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedillaForms — Dispute Letter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      max-width: 750px;
+      margin: 40px auto;
+      padding: 30px 40px;
+      color: #1a1a1a;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .header .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2563eb;
+      letter-spacing: -0.5px;
+    }
+    .header .subtitle {
+      color: #6b7280;
+      font-size: 12px;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    .section { margin-bottom: 25px; }
+    .section h2 {
+      color: #2563eb;
+      font-size: 14px;
+      font-weight: bold;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 20px;
+    }
+    .info-grid p { margin: 3px 0; }
+    .info-grid .label { color: #6b7280; font-size: 11px; text-transform: uppercase; }
+    .info-grid .value { font-size: 13px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 12px;
+    }
+    th {
+      background: #f3f4f6;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    td {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      vertical-align: top;
+    }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .summary {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin: 25px 0;
+    }
+    .summary strong { color: #1e40af; }
+    .signature { margin-top: 40px; }
+    .signature .line { border-top: 1px solid #1a1a1a; width: 250px; margin: 30px 0 5px 0; }
+    .footer {
+      margin-top: 45px;
+      padding-top: 15px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 10px;
+      color: #9ca3af;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">MedillaForms</div>
+    <div class="subtitle">Educational Medical Billing Analysis Service</div>
+  </div>
+
+  <div class="section">
+    <h2>General Information</h2>
+    <div class="info-grid">
+      <div>
+        <p class="label">Date</p>
+        <p class="value">{today}</p>
+      </div>
+      <div>
+        <p class="label">Medical Provider</p>
+        <p class="value">{hospital}</p>
+      </div>
+      <div>
+        <p class="label">Patient</p>
+        <p class="value">{customer_name}</p>
+      </div>
+      <div>
+        <p class="label">Date of Service</p>
+        <p class="value">{fecha}</p>
+      </div>
+      <div>
+        <p class="label">Total Billed</p>
+        <p class="value"><strong>{total_facturado}</strong></p>
+      </div>
+      <div>
+        <p class="label">Estimated Potential Savings</p>
+        <p class="value"><strong>{ahorro_estimado}</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Dear Billing Department</h2>
+    <p>
+      I am writing to request a detailed review of my medical bill.
+      After a thorough analysis of the charges, I have identified <strong>{num_errores} potential errors</strong>
+      totaling approximately <strong>{ahorro_estimado}</strong>.
+    </p>
+    <p style="margin-top: 10px;">
+      Below, I present each of the identified items for your consideration.
+      I would appreciate it if you could review these charges and make the appropriate adjustments.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Identified Errors</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Error</th>
+          <th>Description</th>
+          <th>Billed Amount</th>
+          <th>Reference Price</th>
+          <th>Est. Savings</th>
+        </tr>
+      </thead>
+      <tbody>
+        {errores_rows}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Charge Breakdown</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>CPT Code</th>
+          <th>Description</th>
+          <th>Qty</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {items_rows}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <p style="margin-bottom: 8px;">
+      <strong>Total Estimated Savings: {ahorro_estimado}</strong>
+    </p>
+    <p>
+      I respectfully request the review and adjustment of the charges mentioned above.
+      Thank you in advance for your attention to this matter. I look forward to your response.
+    </p>
+  </div>
+
+  <div class="signature">
+    <p>Sincerely,</p>
+    <div class="line"></div>
+    <p><strong>{customer_name}</strong></p>
+  </div>
+
+  <div class="footer">
+    <p>{disclaimer}</p>
+  </div>
+
+</body>
+</html>

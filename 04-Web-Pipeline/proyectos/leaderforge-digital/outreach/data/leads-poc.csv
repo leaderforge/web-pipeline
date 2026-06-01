@@ -1,0 +1,6 @@
+business_name,phone,email,website,website_quality,has_website,city,source_url,notes,priority,scraped_at
+"Sam's Welding Inc.",(619) 281-2709,samsweldinginc@yahoo.com,https://www.samsweldinginc.com/,good,yes,"San Diego, CA",https://www.samsweldinginc.com/,"Welding shop with 20+ years experience, licensed and insured.",4,2026-05-25T22:58:59
+"San Diego Mobile Welder",858-437-2339,vova@sandiegomobilewelder.com,https://sandiegomobilewelder.com/,good,yes,"San Diego, CA",https://sandiegomobilewelder.com/,"Mobile metal welder and fabricator in San Diego County.",4,2026-05-25T22:59:04
+"Morena Welding",619-275-4829,,https://morenawelding.com/,good,yes,"San Diego, CA",https://morenawelding.com/,"Family-owned custom welding and fabrication since 1985.",4,2026-05-25T22:59:01
+"California On-Site Welding",,,https://www.californiaonsitewelding.com/,good,yes,"Riverside, CA",https://www.californiaonsitewelding.com/,"Mobile welding services in Orange County, Riverside, and San Diego County.",4,2026-05-25T23:03:00
+"American Mobile Welding",,,https://www.americanmobileweld.com/,good,yes,"Ontario, CA",https://www.americanmobileweld.com/,"Industrial, Commercial, and Residential mobile welding specialists.",4,2026-05-25T23:03:03

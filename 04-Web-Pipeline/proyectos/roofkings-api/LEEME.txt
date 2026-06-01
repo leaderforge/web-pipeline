@@ -1,0 +1,57 @@
+ROOF KINGS — Conexion al Backend Multi-Marca
+==============================================
+
+DATOS CONFIGURADOS:
+  - Telegram Bot Token: 8738432929:AAF4PuNksgFgALKNcYxwwDd5IL99a5AF4LA
+  - Telegram Chat ID:   8753553351
+  - WhatsApp:           19495612069
+  - Telefono pagina:    (858) 465-8919
+  - Brand key:          "roof-kings"
+
+ARCHIVOS EN ESTA CARPETA:
+  server.js           → Reemplaza C:\Web Builder\welding-brothers-api\server.js
+  .env.additions      → Agrega estas 2 lineas al .env del API
+  api-integration.js  → Pega este archivo en tu proyecto sdroofkings (js/api-integration.js)
+
+PASOS PARA COMPLETAR:
+
+1. AGREGAR VARIABLES AL .ENV
+   - Abre C:\Web Builder\welding-brothers-api\.env
+   - Copia y pega las 2 lineas del archivo .env.additions al final
+   - Guarda
+
+2. REEMPLAZAR server.js
+   - Copia server.js a C:\Web Builder\welding-brothers-api\server.js
+   - Sobrescribe el archivo existente (es multi-marca, no rompe nada de WB)
+
+3. DESPLEGAR BACKEND A RAILWAY
+   - Abre terminal en C:\Web Builder\welding-brothers-api\
+   - Ejecuta: npx @railway/cli up --detach
+   - Verifica que responda: GET https://dependable-luck-production-7edf.up.railway.app/
+
+4. INTEGRAR FRONTEND (sdroofkings)
+   - Crea la carpeta js/ si no existe
+   - Copia api-integration.js a js/api-integration.js
+   - En index.html, agrega antes de </body>:
+       <script src="js/api-integration.js"></script>
+   - Verifica que:
+     * El form tenga id="quoteForm"
+     * El boton de WhatsApp tenga id="stickyWhatsapp" (o href*="wa.me")
+     * El href de WhatsApp apunte a https://wa.me/19495612069
+     * Los telefonos usen href="tel:+18584658919"
+
+5. DESPLEGAR FRONTEND A VERCEL
+   - Abre terminal en la carpeta de sdroofkings
+   - Ejecuta: npx vercel --prod
+
+QUE LLEGA AL TELEGRAM DE ROOF KINGS (@SD_Roofkings_bot):
+  - Formulario llenado      → nombre, telefono, tipo de trabajo, hora, fotos
+  - Clic en WhatsApp        → "Alguien hizo clic en WhatsApp desde Roof Kings"
+  - Llamada entrante        → numero que llama + hora (si configuras Telnyx)
+  - SMS entrante            → numero + mensaje (si configuras Twilio/Telnyx)
+
+NOTAS:
+  - Google Sheets: datos van a la pestana "RK Leads"
+  - R2 (fotos): se guardan en carpeta "roof-kings/leads/"
+  - El backend de Welding Brothers sigue funcionando SIN cambios
+  - Mismo Railway, mismo Sheets, mismo R2 — solo se agrego la marca

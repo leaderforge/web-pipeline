@@ -1,0 +1,20 @@
+{
+  "name": "welding-brothers-api",
+  "version": "1.0.0",
+  "description": "Lead collection API for The Welding Brothers — form submissions → Google Sheets + Telegram + R2",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/lib-storage": "^3.600.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "googleapis": "^140.0.0",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.7.0",
+    "uuid": "^9.0.1"
+  }
+}

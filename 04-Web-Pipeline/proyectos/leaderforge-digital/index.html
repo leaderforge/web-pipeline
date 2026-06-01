@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeaderForge Digital — Websites That Work For Your Trade</title>
+<meta name="description" content="Professional websites for welders, roofers, plumbers & trades. All your leads — Instagram, Facebook, TikTok, Yelp — land on your phone. One inbox.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        orange: '#f2610b',
+        'orange-dark': '#d95508',
+        zinc: { 850: '#1f1f1f', 950: '#0d0d0d' },
+      },
+      fontFamily: { sans: ['Outfit', 'system-ui', 'sans-serif'] },
+    }
+  }
+}
+</script>
+
+<style>
+  :root {
+    --orange: #f2610b;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  html { scroll-behavior: smooth; font-size: 17.5px; }
+  body { background: #fff; }
+
+  .display-text {
+    font-size: clamp(2.8rem, 6vw, 5.2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+  }
+  .heading-text {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+
+  /* ── Scroll Reveals ── */
+  .reveal { opacity: 1; transform: none; transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo); }
+  .js-ready .reveal { opacity: 0; transform: translateY(50px); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Cards ── */
+  .card-white {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02), 0 8px 24px rgba(0,0,0,0.03);
+    transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+  }
+  .card-white:hover { transform: translateY(-4px); box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.06); }
+
+  /* ── Button Pill ── */
+  .btn-pill {
+    display: inline-flex; align-items: center; gap: 0.625rem;
+    border-radius: 9999px; padding: 1rem 2rem;
+    font-weight: 600; font-size: 1.1rem;
+    transition: all 0.4s var(--spring);
+  }
+  .btn-pill:active { transform: scale(0.96); }
+
+  /* ── Scroll-down indicator (overlaid on video) ── */
+  .scroll-hint {
+    position: absolute; bottom: 0.25rem; left: 50%; transform: translateX(-50%);
+    z-index: 5;
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    cursor: pointer; padding: 0.25rem;
+    transition: opacity 0.6s ease;
+  }
+  .scroll-hint span { font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  .scroll-hint i { font-size: 1.2rem; animation: bounce-down 1.8s ease-in-out infinite; }
+  @keyframes bounce-down {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* ── Video poster overlay ── */
+  .hero-poster {
+    position: absolute; inset: 0; z-index: 2;
+    transition: opacity 0.5s ease; pointer-events: none;
+  }
+  .hero-poster.fade-out { opacity: 0; }
+
+  /* ── Noise Overlay ── */
+  .noise-overlay {
+    position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Anim Stage ── */
+  .anim-stage { aspect-ratio: 16/9; }
+
+  /* ── Video loading: invisible until ready, then fade in ── */
+  .hero-video, .anim2-video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+
+  .hero-stage { position: relative; overflow: hidden; background: #0d0d0d; }
+      .hero-video-wrapper { position: absolute; left: 0; right: 0; bottom: 0; top: 0; display: flex; align-items: center; justify-content: center; }
+
+  /* ── Phone Mockup Frame ── */
+  .phone-frame {
+    background: #1a1a1a;
+    border-radius: 2.5rem;
+    padding: 0.75rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .phone-screen {
+    background: #fafaf9; border-radius: 1.85rem;
+    overflow: hidden; aspect-ratio: 9/19.5;
+  }
+
+  /* ── FAQ Accordion ── */
+  .faq-toggle { display: none; }
+  .faq-toggle + label {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; padding: 1.5rem;
+    background: #fff; border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 1rem; font-weight: 600; font-size: 1.1rem;
+    color: #1a1a1a; transition: all 0.3s ease;
+  }
+  .faq-toggle + label:hover { border-color: rgba(242,97,11,0.2); background: #fffaf7; }
+  .faq-toggle + label .faq-chevron { transition: transform 0.35s var(--spring); }
+  .faq-toggle:checked + label .faq-chevron { transform: rotate(180deg); }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.5s var(--ease-out-expo); }
+  .faq-toggle:checked + label + .faq-answer { max-height: 40rem; }
+  .faq-answer-inner { padding: 0 1.5rem 1.5rem 1.5rem; font-size: 1.05rem; line-height: 1.7; color: #555; }
+
+  /* ── Stats count-up ── */
+  .stat-number { font-variant-numeric: tabular-nums; }
+
+  /* ── Portfolio tilt ── */
+  .tilt-card { transition: transform 0.5s var(--spring), box-shadow 0.5s var(--spring); }
+  .tilt-card:hover { transform: perspective(800px) rotateY(-2deg) rotateX(3deg) translateY(-6px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.1); }
+
+  @media (max-width: 768px) {
+    .btn-pill { padding: 0.85rem 1.5rem; font-size: 1rem; }
+    .card-white { padding: 1.5rem; }
+    .faq-toggle + label { padding: 1.25rem; font-size: 1rem; }
+    .faq-answer-inner { font-size: 1rem; }
+    .anim-stage { aspect-ratio: 9/16; max-height: 85vh; }
+    .phone-frame { border-radius: 2rem; padding: 0.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body class="font-sans text-zinc-900 antialiased js-ready">
+
+<div class="noise-overlay"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- NAV — Ultra-clean, minimal -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<header id="nav" class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-black/5">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6">
+    <div class="flex items-center justify-between h-14 md:h-20">
+      <a href="#" class="text-[17px] sm:text-[21px] font-extrabold tracking-tight shrink-0">
+        LeaderForge<span class="text-orange">.</span>Digital
+      </a>
+      <a href="tel:+18584658919" class="hidden md:block text-[15px] font-semibold text-zinc-600 hover:text-orange transition-colors duration-300">(858) 465-8919</a>
+      <div class="flex items-center gap-1.5 sm:gap-3">
+        <button onclick="toggleLang()" class="text-[11px] sm:text-[14px] font-semibold text-zinc-400 hover:text-zinc-600 bg-zinc-100 hover:bg-zinc-200 rounded-full px-2 py-1 sm:px-3 sm:py-1.5 transition-colors duration-300">
+          <span id="langEn">EN</span><span class="text-zinc-300">|</span><span id="langEs" class="text-orange">ES</span>
+        </button>
+        <a href="#contact" data-en="Get started" data-es="Empezar" class="btn-pill bg-orange hover:bg-orange-dark text-white shadow-lg shadow-orange/20 text-[13px] sm:text-[16px] px-3 py-2 sm:px-5 sm:py-2.5">
+          <span>Get started</span>
+          <i class="ph ph-arrow-right text-[17px] sm:text-[20px]"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO — Full screen video (like SD RoofKings) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="hero-stage min-h-[100dvh]" id="hero">
+  <div class="hero-video-wrapper">
+    <picture class="hero-poster" id="heroPoster">
+      <source media="(min-width: 769px)" srcset="assets/images/hero-poster-desktop.jpg">
+      <source media="(max-width: 768px)" srcset="assets/images/hero-poster-mobile.jpg">
+      <img src="assets/images/hero-poster-desktop.jpg" alt="Animation preview" class="w-full h-full object-cover" loading="eager">
+    </picture>
+    <video class="hero-video" muted loop playsinline autoplay preload="auto"
+           aria-label="Animation: tradesman with phone, social icons converge into unified inbox">
+      <source media="(min-width: 769px)" src="assets/animations/desktop1.mp4" type="video/mp4">
+      <source media="(max-width: 768px)" src="assets/animations/mobile1.mp4" type="video/mp4">
+    </video>
+  </div>
+  <!-- Scroll-down indicator (overlaid at bottom of video) -->
+  <div class="scroll-hint" onclick="document.getElementById('heroText').scrollIntoView({behavior:'smooth'})">
+    <span class="text-orange">Scroll</span>
+    <i class="ph ph-caret-down text-orange"></i>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- HERO TEXT — Below animation -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-16 md:py-24 bg-white" id="heroText">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+    <h1 class="display-text text-zinc-900 mb-5">
+      Your trade business.<br>
+      <span class="text-orange">Online. Working.</span>
+    </h1>
+    <p class="text-zinc-500 text-lg md:text-xl leading-relaxed max-w-[520px] mx-auto mb-8" data-en="We build websites. Your leads from Instagram, Facebook, TikTok — all land on your phone. One inbox. No chaos." data-es="Construimos sitios web. Tus leads de Instagram, Facebook, TikTok — todos llegan a tu celular. Una bandeja. Sin caos.">
+      We build websites. Your leads from Instagram, Facebook, TikTok — all land on your phone. One inbox. No chaos.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="#contact" class="btn-pill bg-orange hover:bg-orange-dark text-white shadow-xl shadow-orange/20 text-lg px-8 py-3.5">
+        <span data-en="Get your website" data-es="Consigue tu web">Get your website</span>
+        <i class="ph ph-arrow-right text-xl"></i>
+      </a>
+      <a href="tel:+18584658919" class="btn-pill bg-white hover:bg-zinc-50 text-zinc-900 border-2 border-zinc-200 shadow-sm">
+        <i class="ph ph-phone text-lg"></i> (858) 465-8919
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- STATS BAR -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section id="stats" class="pb-8 px-4 sm:px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div class="card-white text-center reveal">
+        <div class="stat-number text-4xl sm:text-5xl font-extrabold text-orange tracking-tighter" data-target="40">0</div>
+        <div class="text-xs sm:text-sm text-zinc-500 mt-1 font-medium" data-en="Sites delivered" data-es="Sitios entregados">Sites delivered</div>
+      </div>
+      <div class="card-white text-center reveal">
+        <div class="stat-number text-4xl sm:text-5xl font-extrabold text-orange tracking-tighter" data-target="1200">0</div>
+        <div class="text-xs sm:text-sm text-zinc-500 mt-1 font-medium" data-en="Leads generated" data-es="Leads generados">Leads generated</div>
+      </div>
+      <div class="card-white text-center reveal">
+        <div class="stat-number text-4xl sm:text-5xl font-extrabold text-orange tracking-tighter" data-target="5">0</div>
+        <div class="text-xs sm:text-sm text-zinc-500 mt-1 font-medium" data-en="Days to launch" data-es="Dias en lanzar">Days to launch</div>
+      </div>
+      <div class="card-white text-center reveal">
+        <div class="stat-number text-4xl sm:text-5xl font-extrabold text-orange tracking-tighter" data-target="98">0</div>
+        <div class="text-xs sm:text-sm text-zinc-500 mt-1 font-medium" data-en="Satisfaction rate" data-es="Satisfaccion">Satisfaction rate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANIMATION 2 — Unified Inbox (rounded frame, like SD RoofKings) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-20 md:py-28 bg-white" id="unified">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6">
+
+    <div class="text-center mb-12 reveal">
+      <span class="inline-block rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold text-orange bg-orange/5 mb-5" data-en="The problem" data-es="El problema">The problem</span>
+      <h2 class="heading-text mb-4" data-en="Your customers message you everywhere. They should reach you in one place." data-es="Tus clientes te escriben por todos lados. Deberian llegar a un solo lugar.">
+        Your customers message you everywhere. They should reach you in one place.
+      </h2>
+      <p class="text-xl text-zinc-500 max-w-2xl mx-auto leading-relaxed" data-en="Instagram DMs, Facebook comments, TikTok messages, Yelp inquiries — we route everything to ONE chat on your phone. With AI that suggests replies. You tap once. Done." data-es="DMs de Instagram, comentarios de Facebook, mensajes de TikTok, consultas de Yelp — todo llega a UN chat en tu celular. Con IA que sugiere respuestas. Un tap. Listo.">
+        Instagram DMs, Facebook comments, TikTok messages, Yelp inquiries — we route everything to ONE chat on your phone. With AI that suggests replies. You tap once. Done.
+      </p>
+    </div>
+
+    <div class="reveal">
+      <div class="anim-stage w-full rounded-2xl overflow-hidden bg-black" style="min-height: 300px;" id="anim2Stage">
+        <video class="anim2-video w-full h-full object-cover" muted loop playsinline preload="none"
+               poster="assets/images/hero-desktop.jpg"
+               aria-label="Animation: split screen showing app chaos vs unified Telegram inbox">
+          <source media="(min-width: 769px)" src="assets/animations/desktop2.mp4" type="video/mp4">
+          <source media="(max-width: 768px)" src="assets/animations/mobile2.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+
+    <p class="text-zinc-400 text-sm text-center mt-4 font-medium">Unified Inbox. All your messages in a unified inbox.</p>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- HOW IT WORKS — Simple 3-step explanation -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-24 md:py-36 px-4 sm:px-6 bg-white" id="how">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <span class="inline-block rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold text-orange bg-orange/5 mb-4">How it works</span>
+      <h2 class="heading-text mb-4" data-en="Everything lands on your phone." data-es="Todo llega a tu telefono.">Everything lands on your phone.</h2>
+      <p class="text-zinc-500 text-lg max-w-2xl mx-auto" data-en="Your leads from Instagram, Facebook, TikTok, Yelp — all routed to one inbox. You just reply." data-es="Tus leads de Instagram, Facebook, TikTok, Yelp — todo llega a una sola bandeja. Solo respondes.">Your leads from Instagram, Facebook, TikTok, Yelp — all routed to one inbox. You just reply.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 reveal">
+      <div class="card-white text-center relative">
+        <div class="w-14 h-14 bg-orange/10 rounded-2xl flex items-center justify-center text-orange text-2xl mx-auto mb-5">
+          <i class="ph ph-google-logo"></i>
+        </div>
+        <div class="font-bold text-lg mb-2" data-en="1. They find you" data-es="1. Te encuentran">1. They find you</div>
+        <p class="text-sm text-zinc-500 leading-relaxed" data-en="Customers search on Google, IG, or Facebook. Your site shows up first — built to convert them." data-es="Clientes buscan en Google, IG o Facebook. Tu sitio aparece primero — disenado para convertirlos.">Customers search on Google, IG, or Facebook. Your site shows up first — built to convert them.</p>
+      </div>
+      <div class="card-white text-center relative">
+        <div class="w-14 h-14 bg-orange/10 rounded-2xl flex items-center justify-center text-orange text-2xl mx-auto mb-5">
+          <i class="ph ph-chats-circle"></i>
+        </div>
+        <div class="font-bold text-lg mb-2" data-en="2. They reach out" data-es="2. Te contactan">2. They reach out</div>
+        <p class="text-sm text-zinc-500 leading-relaxed" data-en="Form fills, DMs, comments — all flow into one Telegram chat. Nothing gets lost across platforms." data-es="Formularios, DMs, comentarios — todo fluye a un chat de Telegram. Nada se pierde entre plataformas.">Form fills, DMs, comments — all flow into one Telegram chat. Nothing gets lost across platforms.</p>
+      </div>
+      <div class="card-white text-center relative">
+        <div class="w-14 h-14 bg-orange/10 rounded-2xl flex items-center justify-center text-orange text-2xl mx-auto mb-5">
+          <i class="ph ph-device-mobile"></i>
+        </div>
+        <div class="font-bold text-lg mb-2" data-en="3. You reply fast" data-es="3. Respondes rapido">3. You reply fast</div>
+        <p class="text-sm text-zinc-500 leading-relaxed" data-en="Notification hits your phone. You reply in seconds — no dashboard, no apps. Win the job." data-es="Notificacion a tu celular. Respondes en segundos — sin apps ni paneles. Ganas el trabajo.">Notification hits your phone. You reply in seconds — no dashboard, no apps. Win the job.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SOCIAL PROOF — Google-style reviews -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-24 md:py-36 px-4 sm:px-6" id="reviews">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <span class="inline-block rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold text-orange bg-orange/5 mb-4" data-en="Results" data-es="Resultados">Results</span>
+      <h2 class="heading-text" data-en="Tradesmen love this." data-es="A los negocios les encanta.">Tradesmen love this.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-5 gap-4 reveal">
+      <!-- Review 1 -->
+      <div class="card-white space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center text-orange font-bold text-sm">M</div>
+          <div>
+            <div class="font-semibold text-sm leading-none">Mike R.</div>
+            <div class="text-xs text-zinc-400">Welder, Riverside</div>
+          </div>
+        </div>
+        <div class="flex text-orange text-sm gap-0.5">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+        </div>
+        <p class="text-sm text-zinc-600 leading-relaxed">"I was losing jobs because I wouldn't see Instagram DMs for days. Now everything lands in one place on my phone. Closed 3 gates last month from the site."</p>
+      </div>
+      <!-- Review 2 -->
+      <div class="card-white space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center text-orange font-bold text-sm">A</div>
+          <div>
+            <div class="font-semibold text-sm leading-none">Andres G.</div>
+            <div class="text-xs text-zinc-400">Roofer, Chula Vista</div>
+          </div>
+        </div>
+        <div class="flex text-orange text-sm gap-0.5">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+        </div>
+        <p class="text-sm text-zinc-600 leading-relaxed">"My old site was useless. LeaderForge rebuilt it and now I get 15-20 quote requests a week. The Telegram alerts are instant. Already booked $18K in April."</p>
+      </div>
+      <!-- Review 3 -->
+      <div class="card-white space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center text-orange font-bold text-sm">J</div>
+          <div>
+            <div class="font-semibold text-sm leading-none">Jose L.</div>
+            <div class="text-xs text-zinc-400">Plumber, Escondido</div>
+          </div>
+        </div>
+        <div class="flex text-orange text-sm gap-0.5">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+        </div>
+        <p class="text-sm text-zinc-600 leading-relaxed">"I don't do tech at all. They set up everything. Facebook messages, Yelp inquiries — it all hits my phone. I just reply. That's it. Best $800 I ever spent."</p>
+      </div>
+      <!-- Review 4 -->
+      <div class="card-white space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center text-orange font-bold text-sm">D</div>
+          <div>
+            <div class="font-semibold text-sm leading-none">David K.</div>
+            <div class="text-xs text-zinc-400">HVAC, Oceanside</div>
+          </div>
+        </div>
+        <div class="flex text-orange text-sm gap-0.5">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+        </div>
+        <p class="text-sm text-zinc-600 leading-relaxed">"Before LeaderForge, I'd miss half my Yelp messages. Customers would go to the next guy. Now every lead hits my phone. My response time went from 2 days to 5 minutes."</p>
+      </div>
+      <!-- Review 5 -->
+      <div class="card-white space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center text-orange font-bold text-sm">C</div>
+          <div>
+            <div class="font-semibold text-sm leading-none">Carlos M.</div>
+            <div class="text-xs text-zinc-400">Electrician, San Diego</div>
+          </div>
+        </div>
+        <div class="flex text-orange text-sm gap-0.5">
+          <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+        </div>
+        <p class="text-sm text-zinc-600 leading-relaxed">"I was skeptical. 5 days later I had a site that looks better than companies 10x my size. TikTok comments land in my Telegram now. I've never lost a lead since."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PORTFOLIO — Real sites with tilt effect -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-24 md:py-36 px-4 sm:px-6 bg-white" id="work">
+  <div class="max-w-6xl mx-auto">
+    <div class="mb-14 reveal">
+      <span class="inline-block rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold text-orange bg-orange/5 mb-4">Our work</span>
+      <h2 class="heading-text" data-en="Real sites. Real results." data-es="Sitios reales. Resultados reales.">Real sites. Real results.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- TWB Card -->
+      <div class="tilt-card card-white !p-0 overflow-hidden group reveal block">
+        <div class="h-56 relative">
+          <iframe src="https://theweldingbrothers.site" class="w-full h-full border-0" loading="lazy" sandbox="allow-same-origin allow-scripts" title="The Welding Brothers"></iframe>
+          <a href="https://theweldingbrothers.site" target="_blank" class="absolute inset-0" title="Open The Welding Brothers"></a>
+        </div>
+        <div class="p-4">
+          <div class="text-xs font-semibold text-orange uppercase tracking-widest mb-1">Welding & Fabrication</div>
+          <div class="font-bold text-lg mb-1">The Welding Brothers</div>
+          <div class="text-sm text-zinc-400">Riverside, CA</div>
+        </div>
+      </div>
+      <!-- RoofKings Card -->
+      <div class="tilt-card card-white !p-0 overflow-hidden group reveal block">
+        <div class="h-56 relative">
+          <iframe src="https://sdroofkings.com" class="w-full h-full border-0" loading="lazy" sandbox="allow-same-origin allow-scripts" title="SD Roof Kings"></iframe>
+          <a href="https://sdroofkings.com" target="_blank" class="absolute inset-0" title="Open SD Roof Kings"></a>
+        </div>
+        <div class="p-4">
+          <div class="text-xs font-semibold text-orange uppercase tracking-widest mb-1">Commercial & Residential Roofing</div>
+          <div class="font-bold text-lg mb-1">San Diego RoofKings</div>
+          <div class="text-sm text-zinc-400">San Diego, CA</div>
+        </div>
+      </div>
+      <!-- Sofia Card -->
+      <div class="tilt-card card-white !p-0 overflow-hidden group reveal block">
+        <div class="h-56 relative">
+          <iframe src="https://www.leaderforgeai.com" class="w-full h-full border-0" loading="lazy" sandbox="allow-same-origin allow-scripts" title="Sofia AI Receptionist"></iframe>
+          <a href="https://www.leaderforgeai.com" target="_blank" class="absolute inset-0" title="Open Sofia AI"></a>
+        </div>
+        <div class="p-4">
+          <div class="text-xs font-semibold text-orange uppercase tracking-widest mb-1">AI Receptionist</div>
+          <div class="font-bold text-lg mb-1">Sofia</div>
+          <div class="text-sm text-zinc-400">Bilingual — handles calls & texts for small businesses</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- IMAGE PLACEHOLDERS — Before Footer visual imagery -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--
+  IMAGE PROMPTS — Lifestyle photography for leaderforge.digital
+  ──────────────────────────────────────────────────────────────
+  Use Midjourney, Stable Diffusion, or Firefly. Style: warm, editorial,
+  shallow depth of field. Natural light. Orange accent.
+
+  IMAGE 1 (Hero background or section divider):
+  "A welder in his 40s, wearing a clean work shirt, standing next to his
+  welding rig at golden hour. He's holding an iPhone, looking at it and
+  smiling. The phone screen glows subtly. Behind him, a job site with a
+  half-finished metal structure. Warm California light. Shallow depth of
+  field focusing on the phone. 16:9 aspect ratio, editorial photography
+  style. No hard shadows. Natural color grade with warm undertones."
+
+  IMAGE 2 (Footer area):
+  "Overhead flat lay of a rustic wooden workbench. On it: welding gloves,
+  a modern iPhone showing a website with orange accents on screen, a
+  business card that says 'LeaderForge Digital', and a cup of coffee.
+  Morning sunlight streaming from a window. Warm, textured, authentic.
+  16:9 aspect ratio, editorial product photography style."
+
+  IMAGE 3 (Between sections):
+  "Split composition: left side shows a laptop with a beautiful trade
+  website on screen. Right side shows the same view but on an iPhone
+  being held by a rough, calloused hand. The message: your site looks
+  perfect on every device. Orange accent elements tie the composition
+  together. 16:9, clean product photography style."
+-->
+<section class="py-16 px-4 sm:px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid md:grid-cols-3 gap-6 reveal">
+      <div class="rounded-2xl overflow-hidden h-56">
+        <img src="assets/images/hero-desktop.jpg" alt="Tradesman with phone" class="w-full h-full object-cover" loading="lazy">
+      </div>
+      <div class="rounded-2xl overflow-hidden h-56">
+        <img src="assets/images/flatlay.jpg" alt="Workshop flat lay with phone and tools" class="w-full h-full object-cover" loading="lazy">
+      </div>
+      <div class="rounded-2xl overflow-hidden h-56">
+        <picture>
+          <source media="(min-width: 769px)" srcset="assets/images/device-desktop.jpg">
+          <source media="(max-width: 768px)" srcset="assets/images/device-mobile.jpg">
+          <img src="assets/images/device-desktop.jpg" alt="Website on laptop and phone" class="w-full h-full object-cover" loading="lazy">
+        </picture>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PRICING — Bento, tight copy -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-24 md:py-36 px-4 sm:px-6 bg-white" id="pricing">
+  <div class="max-w-5xl mx-auto">
+    <div class="mb-14 reveal">
+      <span class="inline-block rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold text-orange bg-orange/5 mb-4">Pricing</span>
+      <h2 class="heading-text" data-en="Simple. No surprises." data-es="Simple. Sin sorpresas.">Simple. No surprises.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-[1.2fr_1fr] gap-6">
+      <!-- Tier 1 -->
+      <div class="card-white reveal">
+        <div class="text-xs font-semibold text-orange uppercase tracking-widest mb-3" data-en="Digital Presence" data-es="Presencia Digital">Digital Presence</div>
+        <div class="text-5xl font-extrabold tracking-tighter mb-1">$800</div>
+        <div class="text-zinc-400 text-sm mb-8" data-en="one-time" data-es="pago unico">one-time</div>
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-start gap-3 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-lg mt-0.5 shrink-0"></i><span data-en="Custom-built website — your trade, your brand" data-es="Sitio web personalizado — tu oficio, tu marca">Custom-built website — your trade, your brand</span></li>
+          <li class="flex items-start gap-3 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-lg mt-0.5 shrink-0"></i><span data-en="Google Maps setup — customers find you first" data-es="Google Maps — los clientes te encuentran primero">Google Maps setup — customers find you first</span></li>
+          <li class="flex items-start gap-3 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-lg mt-0.5 shrink-0"></i><span data-en="Leads land on your phone via Telegram" data-es="Leads llegan a tu celular por Telegram">Leads land on your phone via Telegram</span></li>
+          <li class="flex items-start gap-3 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-lg mt-0.5 shrink-0"></i><span data-en="Facebook + Instagram + TikTok created & linked" data-es="Facebook + Instagram + TikTok creados y vinculados">Facebook + Instagram + TikTok created & linked</span></li>
+          <li class="flex items-start gap-3 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-lg mt-0.5 shrink-0"></i><span data-en="Animations that make the big guys jealous" data-es="Animaciones que los grandes envidian">Animations that make the big guys jealous</span></li>
+        </ul>
+        <a href="#contact" class="btn-pill bg-orange hover:bg-orange-dark text-white shadow-xl shadow-orange/20">
+          <span data-en="Get started" data-es="Empezar">Get started</span>
+          <i class="ph ph-arrow-right text-lg"></i>
+        </a>
+      </div>
+
+      <!-- Tier 2 -->
+      <div class="card-white reveal flex flex-col">
+        <div class="text-xs font-semibold text-orange uppercase tracking-widest mb-3" data-en="Full Growth" data-es="Crecimiento Total">Full Growth</div>
+        <div class="text-5xl font-extrabold tracking-tighter mb-1" data-en="Custom" data-es="Personalizado">Custom</div>
+        <div class="text-zinc-400 text-sm mb-6" data-en="monthly" data-es="mensual">monthly</div>
+        <div class="inline-block bg-orange/5 text-orange text-[11px] font-semibold px-3 py-1 rounded-full mb-6" data-en="Everything above +" data-es="Todo lo anterior +">Everything above +</div>
+        <ul class="space-y-3 mb-8 flex-1">
+          <li class="flex items-start gap-2.5 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-base mt-0.5 shrink-0"></i><span data-en="3 posts/week + 4 videos/month on your social" data-es="3 posts/semana + 4 videos/mes en tus redes">3 posts/week + 4 videos/month on your social</span></li>
+          <li class="flex items-start gap-2.5 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-base mt-0.5 shrink-0"></i><span data-en="Unified inbox — IG, FB, Yelp, TikTok → ONE Telegram chat" data-es="Bandeja unificada — IG, FB, Yelp, TikTok → UN chat de Telegram">Unified inbox — IG, FB, Yelp, TikTok → ONE Telegram chat</span></li>
+          <li class="flex items-start gap-2.5 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-base mt-0.5 shrink-0"></i><span data-en="AI replies for you — or you do it yourself" data-es="IA responde por ti — o lo haces tu">AI replies for you — or you do it yourself</span></li>
+          <li class="flex items-start gap-2.5 text-sm text-zinc-600"><i class="ph ph-check-circle text-orange text-base mt-0.5 shrink-0"></i><span data-en="Monthly report: leads, sources, conversions" data-es="Reporte mensual: leads, fuentes, conversiones">Monthly report: leads, sources, conversions</span></li>
+        </ul>
+        <a href="#contact" class="btn-pill bg-zinc-900 hover:bg-zinc-800 text-white">
+          <span data-en="Let's talk" data-es="Hablemos">Let's talk</span>
+          <i class="ph ph-arrow-right text-lg"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FAQ — Acordeon, 4 preguntas -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-24 md:py-36 px-4 sm:px-6" id="faq">
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-14 reveal">
+      <span class="inline-block rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold text-orange bg-orange/5 mb-4">FAQ</span>
+      <h2 class="heading-text" data-en="Quick answers." data-es="Respuestas rapidas.">Quick answers.</h2>
+    </div>
+
+    <div class="space-y-3 reveal">
+      <div>
+        <input type="checkbox" class="faq-toggle" id="faq1">
+        <label for="faq1">
+          <span data-en="How fast can you build my site?" data-es="¿Que tan rapido construyen mi sitio?">How fast can you build my site?</span>
+          <i class="ph ph-caret-down faq-chevron text-zinc-400 text-lg"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner" data-en="Most sites are live in 5 days. We do a 15-minute call, you send us photos of your work, and we build from there. You approve before it goes live." data-es="La mayoria de los sitios estan listos en 5 dias. Hacemos una llamada de 15 minutos, nos envias fotos de tu trabajo y construimos desde ahi. Tu apruebas antes de publicar.">Most sites are live in 5 days. We do a 15-minute call, you send us photos of your work, and we build from there. You approve before it goes live.</div></div>
+      </div>
+      <div>
+        <input type="checkbox" class="faq-toggle" id="faq2">
+        <label for="faq2">
+          <span data-en="Do I need to know tech?" data-es="¿Necesito saber de tecnologia?">Do I need to know tech?</span>
+          <i class="ph ph-caret-down faq-chevron text-zinc-400 text-lg"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner" data-en="Zero. You get notifications when someone visits, clicks, or fills your form. Quotes and questions from Instagram, Facebook, WhatsApp, Yelp, and Google all land on your phone like a text. You just reply." data-es="Cero. Recibes notificaciones cuando alguien visita, hace clic o llena tu formulario. Cotizaciones y preguntas de Instagram, Facebook, WhatsApp, Yelp y Google llegan a tu celular como mensaje de texto. Solo respondes.">Zero. You get notifications when someone visits, clicks, or fills your form. Quotes and questions from Instagram, Facebook, WhatsApp, Yelp, and Google all land on your phone like a text. You just reply.</div></div>
+      </div>
+      <div>
+        <input type="checkbox" class="faq-toggle" id="faq3">
+        <label for="faq3">
+          <span data-en="What do I need to provide?" data-es="¿Que necesito proporcionar?">What do I need to provide?</span>
+          <i class="ph ph-caret-down faq-chevron text-zinc-400 text-lg"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner" data-en="Photos of your work, your logo (if you have one), and 15 minutes for a call. We handle everything else — hosting, domain, Google Maps, social accounts." data-es="Fotos de tu trabajo, tu logo (si tienes uno) y 15 minutos para una llamada. Nosotros manejamos todo lo demas — hosting, dominio, Google Maps, redes sociales.">Photos of your work, your logo (if you have one), and 15 minutes for a call. We handle everything else — hosting, domain, Google Maps, social accounts.</div></div>
+      </div>
+      <div>
+        <input type="checkbox" class="faq-toggle" id="faq4">
+        <label for="faq4">
+          <span data-en="Can you do websites in Spanish?" data-es="¿Pueden hacer sitios en español?">Can you do websites in Spanish?</span>
+          <i class="ph ph-caret-down faq-chevron text-zinc-400 text-lg"></i>
+        </label>
+        <div class="faq-answer"><div class="faq-answer-inner" data-en="Por supuesto. We build bilingual sites by default. Your customers see the language they prefer. We also respond to leads in Spanish if you want." data-es="Por supuesto. Construimos sitios bilingues por defecto. Tus clientes ven el idioma que prefieren. Tambien respondemos leads en español si quieres.">Por supuesto. We build bilingual sites by default. Your customers see the language they prefer. We also respond to leads in Spanish if you want.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CONTACT — Clean form -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="py-24 md:py-36 px-4 sm:px-6 bg-white" id="contact">
+  <div class="max-w-xl mx-auto reveal">
+    <div class="text-center mb-10">
+      <span class="inline-block rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold text-orange bg-orange/5 mb-4" data-en="Let's go" data-es="Vamos">Let's go</span>
+      <h2 class="heading-text mb-3" data-en="Ready for more customers?" data-es="¿Listo para mas clientes?">Ready for more customers?</h2>
+      <p class="text-zinc-500" data-en="Tell us about your business. We'll take a look — no pitch, no pressure." data-es="Cuentanos de tu negocio. Lo revisamos — sin presion.">Tell us about your business. We'll take a look — no pitch, no pressure.</p>
+    </div>
+
+    <form id="leadForm" class="space-y-4" onsubmit="return false;">
+      <div>
+        <label class="block text-xs font-semibold text-zinc-500 mb-1.5" data-en="Your name" data-es="Tu nombre">Your name</label>
+        <input type="text" name="name" required class="w-full border border-black/10 rounded-xl px-4 py-3.5 bg-white focus:outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all duration-300 text-base">
+      </div>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-zinc-500 mb-1.5" data-en="Phone" data-es="Telefono">Phone</label>
+          <input type="tel" name="phone" required class="w-full border border-black/10 rounded-xl px-4 py-3.5 bg-white focus:outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all duration-300 text-base">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-zinc-500 mb-1.5" data-en="Your trade" data-es="Tu oficio">Your trade</label>
+          <select name="trade" class="w-full border border-black/10 rounded-xl px-4 py-3.5 bg-white focus:outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all duration-300 text-base">
+            <option value="" data-en="Select your trade" data-es="Selecciona tu oficio">Select your trade</option>
+            <option>Welding / Fabrication</option>
+            <option>Roofing</option>
+            <option>Plumbing</option>
+            <option>HVAC</option>
+            <option>Electrical</option>
+            <option>Landscaping</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" onclick="submitForm()" class="btn-pill w-full justify-center bg-orange hover:bg-orange-dark text-white shadow-xl shadow-orange/20 text-lg py-4">
+        <span data-en="Get my Website" data-es="Quiero mi web">Get my Website</span>
+        <i class="ph ph-paper-plane-right text-xl"></i>
+      </button>
+      <div id="formStatus" class="text-center text-sm mt-3 hidden"></div>
+    </form>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FOOTER — Clean with image area -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<footer class="py-16 px-4 sm:px-6 border-t border-black/5 bg-zinc-950 text-white">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+      <div class="text-center md:text-left">
+        <div class="text-2xl font-extrabold tracking-tight">LeaderForge<span class="text-orange">.</span>Digital</div>
+        <p class="text-zinc-500 text-sm mt-2" data-en="Websites for local trades. Built by people who get it." data-es="Sitios web para oficios locales. Hechos por gente que entiende.">Websites for local trades. Built by people who get it.</p>
+      </div>
+      <div class="flex items-center gap-6 text-sm text-zinc-400">
+        <a href="mailto:daniel@leaderforgeai.com" class="hover:text-white transition-colors duration-300">daniel@leaderforgeai.com</a>
+        <a href="tel:+18584658919" class="hover:text-white transition-colors duration-300 font-semibold text-white">(858) 465-8919</a>
+      </div>
+    </div>
+    <!-- Footer decorative image -->
+    <div class="rounded-2xl overflow-hidden max-w-2xl mx-auto h-48">
+      <img src="assets/images/footer-banner.jpg" alt="Tradesman at golden hour" class="w-full h-full object-cover" loading="lazy">
+    </div>
+    <div class="text-center text-zinc-600 text-xs mt-10">
+      &copy; 2026 LeaderForge Digital. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- STICKY SMS BUTTON -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<a href="sms:+18584658919?body=Hey%2C%20I%20need%20a%20website%20for%20my%20business" class="fixed bottom-6 right-6 z-50 whatsapp-sticky group" title="Text us" id="stickySms">
+  <div class="wa-btn">
+    <i class="ph ph-chat-circle-dots text-2xl group-hover:scale-110 transition-transform duration-300"></i>
+  </div>
+</a>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SCRIPTS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ═══════════ ANIMATION 1 — Hero Reveal ═══════════
+const heroTl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.3 });
+heroTl.fromTo("#heroText h1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 })
+      .fromTo("#heroText p", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3")
+      .fromTo("#heroText .btn-pill", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.3");
+
+// ═══════════ ANIMATION 2 — Play video on scroll ═══════════
+ScrollTrigger.create({
+  trigger: "#anim2Stage",
+  start: "top 70%",
+  onEnter: () => {
+    const v = document.querySelector('.anim2-video');
+    if (v) v.play().catch(() => {});
+  },
+  once: true,
+});
+
+// ═══════════ Video Loading — poster fade-out, anim2 on scroll ═══════════
+const heroVideo = document.querySelector('.hero-video');
+const heroPoster = document.getElementById('heroPoster');
+const anim2Video = document.querySelector('.anim2-video');
+
+
+// Fade out poster when hero video starts playing
+if (heroVideo && heroPoster) {
+  heroVideo.addEventListener('playing', () => {
+    heroPoster.classList.add('fade-out');
+  }, { once: true });
+  // If video is already playing (cached), hide poster immediately
+  if (!heroVideo.paused && heroVideo.readyState >= 2) {
+    heroPoster.classList.add('fade-out');
+  }
+}
+
+// Animation 2: load & play when scrolled into view
+const anim2Observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      if (anim2Video) {
+        anim2Video.play().catch(() => {});
+      }
+      anim2Observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+
+if (anim2Video) anim2Observer.observe(anim2Video);
+
+// ═══════════ Scroll Reveals ═══════════
+const revealEls = document.querySelectorAll(".reveal");
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const delay = entry.target.dataset.delay || 0;
+      setTimeout(() => entry.target.classList.add("visible"), delay * 1000);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+
+revealEls.forEach(el => observer.observe(el));
+
+// ═══════════ Stats Count-Up ═══════════
+const statEls = document.querySelectorAll(".stat-number");
+const countUp = (el) => {
+  const target = parseInt(el.dataset.target);
+  const duration = 1500;
+  const start = performance.now();
+  const tick = (now) => {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target) + (target === 98 ? "%" : " +");
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
+
+const statsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { countUp(e.target); statsObserver.unobserve(e.target); } });
+}, { threshold: 0.5 });
+statEls.forEach(el => statsObserver.observe(el));
+
+// ═══════════ Sticky SMS show/hide ═══════════
+const stickySms = document.getElementById("stickySms");
+const reviewsSection = document.getElementById("reviews");
+const footer = document.querySelector("footer");
+
+// Show button when user reaches social proof section
+new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      stickySms.classList.add("visible");
+    }
+  });
+}, { threshold: 0.15 }).observe(reviewsSection);
+
+// Hide button when footer enters viewport
+new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      stickySms.classList.remove("visible");
+    }
+  });
+}, { threshold: 0.1 }).observe(footer);
+
+// ═══════════ Bilingual Toggle ═══════════
+let lang = 'en';
+const t = {
+  en: {
+    heroTitle: 'Your trade business.<br><span class="text-orange">Online. Working.</span>',
+    heroSub: 'We build websites. Your leads from Instagram, Facebook, TikTok — all land on your phone. One inbox. No chaos.',
+    heroCta: 'Get your website',
+    unifiedLabel: 'The problem',
+    unifiedTitle: 'Your customers message you everywhere. They should reach you in one place.',
+    unifiedDesc: 'Instagram DMs, Facebook comments, TikTok messages, Yelp inquiries — we route everything to ONE chat on your phone. With AI that suggests replies. You tap once. Done.',
+    howLabel: 'How it works',
+    howTitle: 'Everything lands on your phone.',
+    howDesc: 'Your leads from Instagram, Facebook, TikTok, Yelp — all routed to one inbox. You just reply.',
+    howStep1: '1. They find you',
+    howStep1Desc: 'Customers search on Google, IG, or Facebook. Your site shows up first — built to convert them.',
+    howStep2: '2. They reach out',
+    howStep2Desc: 'Form fills, DMs, comments — all flow into one Telegram chat. Nothing gets lost across platforms.',
+    howStep3: '3. You reply fast',
+    howStep3Desc: 'Notification hits your phone. You reply in seconds — no dashboard, no apps. Win the job.',
+    reviewsLabel: 'Results',
+    reviewsTitle: 'Tradesmen love this.',
+    workLabel: 'Our work',
+    workTitle: 'Real sites. Real results.',
+    pricingLabel: 'Pricing',
+    pricingTitle: 'Simple. No surprises.',
+    tier1Label: 'Digital Presence',
+    tier1Price: '$800',
+    tier1Period: 'one-time',
+    tier1F1: 'Custom-built website — your trade, your brand',
+    tier1F2: 'Google Maps setup — customers find you first',
+    tier1F3: 'Leads land on your phone via Telegram',
+    tier1F4: 'Facebook + Instagram + TikTok created & linked',
+    tier1F5: 'Animations that make the big guys jealous',
+    tier1Cta: 'Get started',
+    tier2Label: 'Full Growth',
+    tier2Price: 'Custom',
+    tier2Period: 'monthly',
+    tier2Badge: 'Everything above +',
+    tier2F1: '3 posts/week + 4 videos/month on your social',
+    tier2F2: 'Unified inbox — IG, FB, Yelp, TikTok → ONE Telegram chat',
+    tier2F3: 'AI replies for you — or you do it yourself',
+    tier2F4: 'Monthly report: leads, sources, conversions',
+    tier2Cta: "Let's talk",
+    faqLabel: 'FAQ',
+    faqTitle: 'Quick answers.',
+    faq1Q: 'How fast can you build my site?',
+    faq1A: 'Most sites are live in 5 days. We do a 15-minute call, you send us photos of your work, and we build from there. You approve before it goes live.',
+    faq2Q: 'Do I need to know tech?',
+    faq2A: 'Zero. You get notifications when someone visits, clicks, or fills your form. Quotes and questions from Instagram, Facebook, WhatsApp, Yelp, and Google all land on your phone like a text. You just reply.',
+    faq3Q: 'What do I need to provide?',
+    faq3A: 'Photos of your work, your logo (if you have one), and 15 minutes for a call. We handle everything else — hosting, domain, Google Maps, social accounts.',
+    faq4Q: 'Can you do websites in Spanish?',
+    faq4A: 'Por supuesto. We build bilingual sites by default. Your customers see the language they prefer. We also respond to leads in Spanish if you want.',
+    contactLabel: "Let's go",
+    contactTitle: 'Ready for more customers?',
+    contactSub: 'Tell us about your business. We\'ll take a look — no pitch, no pressure.',
+    formName: 'Your name',
+    formPhone: 'Phone',
+    formTrade: 'Select your trade',
+    formSubmit: 'Get my Website',
+    footerTagline: 'Websites for local trades. Built by people who get it.',
+  },
+  es: {
+    heroTitle: 'Tu negocio.<br><span class="text-orange">En internet. Funcionando.</span>',
+    heroSub: 'Construimos sitios web. Tus leads de Instagram, Facebook, TikTok — todos llegan a tu celular. Una bandeja. Sin caos.',
+    heroCta: 'Consigue tu web',
+    unifiedLabel: 'El problema',
+    unifiedTitle: 'Tus clientes te escriben por todos lados. Deberian llegar a un solo lugar.',
+    unifiedDesc: 'DMs de Instagram, comentarios de Facebook, mensajes de TikTok, consultas de Yelp — todo llega a UN chat en tu celular. Con IA que sugiere respuestas. Un tap. Listo.',
+    howLabel: 'Como funciona',
+    howTitle: 'Todo llega a tu telefono.',
+    howDesc: 'Tus leads de Instagram, Facebook, TikTok, Yelp — todo llega a una sola bandeja. Solo respondes.',
+    howStep1: '1. Te encuentran',
+    howStep1Desc: 'Clientes buscan en Google, IG o Facebook. Tu sitio aparece primero — disenado para convertirlos.',
+    howStep2: '2. Te contactan',
+    howStep2Desc: 'Formularios, DMs, comentarios — todo fluye a un chat de Telegram. Nada se pierde entre plataformas.',
+    howStep3: '3. Respondes rapido',
+    howStep3Desc: 'Notificacion a tu celular. Respondes en segundos — sin apps ni paneles. Ganas el trabajo.',
+    reviewsLabel: 'Resultados',
+    reviewsTitle: 'A los negocios les encanta.',
+    workLabel: 'Nuestro trabajo',
+    workTitle: 'Sitios reales. Resultados reales.',
+    pricingLabel: 'Precios',
+    pricingTitle: 'Simple. Sin sorpresas.',
+    tier1Label: 'Presencia Digital',
+    tier1Price: '$800',
+    tier1Period: 'pago unico',
+    tier1F1: 'Sitio web personalizado — tu oficio, tu marca',
+    tier1F2: 'Google Maps — los clientes te encuentran primero',
+    tier1F3: 'Leads llegan a tu celular por Telegram',
+    tier1F4: 'Facebook + Instagram + TikTok creados y vinculados',
+    tier1F5: 'Animaciones que los grandes envidian',
+    tier1Cta: 'Empezar',
+    tier2Label: 'Crecimiento Total',
+    tier2Price: 'Personalizado',
+    tier2Period: 'mensual',
+    tier2Badge: 'Todo lo anterior +',
+    tier2F1: '3 posts/semana + 4 videos/mes en tus redes',
+    tier2F2: 'Bandeja unificada — IG, FB, Yelp, TikTok → UN chat de Telegram',
+    tier2F3: 'IA responde por ti — o lo haces tu',
+    tier2F4: 'Reporte mensual: leads, fuentes, conversiones',
+    tier2Cta: 'Hablemos',
+    faqLabel: 'FAQ',
+    faqTitle: 'Respuestas rapidas.',
+    faq1Q: '¿Que tan rapido construyen mi sitio?',
+    faq1A: 'La mayoria de los sitios estan listos en 5 dias. Hacemos una llamada de 15 minutos, nos envias fotos de tu trabajo y construimos desde ahi. Tu apruebas antes de publicar.',
+    faq2Q: '¿Necesito saber de tecnologia?',
+    faq2A: 'Cero. Recibes notificaciones cuando alguien visita, hace clic o llena tu formulario. Cotizaciones y preguntas de Instagram, Facebook, WhatsApp, Yelp y Google llegan a tu celular como mensaje de texto. Solo respondes.',
+    faq3Q: '¿Que necesito proporcionar?',
+    faq3A: 'Fotos de tu trabajo, tu logo (si tienes uno) y 15 minutos para una llamada. Nosotros manejamos todo lo demas — hosting, dominio, Google Maps, redes sociales.',
+    faq4Q: '¿Pueden hacer sitios en espanol?',
+    faq4A: 'Por supuesto. Construimos sitios bilingues por defecto. Tus clientes ven el idioma que prefieren. Tambien respondemos leads en espanol si quieres.',
+    contactLabel: 'Vamos',
+    contactTitle: '¿Listo para mas clientes?',
+    contactSub: 'Cuentanos de tu negocio. Lo revisamos — sin presion.',
+    formName: 'Tu nombre',
+    formPhone: 'Telefono',
+    formTrade: 'Selecciona tu oficio',
+    formSubmit: 'Quiero mi web',
+    footerTagline: 'Sitios web para oficios locales. Hechos por gente que entiende.',
+  }
+};
+
+function toggleLang() {
+  lang = lang === 'en' ? 'es' : 'en';
+  const d = t[lang];
+
+  // Nav toggle indicator
+  document.getElementById('langEn').className = lang === 'en' ? '' : 'text-zinc-400';
+  document.getElementById('langEs').className = lang === 'es' ? 'text-orange' : 'text-zinc-400';
+
+  // Hero
+  document.querySelector('#heroText h1').innerHTML = d.heroTitle;
+  document.querySelector('#heroText p[data-en]').textContent = d.heroSub;
+  document.querySelector('#heroText a[href="#contact"] span').textContent = d.heroCta;
+
+  // Unified section
+  document.querySelector('#unified span').textContent = d.unifiedLabel;
+  document.querySelector('#unified h2').textContent = d.unifiedTitle;
+  document.querySelector('#unified p[data-en]').textContent = d.unifiedDesc;
+
+  // How it works
+  document.querySelector('#how span').textContent = d.howLabel;
+  document.querySelector('#how h2').textContent = d.howTitle;
+  document.querySelector('#how > div > p').textContent = d.howDesc;
+  const howCards = document.querySelectorAll('#how .grid .card-white');
+  howCards[0].querySelector('.font-bold').textContent = d.howStep1;
+  howCards[0].querySelector('p').textContent = d.howStep1Desc;
+  howCards[1].querySelector('.font-bold').textContent = d.howStep2;
+  howCards[1].querySelector('p').textContent = d.howStep2Desc;
+  howCards[2].querySelector('.font-bold').textContent = d.howStep3;
+  howCards[2].querySelector('p').textContent = d.howStep3Desc;
+
+  // Reviews
+  document.querySelector('#reviews span').textContent = d.reviewsLabel;
+  document.querySelector('#reviews h2').textContent = d.reviewsTitle;
+
+  // Work
+  document.querySelector('#work span:first-of-type').textContent = d.workLabel;
+  document.querySelector('#work h2').textContent = d.workTitle;
+
+  // Pricing
+  const pricingSpans = document.querySelectorAll('#pricing span');
+  pricingSpans[0].textContent = d.pricingLabel;
+  document.querySelector('#pricing h2').textContent = d.pricingTitle;
+
+  const cards = document.querySelectorAll('#pricing .card-white');
+  // Tier 1
+  const t1 = cards[0];
+  t1.querySelector('.uppercase').textContent = d.tier1Label;
+  t1.querySelector('.text-5xl').textContent = d.tier1Price;
+  t1.querySelector('.text-zinc-400').textContent = d.tier1Period;
+  const t1Lis = t1.querySelectorAll('li span');
+  t1Lis[0].textContent = d.tier1F1;
+  t1Lis[1].textContent = d.tier1F2;
+  t1Lis[2].textContent = d.tier1F3;
+  t1Lis[3].textContent = d.tier1F4;
+  t1Lis[4].textContent = d.tier1F5;
+  t1.querySelector('a span').textContent = d.tier1Cta;
+  // Tier 2
+  const t2 = cards[1];
+  t2.querySelector('.uppercase').textContent = d.tier2Label;
+  t2.querySelector('.text-5xl').textContent = d.tier2Price;
+  t2.querySelector('.text-zinc-400').textContent = d.tier2Period;
+  t2.querySelector('.bg-orange\\/5').textContent = d.tier2Badge;
+  const t2Lis = t2.querySelectorAll('li span');
+  t2Lis[0].textContent = d.tier2F1;
+  t2Lis[1].textContent = d.tier2F2;
+  t2Lis[2].textContent = d.tier2F3;
+  t2Lis[3].textContent = d.tier2F4;
+  t2.querySelector('a span').textContent = d.tier2Cta;
+
+  // FAQ
+  document.querySelector('#faq span:first-of-type').textContent = d.faqLabel;
+  document.querySelector('#faq h2').textContent = d.faqTitle;
+  const faqQs = document.querySelectorAll('#faq label span');
+  faqQs[0].textContent = d.faq1Q;
+  faqQs[1].textContent = d.faq2Q;
+  faqQs[2].textContent = d.faq3Q;
+  faqQs[3].textContent = d.faq4Q;
+  const faqAs = document.querySelectorAll('#faq .faq-answer-inner');
+  faqAs[0].textContent = d.faq1A;
+  faqAs[1].textContent = d.faq2A;
+  faqAs[2].textContent = d.faq3A;
+  faqAs[3].textContent = d.faq4A;
+
+  // Contact
+  document.querySelector('#contact span:first-of-type').textContent = d.contactLabel;
+  document.querySelector('#contact h2').textContent = d.contactTitle;
+  document.querySelector('#contact p.text-zinc-500').textContent = d.contactSub;
+  document.querySelectorAll('#leadForm label')[0].textContent = d.formName;
+  document.querySelectorAll('#leadForm label')[1].textContent = d.formPhone;
+  document.querySelectorAll('#leadForm label')[2].querySelector('option').textContent = d.formTrade;
+  document.querySelector('#leadForm button span').textContent = d.formSubmit;
+
+  // Footer
+  document.querySelector('footer p').textContent = d.footerTagline;
+}
+
+// ═══════════ Form Submit ═══════════
+const API_URL = 'https://dependable-luck-production-7edf.up.railway.app/api/quote';
+
+async function submitForm() {
+  const form = document.getElementById('leadForm');
+  const btn = form.querySelector('button');
+  const status = document.getElementById('formStatus');
+  const name = form.name.value.trim();
+  const phone = form.phone.value.trim();
+  const trade = form.trade.value;
+
+  if (!name || !phone) {
+    status.className = 'text-red-500 text-sm mt-3';
+    status.textContent = lang === 'es' ? 'Nombre y telefono son obligatorios.' : 'Name and phone are required.';
+    status.classList.remove('hidden');
+    return;
+  }
+
+  btn.querySelector('span').textContent = lang === 'en' ? 'Sending...' : 'Enviando...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, phone,
+        jobType: trade || '(no trade selected)',
+        bestTime: '',
+        source: 'leaderforge.digital',
+        brand: 'leaderforge-digital',
+      }),
+    });
+
+    if (res.ok) {
+      status.className = 'text-green-600 text-sm mt-3';
+      status.textContent = lang === 'es' ? 'Mensaje enviado. Te contactamos pronto.' : 'Message sent. We\'ll get back to you soon.';
+      form.reset();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'API error');
+    }
+  } catch (e) {
+    console.error('Form error:', e);
+    status.className = 'text-red-500 text-sm mt-3';
+    status.textContent = lang === 'es' ? 'Error al enviar. Intenta de nuevo.' : 'Error sending. Try again.';
+  }
+
+  status.classList.remove('hidden');
+  btn.querySelector('span').textContent = lang === 'en' ? 'Get my Website' : 'Quiero mi web';
+}
+</script>
+
+<style>
+/* ── Sticky SMS — inherited from sdroofkings pattern ── */
+.whatsapp-sticky {
+  position: fixed; bottom: 28px; right: 28px; z-index: 40;
+  opacity: 0; transform: translateY(24px) scale(0.9); pointer-events: none;
+  transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--spring);
+}
+.whatsapp-sticky.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.wa-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px; border-radius: 9999px;
+  background: #f2610b; color: #fff;
+  box-shadow: 0 8px 30px rgba(242,97,11,0.35);
+  transition: transform 0.3s var(--spring), box-shadow 0.3s var(--spring);
+}
+.wa-btn:hover { transform: scale(1.08); box-shadow: 0 12px 36px rgba(242,97,11,0.45); }
+.wa-btn:active { transform: scale(0.96); }
+@keyframes wa-heartbeat {
+  0%, 100% { transform: scale(1); }
+  8% { transform: scale(1.12); }
+  16% { transform: scale(1); }
+  24% { transform: scale(1.08); }
+  32% { transform: scale(1); }
+}
+#stickySms .wa-btn { animation: wa-heartbeat 3.2s ease-in-out infinite; }
+</style>
+</body>
+</html>

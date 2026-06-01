@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedillaForms — Carta de Disputa</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      max-width: 750px;
+      margin: 40px auto;
+      padding: 30px 40px;
+      color: #1a1a1a;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .header .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2563eb;
+      letter-spacing: -0.5px;
+    }
+    .header .subtitle {
+      color: #6b7280;
+      font-size: 12px;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    .section { margin-bottom: 25px; }
+    .section h2 {
+      color: #2563eb;
+      font-size: 14px;
+      font-weight: bold;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 20px;
+    }
+    .info-grid p { margin: 3px 0; }
+    .info-grid .label { color: #6b7280; font-size: 11px; text-transform: uppercase; }
+    .info-grid .value { font-size: 13px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 12px;
+    }
+    th {
+      background: #f3f4f6;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    td {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      vertical-align: top;
+    }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .summary {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin: 25px 0;
+    }
+    .summary strong { color: #1e40af; }
+    .signature { margin-top: 40px; }
+    .signature .line { border-top: 1px solid #1a1a1a; width: 250px; margin: 30px 0 5px 0; }
+    .footer {
+      margin-top: 45px;
+      padding-top: 15px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 10px;
+      color: #9ca3af;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">MedillaForms</div>
+    <div class="subtitle">Servicio educativo de análisis de facturación médica</div>
+  </div>
+
+  <div class="section">
+    <h2>Información General</h2>
+    <div class="info-grid">
+      <div>
+        <p class="label">Fecha</p>
+        <p class="value">{today}</p>
+      </div>
+      <div>
+        <p class="label">Proveedor Médico</p>
+        <p class="value">{hospital}</p>
+      </div>
+      <div>
+        <p class="label">Paciente</p>
+        <p class="value">{customer_name}</p>
+      </div>
+      <div>
+        <p class="label">Fecha de Servicio</p>
+        <p class="value">{fecha}</p>
+      </div>
+      <div>
+        <p class="label">Total Facturado</p>
+        <p class="value"><strong>{total_facturado}</strong></p>
+      </div>
+      <div>
+        <p class="label">Ahorro Potencial Estimado</p>
+        <p class="value"><strong>{ahorro_estimado}</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Estimado Departamento de Facturación</h2>
+    <p>
+      Le escribo para solicitar una revisión detallada de mi factura médica.
+      Tras un análisis de los cargos, he identificado <strong>{num_errores} posibles errores</strong>
+      que suman aproximadamente <strong>{ahorro_estimado}</strong>.
+    </p>
+    <p style="margin-top: 10px;">
+      A continuación, presento cada uno de los puntos identificados para su consideración.
+      Agradecería que revisaran estos cargos y realizaran los ajustes correspondientes.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Errores Identificados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Error</th>
+          <th>Descripción</th>
+          <th>Cargo Actual</th>
+          <th>Precio Referencia</th>
+          <th>Ahorro Est.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {errores_rows}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Desglose de Cargos en Factura</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Código CPT</th>
+          <th>Descripción</th>
+          <th>Cant.</th>
+          <th>Precio Unitario</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {items_rows}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <p style="margin-bottom: 8px;">
+      <strong>Ahorro total estimado: {ahorro_estimado}</strong>
+    </p>
+    <p>
+      Solicito respetuosamente la revisión y ajuste de los cargos mencionados anteriormente.
+      Agradezco de antemano su atención a este asunto y quedo atento a su respuesta.
+    </p>
+  </div>
+
+  <div class="signature">
+    <p>Atentamente,</p>
+    <div class="line"></div>
+    <p><strong>{customer_name}</strong></p>
+  </div>
+
+  <div class="footer">
+    <p>{disclaimer}</p>
+  </div>
+
+</body>
+</html>

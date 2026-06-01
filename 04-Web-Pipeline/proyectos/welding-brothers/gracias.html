@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank You — The Welding Brothers</title>
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* --- Nav Glass --- */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(17,17,17,0.82);
+  backdrop-filter:blur(16px) saturate(180%);
+  -webkit-backdrop-filter:blur(16px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:0 20px;height:68px;
+}
+.nav-inner{
+  max-width:1280px;margin:0 auto;height:100%;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-brand{
+  display:flex;align-items:center;gap:12px;text-decoration:none;
+}
+.nav-logo-img{width:40px;height:40px;border-radius:6px}
+.nav-logo-text{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:1rem;
+  color:#FFFFFF;letter-spacing:1px;white-space:nowrap;
+}
+.nav-phone{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:1.05rem;
+  color:#FFFFFF;text-decoration:none;
+  background:#2979C1;padding:8px 18px;border-radius:6px;
+  transition:background 0.2s;
+}
+.nav-phone:hover{background:#3388D0}
+.nav-phone svg{width:18px;height:18px;flex-shrink:0}
+@media(max-width:520px){
+  .nav-logo-text{display:none}
+}
+
+/* --- Body --- */
+body{
+  font-family:'DM Sans',-apple-system,sans-serif;
+  background:#1A1A1A;
+  color:#FFFFFF;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:88px 20px 40px;
+}
+.container{max-width:600px;margin:0 auto}
+
+/* --- Check Icon --- */
+.check-circle{
+  width:72px;height:72px;
+  border:3px solid #2979C1;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 28px;
+}
+.check-circle svg{width:32px;height:32px;stroke:#2979C1}
+
+h1{
+  font-family:'Oswald',sans-serif;
+  font-size:clamp(1.75rem,5vw,2.75rem);font-weight:700;
+  text-transform:uppercase;line-height:1.1;margin-bottom:16px;
+}
+.sub{font-size:1.05rem;color:#8A8A8A;line-height:1.6;margin-bottom:14px}
+.phone-inline{font-size:1.5rem;font-weight:700;color:#2979C1;text-decoration:none}
+.phone-inline:hover{color:#3388D0}
+.bilingual{margin-top:20px;font-size:0.85rem;color:#555}
+
+/* --- Orange Pulse Button --- */
+.btn-back-wrap{margin:32px 0 8px}
+.btn-back{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'Oswald',sans-serif;font-size:1rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.5px;
+  color:#FFFFFF;
+  background:#FF6B35;
+  padding:14px 32px;
+  border-radius:8px;
+  text-decoration:none;
+  animation:btn-pulse 2.4s ease-in-out infinite;
+  transition:background 0.2s;
+}
+.btn-back:hover{background:#FF7F50}
+.btn-back svg{width:20px;height:20px;flex-shrink:0}
+
+@keyframes btn-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,0.55)}
+  50%{box-shadow:0 0 0 16px rgba(255,107,53,0)}
+}
+
+/* --- Mobile --- */
+@media(max-width:480px){
+  .btn-back{padding:14px 24px;font-size:0.95rem}
+}
+</style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LJ9NH433X3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-LJ9NH433X3');
+  gtag('event', 'conversion', { send_to: 'AW-CONVERSION_ID/thank-you' });
+</script>
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '926787570358592');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=926787570358592&ev=PageView&noscript=1"
+/></noscript>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="assets/images/logo.jpg" alt="Logo" class="nav-logo-img" width="40" height="40" loading="eager">
+      <span class="nav-logo-text">THE WELDING BROTHERS</span>
+    </a>
+    <a href="tel:+19514183001" class="nav-phone" aria-label="Call (951) 418-3001">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      (951) 418-3001
+    </a>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="container">
+  <div class="check-circle">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <h1>Got It!<br>We'll Call You Soon.</h1>
+  <p class="sub">Thanks for contacting The Welding Brothers. We'll give you a call within 24 hours. For anything urgent, call us now.</p>
+
+  <a href="tel:+19514183001" class="phone-inline">(951) 418-3001</a>
+  <p class="bilingual">Hablamos Español — bilingual team</p>
+
+  <div class="btn-back-wrap">
+    <a href="/#quote" class="btn-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to Home
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

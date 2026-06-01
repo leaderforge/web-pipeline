@@ -1,0 +1,77 @@
+{
+  "_description": "Common medical billing errors and their detection patterns. Used by AnalyzerAgent cross-reference.",
+  "_updated": "2026-05-25",
+  "error_types": {
+    "A_upcoding": {
+      "name": "CPT Code Upcoding",
+      "description": "Provider billed a higher-level code than the service justified",
+      "pattern": "cpt_level > documentation_supports",
+      "examples": [
+        "ER visit billed as level 5 (99285) when vitals and documentation suggest level 3 (99283)",
+        "Office visit billed as level 5 (99215) for a simple prescription refill"
+      ],
+      "detection": "Compare billed CPT level to documentation. Medicare rate ratio > 3x for that code = suspicious."
+    },
+    "B_duplication": {
+      "name": "Duplicate Charges",
+      "description": "Same procedure or service billed more than once for the same date",
+      "pattern": "same_cpt_code + same_date + same_amount",
+      "examples": [
+        "CBC panel billed twice on same day",
+        "Same X-ray billed by both hospital and radiologist"
+      ],
+      "detection": "Exact match on CPT code + date of service + amount."
+    },
+    "C_unbundling": {
+      "name": "Unbundling",
+      "description": "Multiple separate codes used instead of a single bundled code",
+      "pattern": "individual_codes_belong_to_bundle",
+      "examples": [
+        "80048 (basic panel) + individual tests instead of 80053 (comprehensive panel)",
+        "Multiple wound repair codes instead of one complex repair code"
+      ],
+      "detection": "Multiple CPT codes that are in a known bundled set in cpt_codes.json."
+    },
+    "D_facility_fees": {
+      "name": "Excessive Facility Fees",
+      "description": "Hospital facility fee charged for routine office visit or service that didn't require hospital setting",
+      "pattern": "facility_fee_for_routine_service",
+      "examples": [
+        "$500 facility fee for a 10-minute office consultation",
+        "ER-level facility fee for a scheduled outpatient lab test"
+      ],
+      "detection": "Line item with 'facility' or 'hospital' modifier on routine CPT codes. Amount > 2x the professional fee."
+    },
+    "E_medication_pricing": {
+      "name": "Medication/Supply Markups",
+      "description": "Generic medications or supplies billed at brand-name or excessive prices",
+      "pattern": "medication_price >> expected_generic_price",
+      "examples": [
+        "Generic Tylenol (acetaminophen) billed at $15/pill",
+        "Standard IV saline bag billed at $200",
+        "Band-Aid billed at $25"
+      ],
+      "detection": "Medication/Supply item descriptions with common generic names. Price >> reasonable range. Flag if > $50 for common generics."
+    },
+    "F_quantity_errors": {
+      "name": "Quantity Errors",
+      "description": "Incorrect quantity billed — too many units, days, or doses",
+      "pattern": "quantity > expected_for_procedure",
+      "examples": [
+        "3 physical therapy units for a 15-minute session",
+        "5 days of hospitalization billed for a 2-day stay"
+      ],
+      "detection": "Compare billed quantity to billing_frequency limits for that CPT code."
+    },
+    "G_out_of_network": {
+      "name": "Out-of-Network / Surprise Billing",
+      "description": "Charges from out-of-network providers at in-network facilities (No Surprises Act protections may apply)",
+      "pattern": "oon_provider_at_in_network_facility OR emergency_oon_charges",
+      "examples": [
+        "Anesthesiologist out-of-network during in-network surgery",
+        "ER physician out-of-network at in-network hospital emergency room"
+      ],
+      "detection": "Multiple providers on same bill with different network status noted. Emergency services flagged."
+    }
+  }
+}

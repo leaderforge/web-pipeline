@@ -1,0 +1,8 @@
+- [User Role](user_role.md) — Daniel: entrepreneur in US building websites for clients, Hermes as principal agent
+- [Mission $1M](mission-1m.md) — Core mission: generate $1M USD profit for Daniel
+- [Vault Setup](vault-setup.md) — Obsidian vault inside Hermes-Brain, knowledge layer vs execution layer
+- [Feedback: Proactive Mode](feedback_proactive.md) — Hermes must analyze, anticipate, and recommend proactively
+- [Token Efficiency](token-efficiency.md) — Use sub-agents aggressively to keep main session lean
+- [Google Workspace Trial](google-workspace-trial.md) — Trial started 2026-05-25, $16 charge on 2026-06-08, notify June 7
+- [LeaderForge Digital Project](leaderforge-digital-project.md) — Estado completo: landing page, Railway API, animaciones pendientes, email automation pendiente
+- [Oscar Landeros TRS Roofing](oscar-landeros-trs-roofing.md) — Website deployado: trs-roofing-co.netlify.app, basado en SD Roof Kings
