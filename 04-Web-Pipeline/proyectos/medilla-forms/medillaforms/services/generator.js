@@ -64,12 +64,12 @@ function formatDate(dateStr, lang) {
 }
 
 // =============================================================================
+// =============================================================================
 // Build HTML content for a letter
 // =============================================================================
-function buildHtml(analysis, customerName, lang) {
+function buildHtml(analysis, signerData, lang) {
   let template = loadTemplate(lang);
   if (!template) {
-    // Fallback inline template
     template = getFallbackTemplate(lang);
   }
 
@@ -81,6 +81,46 @@ function buildHtml(analysis, customerName, lang) {
   const items = analysis.items || [];
   const disclaimer = getLetterFooterDisclaimer(lang);
   const today = formatDate(new Date().toISOString().slice(0, 10), lang);
+
+  // ── Signer info ────────────────────────────────────────────────
+  const signerName = signerData.name || "Cliente";
+  const signerRel = signerData.relationship || "self";
+  const patientName = signerData.patientName || signerName;
+  const isMinor = signerData.isMinor || false;
+
+  // ── Patient display name ──────────────────────────────────────
+  const displayPatient = isMinor && patientName
+    ? `${patientName} (${lang === "es" ? "menor de edad" : "minor"})`
+    : patientName || signerName;
+
+  // ── Intro paragraph (adapted by relationship) ─────────────────
+  let introText = "";
+  if (!isMinor || signerRel === "self") {
+    // Adult patient
+    if (lang === "es") {
+      introText = `Le escribo para solicitar una revisión detallada de mi factura médica.`;
+    } else {
+      introText = `I am writing to request a detailed review of my medical bill.`;
+    }
+  } else {
+    // Minor — adapt by relationship
+    const relMap = {
+      "parent": {
+        es: `Le escribo como ${signerName.includes(" ") ? signerName.split(" ")[0] : signerName}, madre/padre de ${patientName}, menor de edad, para solicitar una revisión detallada de su factura médica.`,
+        en: `I am writing as ${signerName.includes(" ") ? signerName.split(" ")[0] : signerName}, parent of ${patientName}, a minor, to request a detailed review of their medical bill.`,
+      },
+      "legal_guardian": {
+        es: `Le escribo como tutor/a legal de ${patientName}, menor de edad, designado/a por corte, para solicitar una revisión detallada de su factura médica.`,
+        en: `I am writing as the court-appointed legal guardian of ${patientName}, a minor, to request a detailed review of their medical bill.`,
+      },
+      "other": {
+        es: `Le escribo como representante autorizado de ${patientName}, menor de edad, para solicitar una revisión detallada de su factura médica.`,
+        en: `I am writing as the authorized representative of ${patientName}, a minor, to request a detailed review of their medical bill.`,
+      },
+    };
+    const entry = relMap[signerRel] || relMap["parent"];
+    introText = entry[lang] || entry["es"];
+  }
 
   // Build errors table rows
   let erroresRows = "";
@@ -119,7 +159,12 @@ function buildHtml(analysis, customerName, lang) {
 
   // Replace placeholders
   const html = template
-    .replace(/\{customer_name\}/g, customerName || "Cliente")
+    .replace(/\{customer_name\}/g, displayPatient)
+    .replace(/\{signer_name\}/g, signerName)
+    .replace(/\{signer_rel\}/g, signerRel === "parent" ? (lang === "es" ? "padre/madre" : "parent") 
+                                : signerRel === "legal_guardian" ? (lang === "es" ? "tutor legal" : "legal guardian")
+                                : (lang === "es" ? "representante autorizado" : "authorized representative"))
+    .replace(/\{intro_text\}/g, introText)
     .replace(/\{hospital\}/g, hospital)
     .replace(/\{fecha\}/g, fecha)
     .replace(/\{total_facturado\}/g, total)
@@ -136,7 +181,7 @@ function buildHtml(analysis, customerName, lang) {
 // =============================================================================
 // Generate both letters as PNG buffers
 // =============================================================================
-async function generateLetters(analysis, customerName) {
+async function generateLetters(analysis, signerData) {
   let playwright;
   try {
     playwright = await import("playwright");
@@ -144,10 +189,10 @@ async function generateLetters(analysis, customerName) {
     throw new Error("Playwright not installed. Run: npx playwright install chromium");
   }
 
-  console.log(`📄 Generating letters for: ${customerName}, hospital: ${analysis.hospital}`);
+  console.log(`📄 Generating letters for: ${signerData.name}, hospital: ${analysis.hospital}`);
 
-  const htmlEs = buildHtml(analysis, customerName, "es");
-  const htmlEn = buildHtml(analysis, customerName, "en");
+  const htmlEs = buildHtml(analysis, signerData, "es");
+  const htmlEn = buildHtml(analysis, signerData, "en");
 
   const browser = await playwright.chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 800, height: 1200 } });
@@ -174,11 +219,16 @@ async function generateLetters(analysis, customerName) {
 // =============================================================================
 // Fallback: plain-text letters if Playwright unavailable
 // =============================================================================
-function generateTextLetters(analysis, customerName) {
+function generateTextLetters(analysis, signerData) {
   const hospital = analysis.hospital || "N/A";
   const fecha = analysis.fecha_servicio || "N/A";
   const total = formatCurrency(analysis.total_facturado || 0);
   const ahorro = formatCurrency(analysis.ahorro_total_estimado || 0);
+  
+  const signerName = signerData.name || "Cliente";
+  const patientName = signerData.patientName || signerName;
+  const isMinor = signerData.isMinor || false;
+  const displayName = isMinor ? `${patientName} (menor) — Firmante: ${signerName}` : signerName;
 
   let erroresTextEs = "";
   let erroresTextEn = "";

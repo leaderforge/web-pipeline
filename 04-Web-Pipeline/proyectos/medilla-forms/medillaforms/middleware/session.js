@@ -26,6 +26,11 @@ export async function initDB() {
       CREATE TABLE IF NOT EXISTS sessions (
         id                    UUID PRIMARY KEY,
         whatsapp_number       VARCHAR(20) NOT NULL,
+        customer_name         VARCHAR(255),
+        patient_name          VARCHAR(255),
+        patient_is_minor      BOOLEAN DEFAULT FALSE,
+        signer_name           VARCHAR(255),
+        signer_relationship   VARCHAR(50),
         state                 VARCHAR(30) DEFAULT 'intake',
         photos                JSONB DEFAULT '[]'::jsonb,
         photos_expected       INTEGER,

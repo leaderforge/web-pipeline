@@ -85,6 +85,12 @@ export class AnalyzerAgent {
       // Step 4: Cross-reference with local knowledge base
       const enriched = this._crossReference(result);
 
+      // Step 4b: Detect minority + extract patient name
+      const patientName = enriched.patient_name || enriched.nombre_paciente || "";
+      const patientAge = enriched.patient_age || enriched.edad_paciente || 
+        this._calculateAge(enriched.patient_dob || enriched.fecha_nacimiento);
+      const isMinor = patientAge > 0 && patientAge < 18;
+
       // Step 5: Save analysis to session
       await pool.query(
         `UPDATE sessions
@@ -94,6 +100,8 @@ export class AnalyzerAgent {
              total_billed = $5,
              hospital_name = $6,
              user_state = $7,
+             patient_name = $8,
+             patient_is_minor = $9,
              photos = photos || '[]'::jsonb,
              state = 'analyzed',
              updated_at = NOW()
@@ -106,6 +114,8 @@ export class AnalyzerAgent {
           enriched.total_facturado || 0,
           enriched.hospital || "N/A",
           enriched.estado || "CA",
+          patientName,
+          isMinor,
         ]
       );
 
@@ -116,6 +126,8 @@ export class AnalyzerAgent {
       this.session.total_billed = enriched.total_facturado || 0;
       this.session.hospital_name = enriched.hospital || "N/A";
       this.session.user_state = enriched.estado || "CA";
+      this.session.patient_name = patientName;
+      this.session.patient_is_minor = isMinor;
 
       // Step 6: Present hook (FASE 3)
       const hermes = new HermesAgent(this.whatsapp, null, this.session);
@@ -241,6 +253,24 @@ export class AnalyzerAgent {
       G: "out_of_network",
     };
     return map[tipo] || "unknown";
+  }
+
+  // Calculate age from DOB string (YYYY-MM-DD, MM/DD/YYYY, etc.)
+  _calculateAge(dob) {
+    if (!dob) return 0;
+    try {
+      const parsed = new Date(dob);
+      if (isNaN(parsed.getTime())) return 0;
+      const today = new Date();
+      let age = today.getFullYear() - parsed.getFullYear();
+      const monthDiff = today.getMonth() - parsed.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < parsed.getDate())) {
+        age--;
+      }
+      return age >= 0 ? age : 0;
+    } catch {
+      return 0;
+    }
   }
 }
 

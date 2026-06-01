@@ -30,6 +30,32 @@ export class IntakeAgent {
       return;
     }
 
+    // --- Name capture (2nd-3rd message, no name yet) ---
+    if (!this.session.customer_name && msgCount <= 3) {
+      const name = text.trim().replace(/\.$/, "");
+      // Validate: looks like a name (2-4 words, no digits, no URLs, no question marks)
+      const looksLikeName = /^[A-Za-zÁ-Úá-úÑñ\s'-]{2,60}$/.test(name) && !/[?¿]/.test(name);
+      if (looksLikeName) {
+        await pool.query(
+          `UPDATE sessions SET customer_name = $2, updated_at = NOW() WHERE id = $1`,
+          [this.session.id, name]
+        );
+        this.session.customer_name = name;
+        await appendToConversationLog(this.session.id, "user", text);
+        await this.whatsapp.sendText(this.phone,
+          `¡Mucho gusto, ${name.split(" ")[0]}! 😊\n\n` +
+          `¿Tiene su factura médica a la mano? Mándeme una foto cuando esté listo. 📸\n\n` +
+          `Si aún no tienen su factura pero quieren saber cómo funciona, también podemos platicar.`
+        );
+        await appendToConversationLog(this.session.id, "assistant", 
+          `¡Mucho gusto, ${name.split(" ")[0]}! 😊\n\n` +
+          `¿Tiene su factura médica a la mano? Mándeme una foto cuando esté listo. 📸\n\n` +
+          `Si aún no tienen su factura pero quieren saber cómo funciona, también podemos platicar.`
+        );
+        return;
+      }
+    }
+
     // --- Price questions ---
     if (this._matches(textLower, ["cuánto", "cuanto", "precio", "cuesta", "costo", "pago",
                                    "how much", "price", "cost", "payment", "fee"])) {
@@ -119,7 +145,7 @@ export class IntakeAgent {
         `¡Buenas! Bienvenido a MedillaForms. 💙\n\n` +
         `Soy Hermes, su asistente de análisis de facturas médicas.\n\n` +
         `*${disclaimer}*\n\n` +
-        `¿En qué le puedo ayudar hoy?`;
+        `Antes de empezar, ¿cómo se llama?`;
 
       await this.whatsapp.sendText(this.phone, welcomeMsg);
       await appendToConversationLog(this.session.id, "assistant", welcomeMsg);

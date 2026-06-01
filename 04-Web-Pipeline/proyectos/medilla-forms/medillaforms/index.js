@@ -429,6 +429,13 @@ async function routeText(phone, text, session, returningContext = "") {
       break;
     }
 
+    case "awaiting_signer": {
+      // User is responding to signer prompt (minor patient)
+      const closer = new CloserAgent(whatsapp, deepseek, stripe, session);
+      await closer.handleSignerResponse(text);
+      break;
+    }
+
     case "paid":
     case "delivering": {
       const educator = new EducatorAgent(whatsapp, deepseek, firecrawl, session);
