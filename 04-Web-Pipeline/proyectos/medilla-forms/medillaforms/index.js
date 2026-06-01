@@ -371,6 +371,39 @@ async function routeText(phone, text, session, returningContext = "") {
     return;
   }
 
+  // ── 24-HOUR RULE ──────────────────────────────────────────────────
+  // WhatsApp Business: solo responder dentro de ventana de 24h
+  const lastMsg = session.last_message_at ? new Date(session.last_message_at) : null;
+  const hoursSinceLastMsg = lastMsg
+    ? (Date.now() - lastMsg.getTime()) / (1000 * 60 * 60)
+    : 0;
+  // Si pasaron más de 24h y el usuario NO acaba de escribir, no iniciar conversación
+  if (hoursSinceLastMsg > 24 && session.state === "closed") {
+    await whatsapp.sendText(phone,
+      "¡Qué gusto volver a saber de usted! ¿Tiene otra factura que revisar? 📸"
+    );
+    await pool.query(
+      `UPDATE sessions SET state = 'intake', updated_at = NOW() WHERE id = $1`,
+      [session.id]
+    );
+    return;
+  }
+
+  // ── ALCANCE: verificar que el mensaje sea sobre facturación médica ─
+  const outOfScopePhrases = [
+    "clima", "weather", "fútbol", "football", "política", "politics",
+    "elecciones", "religión", "religion", "receta", "prescription",
+  ];
+  const textLower = text.toLowerCase();
+  const isOutOfScope = outOfScopePhrases.some(p => textLower.includes(p));
+  if (isOutOfScope) {
+    await whatsapp.sendText(phone,
+      "Mi función es ayudarle exclusivamente con su facturación médica. " +
+      "¿Hay algo sobre los cargos de su factura en lo que pueda servirle?"
+    );
+    return;
+  }
+
   const state = session.state || "intake";
 
   switch (state) {
