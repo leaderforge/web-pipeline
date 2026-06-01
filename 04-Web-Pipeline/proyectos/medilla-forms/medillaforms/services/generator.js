@@ -163,6 +163,7 @@ function buildHtml(analysis, signerData, lang) {
     .replace(/\{signer_name\}/g, signerName)
     .replace(/\{signer_rel\}/g, signerRel === "parent" ? (lang === "es" ? "padre/madre" : "parent") 
                                 : signerRel === "legal_guardian" ? (lang === "es" ? "tutor legal" : "legal guardian")
+                                : signerRel === "self" ? ""
                                 : (lang === "es" ? "representante autorizado" : "authorized representative"))
     .replace(/\{intro_text\}/g, introText)
     .replace(/\{hospital\}/g, hospital)
@@ -242,26 +243,26 @@ function generateTextLetters(analysis, signerData) {
 
   const esText =
     `[MEDILLAFORMS — CARTA DE DISPUTA]\n\n` +
-    `Fecha: ${fecha}\nProveedor: ${hospital}\nPaciente: ${customerName}\n\n` +
+    `Fecha: ${fecha}\nProveedor: ${hospital}\nPaciente: ${displayName}\n\n` +
     `Estimado departamento de facturación:\n\n` +
     `Le escribo para solicitar una revisión detallada de mi factura médica ` +
     `por un total de ${total}. Tras un análisis exhaustivo, he identificado ` +
     `los siguientes posibles errores de facturación:\n\n${erroresTextEs}\n` +
     `Ahorro total estimado: ${ahorro}\n\n` +
     `Agradecería que revisaran estos puntos y ajustaran la factura en consecuencia. ` +
-    `Quedo atento a su respuesta.\n\nAtentamente,\n${customerName}\n\n` +
+    `Quedo atento a su respuesta.\n\nAtentamente,\n${signerName}\n\n` +
     `---\n${disclaimerEs}`;
 
   const enText =
     `[MEDILLAFORMS — DISPUTE LETTER]\n\n` +
-    `Date: ${fecha}\nProvider: ${hospital}\nPatient: ${customerName}\n\n` +
+    `Date: ${fecha}\nProvider: ${hospital}\nPatient: ${displayName}\n\n` +
     `Dear billing department:\n\n` +
     `I am writing to request a detailed review of my medical bill ` +
     `totaling ${total}. After thorough analysis, I have identified ` +
     `the following potential billing errors:\n\n${erroresTextEn}\n` +
     `Total estimated savings: ${ahorro}\n\n` +
     `I would appreciate it if you could review these items and adjust the bill ` +
-    `accordingly. I look forward to your response.\n\nSincerely,\n${customerName}\n\n` +
+    `accordingly. I look forward to your response.\n\nSincerely,\n${signerName}\n\n` +
     `---\n${disclaimerEn}`;
 
   return { es_text: esText, en_text: enText };

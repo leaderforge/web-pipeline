@@ -70,8 +70,8 @@ export class CloserAgent {
       finalSignerName = this.session.customer_name || patientName;
       finalSignerRel = "parent";
     } else {
-      // Adult — signer is the patient or the customer
-      finalSignerName = patientName || this.session.customer_name || "Cliente";
+      // Adult — signer is the patient (name extracted from bill)
+      finalSignerName = patientName || "Cliente";
       finalSignerRel = "self";
     }
 
