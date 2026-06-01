@@ -165,7 +165,7 @@ app.post("/telegram/webhook", async (req, res) => {
 
   // Parse "listo <session_code>" command (Zelle confirmation)
   // The code is the first 8 chars of the UUID — look up full session
-  const listoMatch = text.match(/^listo\s+([a-f0-9-]+)/i);
+  const listoMatch = text.match(/^listo\s+([\w-]+)/i);
   if (listoMatch) {
     const code = listoMatch[1];
 
