@@ -172,6 +172,27 @@ export class HermesAgent {
   // Handle messages while waiting for payment
   // ===========================================================================
   async handleWaitingPayment(text) {
+    // 🔄 RELOAD session from DB to catch Daniel's Zelle confirmation
+    const reloaded = await pool.query(
+      `SELECT * FROM sessions WHERE id = $1`,
+      [this.session.id]
+    );
+    if (reloaded.rowCount > 0) {
+      this.session = { ...this.session, ...reloaded.rows[0] };
+    }
+
+    // ✅ Payment was just confirmed (by Daniel via Zelle, or Stripe webhook)
+    if (this.session.payment_confirmed || this.session.state === 'paid') {
+      await this.whatsapp.sendText(this.phone,
+        "¡Su pago fue confirmado! En un momento le envío sus cartas. 🎉"
+      );
+      // confirmPayment() already triggered deliverLetters() and sent the WhatsApp
+      // "¡Confirmado!" message. This is the race-condition catch — the customer
+      // messaged right after Daniel confirmed. We just ack and update local state.
+      this.session.state = 'paid';
+      return;
+    }
+
     const textLower = text.toLowerCase();
 
     // User says they've paid via Zelle
@@ -188,6 +209,31 @@ export class HermesAgent {
       return;
     }
 
+    // 📸 User sends a screenshot or comprobante
+    if (textLower.includes("comprobante") || textLower.includes("captura") ||
+        textLower.includes("screenshot") || textLower.includes("imagen") ||
+        textLower.includes("foto") || textLower.includes("evidencia")) {
+      await this.whatsapp.sendText(this.phone,
+        "Gracias por enviar el comprobante. Lo estamos revisando. En cuanto se confirme el pago, le enviamos sus cartas. ⏳"
+      );
+      await telegramSvc.sendMessage(
+        `📸 ${this.session.id.slice(0,8)} — El cliente envió comprobante de pago Zelle. Verifica en tu banco.`
+      );
+      return;
+    }
+
+    // ⏳ User asks about wait time or confirmation status
+    if (textLower.includes("cuánto tarda") || textLower.includes("cuánto falta") ||
+        textLower.includes("demora") || textLower.includes("confirmaron") ||
+        textLower.includes("verificaron") || textLower.includes("estatus") ||
+        textLower.includes("status") || textLower.includes("update")) {
+      await this.whatsapp.sendText(this.phone,
+        "Seguimos verificando su pago. Esto puede tomar unos minutos. Le avisaré en cuanto se confirme. ⏳\n\n" +
+        "¡Gracias por su paciencia!"
+      );
+      return;
+    }
+
     // User selected Stripe / credit card (first time or switching from Zelle)
     if (textLower.includes("tarjeta") || textLower.includes("stripe") || textLower.includes("crédito") ||
         textLower.includes("debito") || textLower.includes("card")) {
@@ -195,7 +241,6 @@ export class HermesAgent {
         await this._handleStripeChoice();
         return;
       }
-      // Already on Stripe — remind them
       await this.whatsapp.sendText(this.phone,
         "El link de pago ya está en el mensaje anterior. ¿Lo ve? Si tuvo algún problema con el pago, dígame y le ayudo."
       );
@@ -208,7 +253,6 @@ export class HermesAgent {
         await this._handleZelleChoice();
         return;
       }
-      // Already on Zelle — remind them
       await this.whatsapp.sendText(this.phone,
         `Los datos de Zelle están en el mensaje anterior:\n` +
         `Número: ${zelle.phone}\nNombre: ${zelle.name}\nMonto: $29.00\n\n` +
@@ -217,12 +261,12 @@ export class HermesAgent {
       return;
     }
 
-    // General questions — use DeepSeek
+    // General questions — use DeepSeek but with payment-waiting context
     const history = buildConversationHistory(this.session.conversation_log);
     const response = await this.deepseek.chat(
       "closer_hook",
       history,
-      text,
+      text + "\n\n[IMPORTANTE: El cliente está en espera de verificación de pago Zelle. NO prometas que el pago está confirmado. Sé amable y responde su pregunta, pero recuérdale que su pago está siendo verificado y recibirá confirmación pronto.]",
       { hospital_name: this.session.hospital_name || "" }
     );
     await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(response));
