@@ -14,7 +14,7 @@ class TelegramService {
     this.enabled = !!(this.botToken && this.chatId);
 
     if (!this.enabled) {
-      console.warn("⚠️ Telegram notifications disabled — TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set");
+      console.warn("⚠️ Telegram notifications disabled — MEDILLA_TELEGRAM_BOT_TOKEN or MEDILLA_TELEGRAM_CHAT_ID not set");
     }
   }
 
