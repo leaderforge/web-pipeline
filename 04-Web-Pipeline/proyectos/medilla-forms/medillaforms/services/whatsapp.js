@@ -11,6 +11,8 @@ class WhatsAppService {
     this.fromNumber = process.env.TELNYX_PHONE_NUMBER || "";
     this.profileId = process.env.TELNYX_MESSAGING_PROFILE_ID || "";
     this.baseUrl = "https://api.telnyx.com/v2";
+    this.lastSendError = null;
+    this.lastSendResponse = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -49,13 +51,16 @@ class WhatsAppService {
 
       const data = await response.json();
       if (!response.ok) {
+        this.lastSendError = { status: response.status, body: data, at: new Date().toISOString() };
         console.error(`❌ WhatsApp send error: ${response.status}`, data);
         return { ok: false, error: data };
       }
 
+      this.lastSendResponse = { status: response.status, body: data, at: new Date().toISOString() };
       console.log(`📤 WhatsApp sent to ${to.slice(-4)}: ${text.slice(0, 60)}...`);
       return { ok: true, data };
     } catch (e) {
+      this.lastSendError = { status: "exception", body: e.message, at: new Date().toISOString() };
       console.error("❌ WhatsApp send exception:", e.message);
       return { ok: false, error: e.message };
     }
@@ -95,13 +100,16 @@ class WhatsAppService {
 
       const data = await response.json();
       if (!response.ok) {
+        this.lastSendError = { status: response.status, body: data, at: new Date().toISOString() };
         console.error(`❌ WhatsApp image send error: ${response.status}`, data);
         return { ok: false, error: data };
       }
 
+      this.lastSendResponse = { status: response.status, body: data, at: new Date().toISOString() };
       console.log(`📸 WhatsApp image sent to ${to.slice(-4)}`);
       return { ok: true, data };
     } catch (e) {
+      this.lastSendError = { status: "exception", body: e.message, at: new Date().toISOString() };
       console.error("❌ WhatsApp image send exception:", e.message);
       return { ok: false, error: e.message };
     }
