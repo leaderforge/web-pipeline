@@ -34,8 +34,11 @@ export class AnalyzerAgent {
     );
 
     try {
+      // Build CPT reference lookup for the AI
+      const cptRef = this._buildCptReference();
+
       // Step 1: GPT-4o Vision analysis
-      const result = await this.openai.analyzeBill(imageBuffer);
+      const result = await this.openai.analyzeBill(imageBuffer, cptRef);
 
       if (result.error) {
         await this._handleAnalysisError(result.error);
@@ -197,6 +200,64 @@ export class AnalyzerAgent {
     }
 
     return enriched;
+  }
+
+  // ===========================================================================
+  // Build CPT code reference table for injection into GPT-4o prompt
+  // Extracts the most relevant codes grouped by category
+  // ===========================================================================
+  _buildCptReference() {
+    const cptCodes = this._loadJson("cpt_codes.json");
+    if (!cptCodes?.codes) return "";
+
+    // Focus on hospital-relevant categories with codes under $2000 (common bills)
+    const priorityCategories = [
+      "emergency", "outpatient", "inpatient", "anesthesia",
+      "radiology", "pathology_lab", "medicine", "evaluation_management",
+      "therapy_rehab"
+    ];
+
+    const lines = ["TARIFAS MEDICARE DE REFERENCIA (2025) — Usa estos valores para comparar:"];
+    let count = 0;
+    const MAX = 120;
+
+    for (const [code, info] of Object.entries(cptCodes.codes)) {
+      if (count >= MAX) break;
+      const rate = info.medicare_rate || 0;
+      const cat = info.category || "";
+      const desc = info.description || "";
+
+      // Include high-value codes (surgery, imaging) + all common categories
+      const isPriority = priorityCategories.some(c => cat.includes(c) || cat === c);
+      const isHighValue = rate > 100;
+      const isCommon = !!desc;
+
+      if (isPriority || isHighValue || isCommon) {
+        const descSuffix = desc ? ` (${desc})` : "";
+        lines.push(`${code}: $${rate} [${cat}]${descSuffix}`);
+        count++;
+      }
+    }
+
+    // Add lab reference rates
+    if (cptCodes.lab_reference_rates) {
+      lines.push("\nTARIFAS DE LABORATORIO (CLFS):");
+      for (const [code, info] of Object.entries(cptCodes.lab_reference_rates)) {
+        if (code.startsWith("_")) continue;
+        lines.push(`${code}: $${info.medicare_rate} — ${info.description}`);
+      }
+    }
+
+    // Add medication markup warning
+    if (cptCodes.medication_reference) {
+      lines.push("\nALERTA DE SOBREPRECIO EN MEDICAMENTOS/SUMINISTROS:");
+      for (const [name, info] of Object.entries(cptCodes.medication_reference)) {
+        if (name.startsWith("_")) continue;
+        lines.push(`${name}: costo real ~$${info.actual_cost}${info.unit ? '/' + info.unit : ''}, hospitales cobran ~$${info.typical_charge}${info.unit ? '/' + info.unit : ''}`);
+      }
+    }
+
+    return lines.join("\n");
   }
 
   // ===========================================================================

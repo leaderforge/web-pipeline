@@ -38,6 +38,12 @@ export class HermesAgent {
       return;
     }
 
+    // Build charity care note if applicable
+    const charityInfo = analysis.charity_care_info;
+    const charityNote = charityInfo
+      ? `\nDATO IMPORTANTE: ${hospital} tiene un programa de asistencia financiera (charity care). Si el usuario tiene ingresos limitados, podría calificar para descuentos significativos o incluso cobertura total. Menciona esto de forma natural si es relevante a la conversación. NO lo uses como táctica de venta.`
+      : "";
+
     // Build context for DeepSeek
     const context = {
       hospital_name: hospital,
@@ -47,6 +53,7 @@ export class HermesAgent {
       potential_savings: String(savings),
       zelle_phone: zelle.phone,
       zelle_name: zelle.name,
+      charity_care_note: charityNote,
     };
 
     const history = buildConversationHistory(this.session.conversation_log);

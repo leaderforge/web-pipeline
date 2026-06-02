@@ -76,7 +76,31 @@ export class CloserAgent {
     }
 
     try {
-      // Step 1: Notify user
+      // Step 1: Brief education — explain the errors before generating letters
+      const analysis = this.session.analysis_result || {};
+      const errors = analysis.errores_detectados || [];
+      if (errors.length > 0) {
+        const errorSummary = errors.map((e, i) =>
+          `${i + 1}. *${e.titulo || "Error detectado"}*: ${(e.descripcion || "").slice(0, 200)}`
+        ).join("\n\n");
+
+        await this.whatsapp.sendText(this.phone,
+          `Antes de preparar sus cartas, un resumen de lo que encontramos en su factura:\n\n${errorSummary}\n\n` +
+          `*Ahorro total estimado: $${(analysis.ahorro_total_estimado || 0).toLocaleString()}*\n\n` +
+          `Ahora preparo sus cartas. Un momento...`
+        );
+        await appendToConversationLog(this.session.id, "assistant", "Educator: error summary sent");
+
+        // If charity care applies, mention it
+        if (analysis.charity_care_info) {
+          await this.whatsapp.sendText(this.phone,
+            `💡 Un dato adicional: *${this.session.hospital_name}* tiene un programa de asistencia financiera (charity care). Si sus ingresos son limitados, podría calificar para descuentos importantes.\n\n` +
+            `Es independiente de la disputa — puede aplicar a ambos. ¿Quiere que le explique cómo funciona?`
+          );
+        }
+      }
+
+      // Step 2: Notify user letters are coming
       await this.whatsapp.sendText(this.phone,
         "¡Perfecto! Estoy preparando sus cartas de disputa personalizadas. " +
         "Recibirá dos imágenes:\n" +
@@ -90,8 +114,7 @@ export class CloserAgent {
         [this.session.id]
       );
 
-      // Step 2: Generate letters
-      const analysis = this.session.analysis_result || {};
+      // Step 3: Generate letters (analysis already loaded above)
       const signerData = {
         name: finalSignerName,
         relationship: finalSignerRel,
