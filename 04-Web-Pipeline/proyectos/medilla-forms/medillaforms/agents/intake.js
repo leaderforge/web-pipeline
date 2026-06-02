@@ -4,10 +4,12 @@
 
 import { pool, appendToConversationLog, buildConversationHistory } from "../middleware/session.js";
 import { sanitizeAgentResponse, getFirstMessageDisclaimer } from "../middleware/legal.js";
-import { addPhoto, confirmPhotos, clearBuffer } from "../middleware/buffer.js";
+import { addPhoto, confirmPhotos, clearBuffer, getStoredPhotos, getStoredCount, clearStoredPhotos } from "../middleware/buffer.js";
 import { deepseek } from "../services/deepseek.js";
+import { openai } from "../services/openai.js";
 import { zelle } from "../services/zelle.js";
 import { HermesAgent } from "./hermes.js";
+import { AnalyzerAgent } from "./analyzer.js";
 
 export class IntakeAgent {
   constructor(whatsapp, deepseekSvc, session) {
@@ -60,19 +62,29 @@ export class IntakeAgent {
     if (this._matches(textLower, ["son todas", "todas", "eso es todo", "listo",
                                    "that's all", "done", "ready", "ya está", "ya esta",
                                    "envié todas", "envie todas", "esas son todas"])) {
-      const result = confirmPhotos(this.phone);
-      if (result) {
-        await pool.query(
-          `UPDATE sessions SET photos_confirmed = true, photos_expected = $2, state = 'analyzing', updated_at = NOW() WHERE id = $1`,
-          [this.session.id, result.photoCount]
-        );
-        this.session.photos_confirmed = true;
-        this.session.state = "analyzing";
+      const stored = getStoredPhotos(this.phone);
+      const count = stored.length;
 
+      if (count === 0) {
         await this.whatsapp.sendText(this.phone,
-          "Perfecto, gracias. Deme un momento para revisar su factura, por favor."
+          "No he recibido ninguna foto aún. ¿Puedes enviarme tu factura? 📸"
         );
+        return;
       }
+
+      await pool.query(
+        `UPDATE sessions SET photos_confirmed = true, photos_expected = $2, state = 'analyzing', updated_at = NOW() WHERE id = $1`,
+        [this.session.id, count]
+      );
+      this.session.photos_confirmed = true;
+      this.session.photos_expected = count;
+      this.session.state = "analyzing";
+
+      await this.whatsapp.sendText(this.phone,
+        `Perfecto, ${count} ${count === 1 ? "página confirmada" : "páginas confirmadas"}. Deme un momento para analizarlas... ⏳`
+      );
+
+      await this._triggerAnalysis();
       return;
     }
 
@@ -173,11 +185,51 @@ export class IntakeAgent {
     );
     this.session.photos_expected = num;
 
+    // Check if enough photos are already buffered
+    const alreadyBuffered = getStoredCount(this.phone);
+
+    if (alreadyBuffered >= num) {
+      // All photos already sent — analyze now!
+      await this.whatsapp.sendText(this.phone,
+        `¡Perfecto! Ya tengo las ${alreadyBuffered} páginas. Deme un momento para analizarlas... ⏳`
+      );
+      await pool.query(
+        `UPDATE sessions SET photos_confirmed = true, state = 'analyzing', updated_at = NOW() WHERE id = $1`,
+        [this.session.id]
+      );
+      this.session.photos_confirmed = true;
+      this.session.state = "analyzing";
+      await this._triggerAnalysis();
+      return;
+    }
+
+    const remaining = num - alreadyBuffered;
     await this.whatsapp.sendText(this.phone,
-      `Perfecto, ${num} página(s). Cuando guste, envíemelas.\n\n` +
-      `Le recomiendo tomarles foto con buena iluminación, sobre una superficie plana, ` +
-      `asegurándose que todo el texto sea legible.`
+      `Perfecto, ${num} página${num === 1 ? "" : "s"}. Ya recibí ${alreadyBuffered}. ` +
+      `Envíame ${remaining === 1 ? "la que falta" : `las ${remaining} restantes`} cuando estés listo.`
     );
+  }
+
+  // ===========================================================================
+  // Trigger analysis from buffered photos
+  // ===========================================================================
+  async _triggerAnalysis() {
+    const allPhotos = getStoredPhotos(this.phone);
+    if (allPhotos.length === 0) {
+      console.warn("⚠️ _triggerAnalysis called but no photos buffered");
+      return;
+    }
+
+    try {
+      const analyzer = new AnalyzerAgent(this.whatsapp, openai, this.session);
+      await analyzer.analyze(allPhotos[0].buffer);
+
+      // Clean up buffer after successful analysis
+      clearStoredPhotos(this.phone);
+    } catch (err) {
+      console.error("❌ Intake _triggerAnalysis error:", err);
+      clearStoredPhotos(this.phone);
+    }
   }
 
   // ===========================================================================

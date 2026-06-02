@@ -430,10 +430,10 @@ async function processInbound(phone, text, media, contactName, msgType) {
   await whatsapp.sendText(phone, "Por ahora solo puedo leer texto e imágenes. ¿Tiene una factura médica que enviarme? 📸");
 }
 
-// Session management functions imported from middleware/session.js
+import { addPhoto, confirmPhotos, clearBuffer, storePhoto, getStoredPhotos, getStoredCount, clearStoredPhotos } from "./middleware/buffer.js";
 
 // =============================================================================
-// Handle Media (Photo of Bill)
+// Handle Media (Photo of Bill) — Multi-page aware with buffer
 // =============================================================================
 async function handleIncomingMedia(phone, media, session) {
   const mediaUrl = media[0]?.url;
@@ -442,7 +442,8 @@ async function handleIncomingMedia(phone, media, session) {
     return;
   }
 
-  await whatsapp.sendText(phone, "¡Perfecto! Recibí su factura. Deme un momento para analizarla... ⏳");
+  // Acknowledge receipt immediately
+  await whatsapp.sendText(phone, "¡Recibí tu foto! 📸");
 
   try {
     // Download image from Telnyx
@@ -472,14 +473,80 @@ async function handleIncomingMedia(phone, media, session) {
       console.log(`📐 Resized: ${metadata.width}x${metadata.height} → processed`);
     }
 
-    // Run analyzer
-    const analyzer = new AnalyzerAgent(whatsapp, openai, session);
-    await analyzer.analyze(processed);
+    // ── Store in buffer — do NOT analyze yet ──
+    storePhoto(phone, { buffer: processed, url: mediaUrl, size: processed.length });
+    const receivedCount = getStoredCount(phone);
+    const expected = session.photos_expected;
+
+    // ── CASE A: First photo, unknown page count → ASK ──
+    if (!expected) {
+      await whatsapp.sendText(phone,
+        "¿Cuántas páginas tiene tu factura en total? 📄\n\n" +
+        "Así sé cuántas esperar antes de analizarla. " +
+        "Ejemplo: si son 3 páginas, responde \"3\"."
+      );
+      return;
+    }
+
+    // ── CASE B: Known count, still waiting → ACKNOWLEDGE ──
+    if (receivedCount < expected) {
+      const remaining = expected - receivedCount;
+      await whatsapp.sendText(phone,
+        `📄 Página ${receivedCount} de ${expected} recibida.\n\n` +
+        `Envíame ${remaining === 1 ? "la última" : `las ${remaining} restantes`} cuando estés listo${remaining === 1 ? "a" : ""}.`
+      );
+      return;
+    }
+
+    // ── CASE C: All expected received (or exceeded) → ANALYZE ──
+    await processAllPhotos(phone, session);
 
   } catch (err) {
     console.error("❌ Media processing error:", err);
     await telegram.alertServerError(err).catch(() => {});
     await whatsapp.sendText(phone, "Disculpe, tuve un problema técnico. ¿Podría intentarlo de nuevo en un momento?");
+  }
+}
+
+// =============================================================================
+// Process all buffered photos — trigger analysis
+// =============================================================================
+async function processAllPhotos(phone, session) {
+  const allPhotos = getStoredPhotos(phone);
+  const count = allPhotos.length;
+
+  if (count === 0) {
+    await whatsapp.sendText(phone, "No tengo fotos guardadas. ¿Podrías reenviar tu factura? 📸");
+    return;
+  }
+
+  await whatsapp.sendText(phone,
+    `¡${count} ${count === 1 ? "página lista" : "páginas listas"}! Deme un momento para analizarlas... ⏳`
+  );
+
+  // Update session with expected count (if not already set)
+  if (!session.photos_expected || session.photos_expected < count) {
+    await pool.query(
+      `UPDATE sessions SET photos_expected = $2, photos_confirmed = true, updated_at = NOW() WHERE id = $1`,
+      [session.id, count]
+    );
+    session.photos_expected = count;
+    session.photos_confirmed = true;
+  }
+
+  try {
+    // Run analyzer on the first photo (GPT-4o can only handle one image per call currently)
+    // TODO: multi-image stitching for truly multi-page analysis
+    const analyzer = new AnalyzerAgent(whatsapp, openai, session);
+    await analyzer.analyze(allPhotos[0].buffer);
+
+    // Clean up buffer after successful analysis
+    clearStoredPhotos(phone);
+
+  } catch (err) {
+    console.error("❌ processAllPhotos error:", err);
+    clearStoredPhotos(phone); // clean up anyway
+    throw err;
   }
 }
 
@@ -576,6 +643,20 @@ async function routeText(phone, text, session, returningContext = "") {
 
     case "awaiting_bill": {
       // ── Prepaid user needs to send their bill ──
+      // Check if user is telling us how many pages
+      const pageNum = parseInt(text.trim());
+      if (pageNum >= 1 && pageNum <= 20) {
+        await pool.query(
+          `UPDATE sessions SET photos_expected = $2, updated_at = NOW() WHERE id = $1`,
+          [session.id, pageNum]
+        );
+        session.photos_expected = pageNum;
+        await whatsapp.sendText(phone,
+          `Perfecto, ${pageNum} página${pageNum === 1 ? "" : "s"}. Envíamelas cuando estés listo. 📸\n\n` +
+          `Toma las fotos con buena luz, sobre una superficie plana, para que el texto sea legible.`
+        );
+        break;
+      }
       await whatsapp.sendText(phone,
         "Estoy listo para analizar tu factura. 📸\n\n" +
         "Envíame una foto clara de tu factura médica y en unos minutos " +

@@ -6,6 +6,10 @@
 // Key: phone number, Value: { timer, photos: [], expected, confirmed }
 const buffers = new Map();
 
+// In-memory image store — holds actual image buffers until analysis
+// Key: phone number, Value: [{ buffer: Buffer, url: string, receivedAt: Date }]
+const imageStore = new Map();
+
 const DEFAULT_TIMER_MS = 15000; // 15 seconds after each photo
 const CONFIRMED_TIMER_MS = 5000; // 5 seconds after all photos received
 
@@ -120,4 +124,35 @@ export function clearBuffer(phone) {
   buffers.delete(phone);
 }
 
-export default { addPhoto, confirmPhotos, getBufferStatus, clearBuffer };
+// ===========================================================================
+// Image store functions — holds actual image buffers for multi-page uploads
+// ===========================================================================
+
+/** Store a processed image buffer for later batch analysis */
+export function storePhoto(phone, photoData) {
+  if (!imageStore.has(phone)) imageStore.set(phone, []);
+  imageStore.get(phone).push({
+    buffer: photoData.buffer,
+    url: photoData.url || "",
+    size: photoData.size || 0,
+    receivedAt: new Date().toISOString(),
+  });
+  return imageStore.get(phone).length;
+}
+
+/** Get all stored photo buffers for a phone number */
+export function getStoredPhotos(phone) {
+  return imageStore.get(phone) || [];
+}
+
+/** Get count of stored photos */
+export function getStoredCount(phone) {
+  return (imageStore.get(phone) || []).length;
+}
+
+/** Clear stored photos for a phone number */
+export function clearStoredPhotos(phone) {
+  imageStore.delete(phone);
+}
+
+export default { addPhoto, confirmPhotos, getBufferStatus, clearBuffer, storePhoto, getStoredPhotos, getStoredCount, clearStoredPhotos };
