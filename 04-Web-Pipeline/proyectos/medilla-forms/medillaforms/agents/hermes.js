@@ -23,6 +23,11 @@ export class HermesAgent {
   // FASE 3 — Present the hook and payment options
   // ===========================================================================
   async presentHook() {
+    // ── PRECHECK: if payment already confirmed (prepaid/landing flow), skip to delivery ──
+    if (this.session.payment_confirmed) {
+      await this._skipToDelivery();
+      return;
+    }
     const analysis = this.session.analysis_result || {};
     const errorsFound = analysis.errores_detectados?.length || this.session.errors_found || 0;
     const savings = analysis.ahorro_total_estimado || this.session.potential_savings || 0;
@@ -75,6 +80,41 @@ export class HermesAgent {
       [this.session.id]
     );
     this.session.state = "waiting_payment";
+  }
+
+  // ===========================================================================
+  // Skip payment phase — user already paid (prepaid/landing)
+  // ===========================================================================
+  async _skipToDelivery() {
+    const analysis = this.session.analysis_result || {};
+    const errorsFound = analysis.errores_detectados?.length || this.session.errors_found || 0;
+
+    if (errorsFound === 0) {
+      await this.whatsapp.sendText(this.phone,
+        `Revisé su factura y no encontré errores evidentes de facturación.\n\n` +
+        `Su factura parece estar correcta. Como su pago ya fue procesado y no se encontraron ` +
+        `errores que disputar, podemos ofrecerle un reembolso completo.\n\n` +
+        `¿Desea que procesemos el reembolso?`
+      );
+      return;
+    }
+
+    await this.whatsapp.sendText(this.phone,
+      `✅ Su pago ya está confirmado. Encontré ${errorsFound} errores en su factura.\n\n` +
+      `Estoy generando sus cartas de disputa ahora mismo. Un momento...`
+    );
+
+    // Update state and trigger delivery
+    await pool.query(
+      `UPDATE sessions SET state = 'paid', updated_at = NOW() WHERE id = $1`,
+      [this.session.id]
+    );
+    this.session.state = 'paid';
+
+    // Import dynamically to avoid circular dependency
+    const { default: closerModule } = await import("./closer.js");
+    const closer = new closerModule.CloserAgent(this.whatsapp, this.deepseek, null, this.session);
+    await closer.deliver();
   }
 
   // ===========================================================================

@@ -43,7 +43,7 @@ class StripeService {
           },
         ],
         mode: "payment",
-        success_url: "https://medillaforms.com/gracias",
+        success_url: "https://medillaforms.com/gracias?source=whatsapp",
         cancel_url: "https://medillaforms.com/",
         client_reference_id: sessionId,
         metadata: {

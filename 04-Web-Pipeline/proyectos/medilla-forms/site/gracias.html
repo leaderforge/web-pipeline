@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>¡Pago confirmado! — MedillaForms</title>
-<meta name="description" content="Tu pago ha sido confirmado. En un momento nos comunicamos contigo por WhatsApp con tus cartas de disputa.">
 <link rel="icon" type="image/png" href="assets/images/logomedillaforms1-cropped.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,6 +62,16 @@ tailwind.config = {
     50% { box-shadow: 0 0 0 24px rgba(20,184,166,0); }
   }
   .pulse-ring { animation: pulseRing 2.5s ease-in-out infinite; }
+
+  .card {
+    background:#fff;
+    border-radius:1.25rem;
+    padding:1.5rem;
+    border:1px solid rgba(0,0,0,0.05);
+    box-shadow:0 1px 2px rgba(0,0,0,0.02),0 4px 12px rgba(0,0,0,0.03);
+  }
+
+  .hide { display: none !important; }
 </style>
 </head>
 <body class="bg-warm min-h-screen flex items-center justify-center p-4">
@@ -79,35 +88,68 @@ tailwind.config = {
     </div>
   </div>
 
-  <!-- Message -->
-  <h1 class="font-display font-bold text-[1.8rem] sm:text-[2.2rem] leading-[1.15] tracking-[-0.02em] text-deep mb-3 animate-fade-up">
-    ¡Pago confirmado!
-  </h1>
-  <p class="text-slate-500 text-[16px] leading-relaxed mb-2 animate-fade-up" style="animation-delay:0.15s">
-    Tu pago de <strong class="text-deep">$29 USD</strong> ha sido registrado exitosamente.
-  </p>
-  <p class="text-slate-400 text-[14px] leading-relaxed mb-8 animate-fade-up" style="animation-delay:0.25s">
-    En un momento nos comunicamos contigo por WhatsApp para enviarte tus dos cartas de disputa.
-  </p>
+  <!-- ============================================ -->
+  <!-- VERSION A: Payment from WhatsApp flow        -->
+  <!-- ============================================ -->
+  <div id="msg-whatsapp" class="hide">
+    <h1 class="font-display font-bold text-[1.8rem] sm:text-[2.2rem] leading-[1.15] tracking-[-0.02em] text-deep mb-3 animate-fade-up">
+      ¡Pago confirmado!
+    </h1>
+    <p class="text-slate-500 text-[16px] leading-relaxed mb-2 animate-fade-up" style="animation-delay:0.15s">
+      Tu pago de <strong class="text-deep">$29 USD</strong> ha sido registrado exitosamente.
+    </p>
+    <p class="text-slate-400 text-[14px] leading-relaxed mb-8 animate-fade-up" style="animation-delay:0.25s">
+      En un momento nos comunicamos contigo por WhatsApp para enviarte tus dos cartas de disputa.
+    </p>
 
-  <!-- Steps -->
-  <div class="card mb-6 animate-fade-up" style="animation-delay:0.35s">
-    <div class="flex items-center gap-3 text-left mb-3">
-      <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-check text-brand-600 text-[16px]"></i></div>
-      <p class="text-[14px] text-slate-700">Pago procesado</p>
-    </div>
-    <div class="flex items-center gap-3 text-left mb-3">
-      <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-clock-countdown text-amber-600 text-[16px]"></i></div>
-      <p class="text-[14px] text-slate-700">Analizando tu factura</p>
-    </div>
-    <div class="flex items-center gap-3 text-left">
-      <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-whatsapp-logo text-slate-400 text-[16px]"></i></div>
-      <p class="text-[14px] text-slate-500">Te contactamos por WhatsApp</p>
+    <div class="card mb-6 animate-fade-up" style="animation-delay:0.35s">
+      <div class="flex items-center gap-3 text-left mb-3">
+        <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-check text-brand-600 text-[16px]"></i></div>
+        <p class="text-[14px] text-slate-700">Pago procesado</p>
+      </div>
+      <div class="flex items-center gap-3 text-left mb-3">
+        <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-clock-countdown text-amber-600 text-[16px]"></i></div>
+        <p class="text-[14px] text-slate-700">Analizando tu factura</p>
+      </div>
+      <div class="flex items-center gap-3 text-left">
+        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-whatsapp-logo text-slate-400 text-[16px]"></i></div>
+        <p class="text-[14px] text-slate-500">Te contactamos por WhatsApp</p>
+      </div>
     </div>
   </div>
 
-  <!-- CTA -->
-  <a href="https://wa.me/12139054680?text=Hola%2C%20acabo%20de%20hacer%20mi%20pago%20de%20%2429%20USD" target="_blank"
+  <!-- ============================================ -->
+  <!-- VERSION B: Payment from Landing (direct)     -->
+  <!-- ============================================ -->
+  <div id="msg-direct" class="hide">
+    <h1 class="font-display font-bold text-[1.8rem] sm:text-[2.2rem] leading-[1.15] tracking-[-0.02em] text-deep mb-3 animate-fade-up">
+      ¡Pago confirmado!
+    </h1>
+    <p class="text-slate-500 text-[16px] leading-relaxed mb-2 animate-fade-up" style="animation-delay:0.15s">
+      Tu pago de <strong class="text-deep">$29 USD</strong> ha sido registrado exitosamente.
+    </p>
+    <p class="text-slate-500 text-[16px] leading-relaxed mb-8 animate-fade-up font-semibold" style="animation-delay:0.25s">
+      Ahora envía tu factura por WhatsApp y recibe tus cartas.
+    </p>
+
+    <div class="card mb-6 animate-fade-up" style="animation-delay:0.35s">
+      <div class="flex items-center gap-3 text-left mb-3">
+        <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-check text-brand-600 text-[16px]"></i></div>
+        <p class="text-[14px] text-slate-700">Pago registrado</p>
+      </div>
+      <div class="flex items-center gap-3 text-left mb-3">
+        <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-camera text-amber-600 text-[16px]"></i></div>
+        <p class="text-[14px] text-slate-700">Envía tu factura por WhatsApp</p>
+      </div>
+      <div class="flex items-center gap-3 text-left">
+        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-file-text text-slate-400 text-[16px]"></i></div>
+        <p class="text-[14px] text-slate-500">Recibe tus cartas en minutos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA (same for both) -->
+  <a href="https://wa.me/12139054680?text=Hola%2C%20acabo%20de%20hacer%20mi%20pago" target="_blank"
      class="btn-wa bg-wa text-white font-semibold text-[15px] px-7 py-3.5 rounded-full shadow-lg animate-fade-up"
      style="animation-delay:0.45s">
     <i class="ph-fill ph-whatsapp-logo text-[20px]"></i>
@@ -115,10 +157,21 @@ tailwind.config = {
   </a>
 
   <p class="text-[12px] text-slate-400 mt-4 animate-fade-up" style="animation-delay:0.5s">
-    Si no recibes nuestras cartas en 15 minutos, escríbenos.
+    Si tienes dudas, escríbenos por WhatsApp.
   </p>
 
 </div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const source = params.get('source') || 'direct';
+
+  if (source === 'whatsapp') {
+    document.getElementById('msg-whatsapp').classList.remove('hide');
+  } else {
+    document.getElementById('msg-direct').classList.remove('hide');
+  }
+</script>
 
 </body>
 </html>

@@ -185,12 +185,74 @@ app.post("/stripe/webhook", async (req, res) => {
     const sessionId = session.client_reference_id;
 
     if (sessionId) {
+      // ── Pago desde WhatsApp (flujo normal) ──
       await confirmPayment(sessionId, "stripe", session.id);
+    } else {
+      // ── Pago desde Landing (Payment Link sin sesión previa) ──
+      await handleLandingPayment(session);
     }
   }
 
   res.status(200).json({ status: "ok" });
 });
+
+// =============================================================================
+// Handle Landing Page Payment (no prior WhatsApp session)
+// =============================================================================
+async function handleLandingPayment(stripeSession) {
+  try {
+    // Extract WhatsApp number from Payment Link custom field
+    const whatsappField = (stripeSession.custom_fields || []).find(
+      (f) => f.key === "whatsapp_number"
+    );
+    const rawPhone = whatsappField?.text?.value || "";
+
+    if (!rawPhone) {
+      console.warn("⚠️ Landing payment sin número de WhatsApp — ignorado");
+      return;
+    }
+
+    // Normalize phone number
+    const phone = rawPhone.replace(/[\s\-\(\)]/g, "");
+
+    // Determine which amount was paid
+    const amount = stripeSession.metadata?.amount
+      ? parseFloat(stripeSession.metadata.amount)
+      : 29;
+
+    // Check if there's already an active session for this phone
+    const existing = await pool.query(
+      `SELECT id, state, payment_confirmed FROM sessions
+       WHERE whatsapp_number = $1 AND session_closed_at IS NULL
+       ORDER BY created_at DESC LIMIT 1`,
+      [phone]
+    );
+
+    if (existing.rowCount > 0 && !existing.rows[0].payment_confirmed) {
+      // Apply payment to existing session (user chatted first, then paid via landing)
+      await confirmPayment(existing.rows[0].id, "stripe", stripeSession.id);
+      return;
+    }
+
+    // Create a prepaid session — user hasn't chatted yet
+    const newSession = await createSession(phone, "");
+    await pool.query(
+      `UPDATE sessions
+       SET state = 'prepaid',
+           payment_method = 'stripe',
+           payment_confirmed = true,
+           stripe_session_id = $2,
+           amount = $3,
+           updated_at = NOW()
+       WHERE id = $1`,
+      [newSession.id, stripeSession.id, amount]
+    );
+
+    console.log(`💳 Prepaid session created: ${phone} ($${amount})`);
+  } catch (e) {
+    console.error("❌ handleLandingPayment error:", e);
+  }
+}
 
 // =============================================================================
 // Telegram Webhook (POST /telegram/webhook)
@@ -476,6 +538,22 @@ async function routeText(phone, text, session, returningContext = "") {
       break;
     }
 
+    case "prepaid": {
+      // ── User paid via landing, now messaging for the first time ──
+      await handlePrepaidSession(phone, text, session);
+      break;
+    }
+
+    case "awaiting_bill": {
+      // ── Prepaid user needs to send their bill ──
+      await whatsapp.sendText(phone,
+        "Estoy listo para analizar tu factura. 📸\n\n" +
+        "Envíame una foto clara de tu factura médica y en unos minutos " +
+        "tendrás tus cartas de disputa listas."
+      );
+      break;
+    }
+
     case "analyzing":
     case "analyzed": {
       // User sent text while analyzing or between analysis and hook
@@ -528,6 +606,35 @@ async function routeText(phone, text, session, returningContext = "") {
       await hermes.handleFallback(text);
     }
   }
+}
+
+// =============================================================================
+// Handle Prepaid Session (user paid via landing, now on WhatsApp)
+// =============================================================================
+async function handlePrepaidSession(phone, text, session) {
+  // This is their first message after paying. Welcome them and ask for the bill.
+  // We skip intake + payment flow entirely.
+
+  const amount = session.amount || 29;
+
+  await whatsapp.sendText(phone,
+    `¡Gracias por tu pago de $${amount} USD! ✅\n\n` +
+    `Tu pago ya está registrado. Ahora solo necesito tu factura médica ` +
+    `para comenzar el análisis y enviarte tus dos cartas de disputa.\n\n` +
+    `📸 Envíame una foto de tu factura y en unos minutos tendrás tus cartas ` +
+    `en español e inglés.`
+  );
+
+  // Transition to intake-like state (but payment already confirmed)
+  await pool.query(
+    `UPDATE sessions SET state = 'awaiting_bill', updated_at = NOW() WHERE id = $1`,
+    [session.id]
+  );
+  session.state = "awaiting_bill";
+
+  await appendToConversationLog(session.id, "assistant",
+    `[prepaid] ¡Gracias por tu pago de $${amount} USD! Envíame tu factura.`
+  );
 }
 
 // =============================================================================

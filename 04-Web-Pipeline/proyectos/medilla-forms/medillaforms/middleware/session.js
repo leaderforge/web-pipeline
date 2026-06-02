@@ -44,6 +44,7 @@ export async function initDB() {
         stripe_session_id     VARCHAR(255),
         payment_method        VARCHAR(20),
         payment_confirmed     BOOLEAN DEFAULT FALSE,
+        amount                DECIMAL(10,2) DEFAULT 29.00,
         zelle_pending         BOOLEAN DEFAULT FALSE,
         carta_es_url          VARCHAR(500),
         carta_en_url          VARCHAR(500),

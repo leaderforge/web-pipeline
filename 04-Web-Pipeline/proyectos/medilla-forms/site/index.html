@@ -513,12 +513,19 @@ tailwind.config = {
 
     <p class="text-[14px] text-slate-400 max-w-[500px] mx-auto">100x de retorno promedio. <strong class="text-deep">7 días de garantía.</strong></p>
 
-    <div class="pt-3">
+    <div class="pt-3 space-y-3">
       <a href="https://wa.me/12139054680?text=Hola%2C%20quiero%20revisar%20mi%20factura%20m%C3%A9dica" target="_blank" rel="noopener" class="btn-wa bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-[16px] sm:text-[18px] px-7 py-4 rounded-full shadow-[0_4px_32px_rgba(37,211,102,0.35)] no-underline w-full sm:w-auto">
         <i class="ph ph-whatsapp-logo text-[22px]"></i>
         Analiza tu factura GRATIS por WhatsApp
         <i class="ph ph-arrow-right text-[14px]"></i>
       </a>
+      <div>
+        <a href="https://buy.stripe.com/test_6oU5kx18o0gNgsj89I0RG04" target="_blank" rel="noopener" class="btn-wa bg-deep hover:bg-slate-800 text-white font-semibold text-[15px] px-6 py-3 rounded-full shadow-[0_4px_20px_rgba(15,23,42,0.25)] no-underline inline-flex">
+          <i class="ph ph-credit-card text-[18px]"></i>
+          Pagar $29 directo
+        </a>
+        <p class="text-[11px] text-slate-400 mt-1.5">Sin análisis previo. Pago seguro con Stripe.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -618,17 +625,38 @@ tailwind.config = {
   new IntersectionObserver((e)=>{e.forEach(e=>{e.isIntersecting?wa.classList.remove('on'):wa.classList.add('on')})},{threshold:0,rootMargin:'-60px 0px 0px 0px'}).observe(hero);
 
   // Track WhatsApp clicks
-  function track(n,p){p=p||{};if(typeof gtag==='function')gtag('event',n,p);if(typeof fbq==='function')fbq('track',n,p)}
+  function track(n,p){p=p||{};if(typeof gtag=='function')gtag('event',n,p);if(typeof fbq=='function')fbq('track',n,p)}
   document.querySelectorAll('a[href*="wa.me"]').forEach(l=>l.addEventListener('click',()=>{
     track('Lead',{content_name:'whatsapp_click',content_category:'lead'});
-    fetch('https://medillaforms-production.up.railway.app/api/track/landing-click',{
+    fetch('https://api.medillaforms.com/api/track/landing-click',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({referrer:document.referrer||'directo'}),
       keepalive:true
     }).catch(()=>{});
   }));
-})();
-</script>
+
+  // ═══ EXIT INTENT POPUP ═══
+  var exitShown = false;
+  var exitPopup = document.createElement('div');
+  exitPopup.id = 'exit-popup';
+  exitPopup.innerHTML = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.4s cubic-bezier(0.32,0.72,0,1)"><div style="background:#fff;border-radius:1.5rem;padding:2rem 1.5rem;max-width:380px;width:100%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1)"><button onclick="document.getElementById(\'exit-popup\').style.opacity=\'0\';setTimeout(function(){document.getElementById(\'exit-popup\').remove()},400)" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:4px 8px">&times;</button><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px">Oferta especial</span><p style="font-family:\'Clash Display\',\'Plus Jakarta Sans\',sans-serif;font-weight:700;font-size:1.6rem;line-height:1.15;color:#0f172a;margin-bottom:8px">¡Espera!</p><p style="color:#64748b;font-size:15px;line-height:1.5;margin-bottom:20px">Llévate tus dos cartas de disputa por <strong style="color:#0d9488">$24 USD</strong> en vez de $29.</p><a href="https://buy.stripe.com/test_bJe28ldVa5B78ZRblU0RG05" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#0f172a;color:#fff;font-weight:600;font-size:15px;padding:12px 28px;border-radius:50px;text-decoration:none;transition:all 0.3s">Pagar $24 USD <span style="font-size:14px">→</span></a><p style="color:#94a3b8;font-size:11px;margin-top:12px">Pago seguro con Stripe · 7 días de garantía</p></div></div>';
+  exitPopup.style.opacity = '0';
+  exitPopup.style.position = 'fixed';
+  exitPopup.style.inset = '0';
+  exitPopup.style.zIndex = '9999';
+  exitPopup.style.pointerEvents = 'none';
+  document.body.appendChild(exitPopup);
+
+  document.addEventListener('mouseout', function(e) {
+    if (exitShown) return;
+    if (e.clientY > 10) return; // Only trigger when mouse actually leaves the top
+    exitShown = true;
+    exitPopup.style.pointerEvents = 'auto';
+    exitPopup.style.opacity = '1';
+    var inner = exitPopup.querySelector('div > div');
+    if (inner) inner.style.transform = 'scale(1)';
+  });
+})();</script>
 
 </body>
 </html>
