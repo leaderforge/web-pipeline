@@ -119,16 +119,43 @@ app.post("/webhook/whatsapp", async (req, res) => {
 
   // Extract phone and message from Telnyx payload
   const payload = data?.payload || {};
+  // DEBUG: log raw payload structure for WhatsApp debugging
+  console.log(`🔍 Payload keys: ${Object.keys(payload).join(', ')}`);
+  console.log(`🔍 payload.text = ${JSON.stringify(payload.text)}`);
+  console.log(`🔍 payload.body = ${JSON.stringify(payload.body)}`);
+  console.log(`🔍 payload.type = "${payload.type}"`);
+  if (payload.from) console.log(`🔍 payload.from = ${JSON.stringify(payload.from).slice(0,100)}`);
+  
   const fromRaw = payload.from || {};
   const phone = typeof fromRaw === "object"
     ? (fromRaw.phone_number || "")
     : String(fromRaw || "");
   const contactName = typeof fromRaw === "object" ? (fromRaw.name || "") : "";
-  const text = payload.text || "";
+  
+  // WhatsApp payload.body is an object: { text: { body: "msg" }, type: "text", from: "+52..." }
+  // SMS uses flat payload.text as string
+  let text = "";
+  if (typeof payload.text === "string" && payload.text) {
+    text = payload.text;
+  } else if (payload.body && typeof payload.body === "object") {
+    // WhatsApp format: body.text.body for text, body.image.caption for images
+    text = payload.body.text?.body || payload.body.button?.text || "";
+  } else if (typeof payload.body === "string") {
+    text = payload.body;
+  }
+  
+  // WhatsApp sender may be in payload.body.from (more reliable)
+  const waSender = (payload.body?.from) || "";
+  const finalPhone = waSender || phone;
+  
   const media = payload.media || [];
+  // WhatsApp images come in payload.body.image, not payload.media
+  if (payload.body?.type === "image" && payload.body.image?.link) {
+    media.push({ url: payload.body.image.link, content_type: "image/jpeg" });
+  }
   const msgType = payload.type || "text";
 
-  if (!phone) {
+  if (!finalPhone) {
     return res.status(200).json({ status: "no_phone" });
   }
 
@@ -136,7 +163,7 @@ app.post("/webhook/whatsapp", async (req, res) => {
   res.status(200).json({ status: "accepted" });
 
   // Fire-and-forget processing
-  processInbound(phone, text, media, contactName, msgType).catch((err) => {
+  processInbound(finalPhone, text, media, contactName, msgType).catch((err) => {
     console.error("❌ processInbound error:", err);
     telegram.alertServerError(err).catch(() => {});
   });
@@ -261,10 +288,16 @@ app.get("/api/admin/stats", async (req, res) => {
 async function processInbound(phone, text, media, contactName, msgType) {
   // Load or create session from PostgreSQL
   let session = await loadSession(phone);
+  const isNewSession = !session;
 
   if (!session) {
     session = await createSession(phone, contactName);
   }
+
+  // 📨 Notify Daniel on every inbound message
+  const hasMedia = media && media.length > 0;
+  const displayText = text || (hasMedia ? "" : "");
+  telegram.notifyNewMessage(phone, displayText, isNewSession, hasMedia).catch(() => {});
 
   // Detect returning user (24h+ since last message)
   const returningContext = buildContextFromHistory(session);
@@ -533,6 +566,36 @@ async function deliverLetters(session) {
     );
   }
 }
+
+// =============================================================================
+// Landing Page Tracking — WhatsApp click notifications
+// =============================================================================
+app.post("/api/track/landing-click", (req, res) => {
+  // CORS for landing page
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  const ref = req.body?.referrer || req.headers?.referer || "directo";
+  const ua = (req.headers["user-agent"] || "").slice(0, 80);
+  const isMobile = /Mobile|Android|iPhone/i.test(ua) ? "📱" : "💻";
+
+  telegram.sendMessage(
+    `${isMobile} <b>Click en WhatsApp — Landing</b>\n\n` +
+    `Origen: ${ref.slice(0, 60)}\n` +
+    `Dispositivo: ${ua}`
+  ).catch(() => {});
+
+  res.status(200).json({ status: "ok" });
+});
+
+// Handle OPTIONS preflight
+app.options("/api/track/landing-click", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.status(204).end();
+});
 
 // =============================================================================
 // Startup

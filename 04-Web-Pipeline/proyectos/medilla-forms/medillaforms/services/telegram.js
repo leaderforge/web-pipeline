@@ -53,6 +53,23 @@ class TelegramService {
   }
 
   // ---------------------------------------------------------------------------
+  // 📨 New inbound message notification
+  // ---------------------------------------------------------------------------
+  async notifyNewMessage(phone, text, isNewSession = false, hasMedia = false) {
+    const phoneLast4 = (phone || "").slice(-4);
+    const emoji = hasMedia ? "📸" : "💬";
+    const label = isNewSession ? "🆕 NUEVO" : "📨 Mensaje";
+    const preview = (text || "").slice(0, 120) || (hasMedia ? "[Foto/Archivo]" : "[Audio/Voice]");
+
+    await this.sendMessage(
+      `${emoji} <b>${label} — MedillaForms</b>\n\n` +
+      `WhatsApp: ***${phoneLast4}\n` +
+      `Mensaje: ${preview}`,
+      false
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // 🔴 Critical: OpenAI API down
   // ---------------------------------------------------------------------------
   async alertOpenaiDown(detail = "") {

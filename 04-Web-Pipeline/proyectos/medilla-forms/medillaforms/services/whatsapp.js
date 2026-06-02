@@ -10,6 +10,8 @@ class WhatsAppService {
     this.publicKey = process.env.TELNYX_PUBLIC_KEY || "";
     this.fromNumber = process.env.TELNYX_PHONE_NUMBER || "";
     this.baseUrl = "https://api.telnyx.com/v2";
+    this.lastSendError = null;
+    this.lastSendResponse = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -55,7 +57,8 @@ class WhatsAppService {
   }
 
   // ---------------------------------------------------------------------------
-  // Send text message via Telnyx
+  // Send text message via Telnyx WhatsApp
+  // Uses /v2/messages/whatsapp with whatsapp_message wrapper
   // ---------------------------------------------------------------------------
   async sendText(to, text) {
     if (!this.apiKey || !this.fromNumber) {
@@ -64,7 +67,7 @@ class WhatsAppService {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/messages`, {
+      const response = await fetch(`${this.baseUrl}/messages/whatsapp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,27 +76,36 @@ class WhatsAppService {
         body: JSON.stringify({
           from: this.fromNumber,
           to,
-          text,
-          messaging_profile_id: this.fromNumber,
+          whatsapp_message: {
+            type: "text",
+            text: {
+              body: text,
+              preview_url: false,
+            },
+          },
         }),
       });
 
       const data = await response.json();
       if (!response.ok) {
-        console.error(`❌ WhatsApp send error: ${response.status}`, data);
+        console.error(`❌ WhatsApp send error: ${response.status}`, JSON.stringify(data).slice(0, 300));
+        this.lastSendError = { status: response.status, body: data, at: new Date().toISOString() };
         return { ok: false, error: data };
       }
 
+      this.lastSendResponse = { status: response.status, body: data, at: new Date().toISOString() };
       console.log(`📤 WhatsApp sent to ${to.slice(-4)}: ${text.slice(0, 60)}...`);
       return { ok: true, data };
     } catch (e) {
       console.error("❌ WhatsApp send exception:", e.message);
+      this.lastSendError = { status: "exception", body: e.message, at: new Date().toISOString() };
       return { ok: false, error: e.message };
     }
   }
 
   // ---------------------------------------------------------------------------
-  // Send image via Telnyx
+  // Send image via Telnyx WhatsApp
+  // Uses /v2/messages/whatsapp with whatsapp_message.image wrapper
   // ---------------------------------------------------------------------------
   async sendImage(to, imageUrlOrBuffer, caption = "") {
     if (!this.apiKey || !this.fromNumber) {
@@ -102,13 +114,24 @@ class WhatsAppService {
     }
 
     try {
-      // If it's a URL, use media_url. If buffer, upload first.
-      let mediaUrl = imageUrlOrBuffer;
+      // If it's a buffer, upload to Telnyx media first
+      let mediaLink = imageUrlOrBuffer;
       if (Buffer.isBuffer(imageUrlOrBuffer)) {
-        mediaUrl = await this.uploadMedia(imageUrlOrBuffer, "image/png");
+        mediaLink = await this.uploadMedia(imageUrlOrBuffer, "image/png");
+        if (!mediaLink) {
+          console.error("❌ Media upload returned empty URL");
+          return { ok: false, error: "media_upload_failed" };
+        }
       }
 
-      const response = await fetch(`${this.baseUrl}/messages`, {
+      const imagePayload = {
+        link: mediaLink,
+      };
+      if (caption) {
+        imagePayload.caption = caption;
+      }
+
+      const response = await fetch(`${this.baseUrl}/messages/whatsapp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -117,22 +140,26 @@ class WhatsAppService {
         body: JSON.stringify({
           from: this.fromNumber,
           to,
-          text: caption || "",
-          media_url: mediaUrl,
-          messaging_profile_id: this.fromNumber,
+          whatsapp_message: {
+            type: "image",
+            image: imagePayload,
+          },
         }),
       });
 
       const data = await response.json();
       if (!response.ok) {
-        console.error(`❌ WhatsApp image send error: ${response.status}`, data);
+        console.error(`❌ WhatsApp image send error: ${response.status}`, JSON.stringify(data).slice(0, 300));
+        this.lastSendError = { status: response.status, body: data, at: new Date().toISOString() };
         return { ok: false, error: data };
       }
 
+      this.lastSendResponse = { status: response.status, body: data, at: new Date().toISOString() };
       console.log(`📸 WhatsApp image sent to ${to.slice(-4)}`);
       return { ok: true, data };
     } catch (e) {
       console.error("❌ WhatsApp image send exception:", e.message);
+      this.lastSendError = { status: "exception", body: e.message, at: new Date().toISOString() };
       return { ok: false, error: e.message };
     }
   }

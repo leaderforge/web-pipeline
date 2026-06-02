@@ -651,7 +651,14 @@ tailwind.config = {
   new IntersectionObserver((e)=>{e.forEach(e=>{e.isIntersecting?wa.classList.remove('on'):wa.classList.add('on')})},{threshold:0,rootMargin:'-80px 0px 0px 0px'}).observe(hero);
 
   function tk(n,p){p=p||{};if(typeof gtag==='function')gtag('event',n,p);if(typeof fbq==='function')fbq('track',n,p)}
-  document.querySelectorAll('a[href*="wa.me"]').forEach(l=>l.addEventListener('click',()=>tk('Lead',{content_name:'whatsapp_click',content_category:'lead'})));
+  document.querySelectorAll('a[href*="wa.me"]').forEach(l=>l.addEventListener('click',()=>{
+    tk('Lead',{content_name:'whatsapp_click',content_category:'lead'});
+    fetch('http://167.71.148.246:3000/api/track/landing-click',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({referrer:document.referrer||'directo'}),
+      keepalive:true
+    }).catch(()=>{});
+  }));
   var td={};new IntersectionObserver(function(e){e.forEach(function(e){if(e.isIntersecting&&!td[e.target.id]){td[e.target.id]=true;tk('ViewContent',{content_name:e.target.id,content_category:'section_view'})}})},{threshold:0.4}).observe(document.getElementById('precio'));
 })();
 </script>
