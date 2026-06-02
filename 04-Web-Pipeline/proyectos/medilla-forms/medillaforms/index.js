@@ -149,9 +149,39 @@ app.post("/webhook/whatsapp", async (req, res) => {
   const finalPhone = waSender || phone;
   
   const media = payload.media || [];
-  // WhatsApp images come in payload.body.image, not payload.media
-  if (payload.body?.type === "image" && payload.body.image?.link) {
-    media.push({ url: payload.body.image.link, content_type: "image/jpeg" });
+  // WhatsApp images: try multiple possible payload structures
+  const bodyObj = payload.body;
+  if (bodyObj) {
+    // Format 1: body.type === "image" with body.image.url (Telnyx format)
+    if (bodyObj.type === "image" && bodyObj.image?.url) {
+      media.push({ url: bodyObj.image.url, content_type: bodyObj.image.mime_type || "image/jpeg" });
+    }
+    // Format 2: body.type === "image" with body.image.link (alternate format)
+    else if (bodyObj.type === "image" && bodyObj.image?.link) {
+      media.push({ url: bodyObj.image.link, content_type: bodyObj.image.mime_type || "image/jpeg" });
+    }
+    // Format 3: body.type === "image" with body.image?.id only (Meta media ID, no URL)
+    else if (bodyObj.type === "image" && bodyObj.image?.id) {
+      console.log(`📸 WhatsApp image via Meta ID: ${bodyObj.image.id.slice(0,20)}... (no direct URL)`);
+      media.push({ url: bodyObj.image.id, content_type: "image/jpeg", is_meta_id: true });
+    }
+    // Format 4: Media URLs in body.media array (older format)
+    if (bodyObj.media && Array.isArray(bodyObj.media)) {
+      for (const m of bodyObj.media) {
+        if (m.url || m.link) {
+          media.push({ url: m.url || m.link, content_type: m.type || "image/jpeg" });
+        }
+      }
+    }
+    // Format 5: body has url directly (fallback)
+    if (bodyObj.url && !media.length) {
+      media.push({ url: bodyObj.url, content_type: "image/jpeg" });
+    }
+  }
+  
+  // Log image detection for debugging
+  if (media.length > 0) {
+    console.log(`📸 IMAGE DETECTED — ${media.length} media item(s), type: ${bodyObj?.type}, has image.link: ${!!bodyObj?.image?.link}, has image.id: ${!!bodyObj?.image?.id}`);
   }
   const msgType = payload.type || "text";
 
