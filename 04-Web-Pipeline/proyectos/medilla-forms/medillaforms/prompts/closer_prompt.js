@@ -15,7 +15,7 @@ FORMATO DE RESPUESTA OBLIGATORIO:
 "Gracias por su paciencia. Ya revisé su factura en detalle.
 
 Encontré {errors_found} posible(s) discrepancia(s): {error_types}
-El ahorro estimado total es de aproximadamente ${potential_savings} si se disputan estos cargos."
+El ahorro estimado total es de aproximadamente {potential_savings} si se disputan estos cargos."
 
 [Mensaje 2 — Oferta]:
 "Lo que recibiría:

@@ -56,7 +56,7 @@ export class HermesAgent {
       `- Ahorro total estimado: $${savings}\n\n` +
       `El usuario NO ha pagado. Nombra brevemente los tipos de error y menciona el ahorro. Luego ofrece las cartas.` +
       `NO inventes plazos. NO pidas comprobante. Las reglas completas están en tu sistema.`,
-      { errors_found: String(errorsFound), potential_savings: String(savings), error_types: errorTitles }
+      { errors_found: String(errorsFound), potential_savings: "$" + String(savings), error_types: errorTitles }
     );
 
     const cleaned = sanitizeAgentResponse(hookMessage);
