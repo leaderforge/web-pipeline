@@ -211,6 +211,57 @@ class WhatsAppService {
   }
 
   // ---------------------------------------------------------------------------
+  // Download WhatsApp media via Meta media ID (resolved through Telnyx)
+  // ---------------------------------------------------------------------------
+  async downloadWhatsAppMedia(messageId, mediaId) {
+    try {
+      // Step 1: Retrieve the full message from Telnyx to get the media URL
+      const msgResponse = await fetch(`${this.baseUrl}/messages/${messageId}`, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!msgResponse.ok) {
+        throw new Error(`Message retrieval failed: ${msgResponse.status}`);
+      }
+
+      const msgData = await msgResponse.json();
+      const mediaUrls = msgData.data?.media || [];
+      
+      // Find the matching media by ID or use the first one
+      let downloadUrl = null;
+      if (mediaUrls.length > 0) {
+        downloadUrl = mediaUrls[0].url || mediaUrls[0].content_url || null;
+      }
+
+      if (!downloadUrl) {
+        // Fallback: try WhatsApp direct media URL via Telnyx
+        downloadUrl = `${this.baseUrl}/messages/${messageId}/media/${mediaId}`;
+      }
+
+      console.log(`📥 Downloading WhatsApp media: ${downloadUrl.slice(0, 80)}...`);
+
+      const response = await fetch(downloadUrl, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`WhatsApp media download failed: ${response.status}`);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      return Buffer.from(arrayBuffer);
+    } catch (e) {
+      console.error("❌ WhatsApp media download error:", e.message);
+      throw e;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Send typing indicator (when agent is "thinking")
   // ---------------------------------------------------------------------------
   async sendTypingIndicator(to, action = "typing_on") {

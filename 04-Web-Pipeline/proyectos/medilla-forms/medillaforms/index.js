@@ -193,7 +193,7 @@ app.post("/webhook/whatsapp", async (req, res) => {
   res.status(200).json({ status: "accepted" });
 
   // Fire-and-forget processing
-  processInbound(finalPhone, text, media, contactName, msgType).catch((err) => {
+  processInbound(finalPhone, text, media, contactName, msgType, eventId).catch((err) => {
     console.error("❌ processInbound error:", err);
     telegram.alertServerError(err).catch(() => {});
   });
@@ -377,7 +377,7 @@ app.get("/api/admin/stats", async (req, res) => {
 // =============================================================================
 // Core: Process Inbound Messages
 // =============================================================================
-async function processInbound(phone, text, media, contactName, msgType) {
+async function processInbound(phone, text, media, contactName, msgType, eventId) {
   // Load or create session from PostgreSQL
   let session = await loadSession(phone);
   const isNewSession = !session;
@@ -410,7 +410,7 @@ async function processInbound(phone, text, media, contactName, msgType) {
 
   // Handle media (photo of bill)
   if (media && media.length > 0) {
-    await handleIncomingMedia(phone, media, session);
+    await handleIncomingMedia(phone, media, session, eventId);
     return;
   }
 
@@ -435,9 +435,12 @@ import { addPhoto, confirmPhotos, clearBuffer, storePhoto, getStoredPhotos, getS
 // =============================================================================
 // Handle Media (Photo of Bill) — Multi-page aware with buffer
 // =============================================================================
-async function handleIncomingMedia(phone, media, session) {
-  const mediaUrl = media[0]?.url;
-  if (!mediaUrl) {
+async function handleIncomingMedia(phone, media, session, eventId) {
+  const mediaItem = media[0];
+  const mediaUrl = mediaItem?.url;
+  const isMetaId = mediaItem?.is_meta_id;
+  
+  if (!mediaUrl && !isMetaId) {
     await whatsapp.sendText(phone, "No pude leer la imagen. ¿Podría reenviarla?");
     return;
   }
@@ -446,8 +449,15 @@ async function handleIncomingMedia(phone, media, session) {
   await whatsapp.sendText(phone, "¡Recibí tu foto! 📸");
 
   try {
-    // Download image from Telnyx
-    const imageBuffer = await whatsapp.downloadMedia(mediaUrl);
+    // Download image — handle both direct URLs and Meta media IDs
+    let imageBuffer;
+    if (isMetaId) {
+      console.log(`📥 WhatsApp Meta media — messageId=${eventId?.slice(0, 16)} mediaId=${mediaUrl?.slice(0, 16)}`);
+      imageBuffer = await whatsapp.downloadWhatsAppMedia(eventId, mediaUrl);
+      console.log(`📥 WhatsApp media downloaded: ${imageBuffer.length} bytes`);
+    } else {
+      imageBuffer = await whatsapp.downloadMedia(mediaUrl);
+    }
 
     // Validate size
     if (imageBuffer.length > 10 * 1024 * 1024) {
