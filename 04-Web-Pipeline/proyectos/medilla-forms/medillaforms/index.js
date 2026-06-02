@@ -74,6 +74,18 @@ app.get("/api/internal/ping", (req, res) => {
   res.json({ pong: true, ts: new Date().toISOString(), commit: "messaging_profile_id_fix" });
 });
 
+// Diagnostic endpoint (TEMP — remove after debugging)
+app.get("/api/internal/diag", (req, res) => {
+  const mask = (v) => v ? `${v.slice(0,4)}...${v.slice(-4)} (len=${v.length})` : "❌ NOT SET";
+  res.json({
+    TELNYX_API_KEY: mask(process.env.TELNYX_API_KEY),
+    TELNYX_PUBLIC_KEY: mask(process.env.TELNYX_PUBLIC_KEY),
+    TELNYX_PHONE_NUMBER: process.env.TELNYX_PHONE_NUMBER || "❌ NOT SET",
+    TELNYX_MESSAGING_PROFILE_ID: process.env.TELNYX_MESSAGING_PROFILE_ID || "❌ NOT SET",
+    TELNYX_SKIP_SIGNATURE: process.env.TELNYX_SKIP_SIGNATURE || "❌ NOT SET",
+  });
+});
+
 // =============================================================================
 // Telnyx WhatsApp Webhook (POST /webhook/whatsapp)
 // =============================================================================
