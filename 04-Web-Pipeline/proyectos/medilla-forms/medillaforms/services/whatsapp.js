@@ -16,6 +16,13 @@ class WhatsAppService {
   // Verify Ed25519 webhook signature
   // ---------------------------------------------------------------------------
   verifySignature(payload, signature, timestamp) {
+    // TEMP: skip signature verification to debug message processing
+    // TODO: re-enable after confirming pipeline works end-to-end
+    if (process.env.TELNYX_SKIP_SIGNATURE === "true") {
+      console.warn("⚠️ TELNYX_SKIP_SIGNATURE=true — skipping Ed25519 verification");
+      return true;
+    }
+
     if (!signature || !timestamp || !this.publicKey) {
       // If no public key configured, skip verification (dev mode)
       if (!this.publicKey) {
