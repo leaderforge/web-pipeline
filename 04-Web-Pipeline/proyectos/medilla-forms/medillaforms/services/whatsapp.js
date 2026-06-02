@@ -25,7 +25,7 @@ class WhatsAppService {
   }
 
   // ---------------------------------------------------------------------------
-  // Send text message via Telnyx
+  // Send text message via Telnyx WhatsApp API
   // ---------------------------------------------------------------------------
   async sendText(to, text) {
     if (!this.apiKey || !this.fromNumber) {
@@ -34,7 +34,7 @@ class WhatsAppService {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/messages`, {
+      const response = await fetch(`${this.baseUrl}/messages/whatsapp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,9 +43,13 @@ class WhatsAppService {
         body: JSON.stringify({
           from: this.fromNumber,
           to,
-          text,
-          messaging_profile_id: this.profileId,
-          type: "whatsapp",
+          whatsapp_message: {
+            type: "text",
+            text: {
+              body: text,
+              preview_url: false,
+            },
+          },
         }),
       });
 
@@ -67,7 +71,7 @@ class WhatsAppService {
   }
 
   // ---------------------------------------------------------------------------
-  // Send image via Telnyx
+  // Send image via Telnyx WhatsApp API
   // ---------------------------------------------------------------------------
   async sendImage(to, imageUrlOrBuffer, caption = "") {
     if (!this.apiKey || !this.fromNumber) {
@@ -76,13 +80,13 @@ class WhatsAppService {
     }
 
     try {
-      // If it's a URL, use media_url. If buffer, upload first.
+      // If it's a URL, use it directly. If buffer, upload first.
       let mediaUrl = imageUrlOrBuffer;
       if (Buffer.isBuffer(imageUrlOrBuffer)) {
         mediaUrl = await this.uploadMedia(imageUrlOrBuffer, "image/png");
       }
 
-      const response = await fetch(`${this.baseUrl}/messages`, {
+      const response = await fetch(`${this.baseUrl}/messages/whatsapp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,10 +95,13 @@ class WhatsAppService {
         body: JSON.stringify({
           from: this.fromNumber,
           to,
-          text: caption || "",
-          media_url: mediaUrl,
-          messaging_profile_id: this.profileId,
-          type: "whatsapp",
+          whatsapp_message: {
+            type: "image",
+            image: {
+              link: mediaUrl,
+              ...(caption ? { caption } : {}),
+            },
+          },
         }),
       });
 
