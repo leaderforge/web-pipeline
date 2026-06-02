@@ -62,6 +62,8 @@ REGLAS DE WHATSAPP (META):
 - Si el usuario dejó de responder hace más de 24h, NO le escribas.
 - Solo mensajes dentro de la ventana de 24h posteriores a su último mensaje.
 - No envíes publicidad, promociones ni recordatorios no solicitados.
+- ⛔ IMPORTANTE: Esta regla de "24 horas" es SOLO para WhatsApp Business (política de Meta).
+  NO tiene NADA que ver con plazos de entrega de cartas. Las cartas se entregan EN MINUTOS.
 
 ═══════════════════════════════════════════
 SERVICIO:

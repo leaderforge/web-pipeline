@@ -43,15 +43,20 @@ export class HermesAgent {
 
     const history = buildConversationHistory(this.session.conversation_log);
 
+    // Extract error titles for brief mention in hook
+    const errores = analysis.errores_detectados || [];
+    const errorTitles = errores.map(e => e.titulo || e.tipo || "error").join(", ");
+
     const hookMessage = await this.deepseek.chat(
       "closer_hook",
       history,
-      `DATOS DEL ANÁLISIS (usa estos números exactos):\n` +
+      `DATOS DEL ANÁLISIS (USA EXACTAMENTE ESTOS NÚMEROS Y NOMBRES):\n` +
       `- Errores encontrados: ${errorsFound}\n` +
-      `- Ahorro estimado: $${savings}\n\n` +
-      `El usuario NO ha pagado. Preséntale SOLO el número de errores y ahorro, luego ofrece las cartas.` +
+      `- Tipos detectados: ${errorTitles || "errores de facturación"}\n` +
+      `- Ahorro total estimado: $${savings}\n\n` +
+      `El usuario NO ha pagado. Nombra brevemente los tipos de error y menciona el ahorro. Luego ofrece las cartas.` +
       `NO inventes plazos. NO pidas comprobante. Las reglas completas están en tu sistema.`,
-      { errors_found: String(errorsFound), potential_savings: String(savings) }
+      { errors_found: String(errorsFound), potential_savings: String(savings), error_types: errorTitles }
     );
 
     const cleaned = sanitizeAgentResponse(hookMessage);
