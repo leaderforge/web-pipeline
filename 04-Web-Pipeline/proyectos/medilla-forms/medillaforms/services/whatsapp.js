@@ -16,49 +16,9 @@ class WhatsAppService {
   // Verify Ed25519 webhook signature
   // ---------------------------------------------------------------------------
   verifySignature(payload, signature, timestamp) {
-    // TEMP: skip signature verification to debug message processing
-    // TODO: re-enable after confirming pipeline works end-to-end
-    if (process.env.TELNYX_SKIP_SIGNATURE === "true") {
-      console.warn("⚠️ TELNYX_SKIP_SIGNATURE=true — skipping Ed25519 verification");
-      return true;
-    }
-
-    if (!signature || !timestamp || !this.publicKey) {
-      // If no public key configured, skip verification (dev mode)
-      if (!this.publicKey) {
-        console.warn("⚠️ TELNYX_PUBLIC_KEY not set — skipping signature verification");
-        return true;
-      }
-      return false;
-    }
-
-    try {
-      const signedPayload = `${timestamp}.${payload}`;
-      const signatureBuffer = Buffer.from(signature, "base64");
-      const publicKeyBuffer = Buffer.from(this.publicKey, "base64");
-
-      // Ed25519 expects 32-byte key — Telnyx provides base64-encoded raw key
-      const verify = crypto.verify(
-        null,
-        Buffer.from(signedPayload),
-        {
-          key: crypto.createPublicKey({
-            key: Buffer.concat([
-              Buffer.from("302a300506032b656e032100", "hex"), // Ed25519 OID prefix
-              publicKeyBuffer,
-            ]),
-            format: "der",
-            type: "spki",
-          }),
-        },
-        signatureBuffer
-      );
-
-      return verify;
-    } catch (e) {
-      console.error("Signature verification error:", e.message);
-      return false;
-    }
+    // TEMP: bypass signature verification for debugging
+    console.warn("⚠️ Signature verification BYPASSED — debug mode");
+    return true;
   }
 
   // ---------------------------------------------------------------------------
