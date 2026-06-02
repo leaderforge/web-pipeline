@@ -294,10 +294,21 @@ async function processInbound(phone, text, media, contactName, msgType) {
     session = await createSession(phone, contactName);
   }
 
-  // 📨 Notify Daniel on every inbound message
+  // 📨 Notify Daniel on first 10 NEW customers only
   const hasMedia = media && media.length > 0;
   const displayText = text || (hasMedia ? "" : "");
-  telegram.notifyNewMessage(phone, displayText, isNewSession, hasMedia).catch(() => {});
+  if (isNewSession) {
+    try {
+      const rawCount = await redis.get("medillaforms:new_user_notifications");
+      const count = Math.max(0, parseInt(rawCount || "0", 10));
+      if (count < 10) {
+        telegram.notifyNewMessage(phone, displayText, true, hasMedia).catch(() => {});
+        await redis.set("medillaforms:new_user_notifications", count + 1);
+      }
+    } catch (_) {
+      telegram.notifyNewMessage(phone, displayText, true, hasMedia).catch(() => {});
+    }
+  }
 
   // Detect returning user (24h+ since last message)
   const returningContext = buildContextFromHistory(session);
