@@ -56,9 +56,10 @@ export class IntakeAgent {
       return;
     }
 
-    // --- User confirms all photos sent ---
-    if (this._matches(textLower, ["sí", "si", "son todas", "todas", "eso es todo", "listo",
-                                   "yes", "all", "that's all", "done", "ready"])) {
+    // --- User confirms all photos sent (require stronger match than just "si") ---
+    if (this._matches(textLower, ["son todas", "todas", "eso es todo", "listo",
+                                   "that's all", "done", "ready", "ya está", "ya esta",
+                                   "envié todas", "envie todas", "esas son todas"])) {
       const result = confirmPhotos(this.phone);
       if (result) {
         await pool.query(
