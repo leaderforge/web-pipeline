@@ -3,197 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>¡Gracias! — MedillaForms</title>
-<meta name="robots" content="noindex, nofollow">
+<title>¡Pago confirmado! — MedillaForms</title>
+<meta name="description" content="Tu pago ha sido confirmado. En un momento nos comunicamos contigo por WhatsApp con tus cartas de disputa.">
+<link rel="icon" type="image/png" href="assets/images/logomedillaforms1-cropped.png">
 
-<!-- Fonts (matching landing page) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
-
-<!-- GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX'); // TODO: Replace with real GA4 ID
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a' },
+        warm: '#faf8f5',
+        deep: '#0f172a',
+        wa: '#25D366',
+      },
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"','system-ui','sans-serif'],
+        display: ['"Clash Display"','"Plus Jakarta Sans"','sans-serif'],
+      },
+      animation: {
+        'fade-up': 'fadeUp 0.7s cubic-bezier(0.32,0.72,0,1) forwards',
+        'pop': 'pop 0.5s cubic-bezier(0.32,0.72,0,1) forwards',
+      },
+      keyframes: {
+        fadeUp: { '0%':{opacity:'0',transform:'translateY(20px)'}, '100%':{opacity:'1',transform:'translateY(0)'} },
+        pop: { '0%':{opacity:'0',transform:'scale(0.8)'}, '70%':{transform:'scale(1.05)'}, '100%':{opacity:'1',transform:'scale(1)'} },
+      },
+    }
+  }
+}
 </script>
-
-<!-- Meta Pixel -->
-<script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', 'PIXEL_ID_PLACEHOLDER'); // TODO: Replace with real Pixel ID
-  fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=PIXEL_ID_PLACEHOLDER&ev=PageView&noscript=1"
-/></noscript>
 
 <style>
-  :root {
-    --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  :root { --ease-spring: cubic-bezier(0.32,0.72,0,1); }
+  * { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+
+  .btn-wa {
+    transition: all 0.35s var(--ease-spring);
+    min-height: 52px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: '"Plus Jakarta Sans"', system-ui, sans-serif;
-    background: #faf8f5;
-    color: #0f172a;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
-    -webkit-font-smoothing: antialiased;
+  .btn-wa:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(13,148,136,0.4); }
+  .btn-wa:active { transform: scale(0.97); }
+
+  @keyframes checkDraw {
+    0% { stroke-dashoffset: 50; }
+    100% { stroke-dashoffset: 0; }
   }
-  .card {
-    background: white;
-    border-radius: 2rem;
-    padding: 3rem 2rem;
-    max-width: 480px;
-    width: 100%;
-    box-shadow:
-      0 1px 2px rgba(0,0,0,0.02),
-      0 4px 16px rgba(0,0,0,0.03),
-      0 16px 48px rgba(0,0,0,0.04);
-    animation: fadeUp 0.6s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  .check-circle { stroke-dasharray: 50; animation: checkDraw 0.6s ease-out 0.3s forwards; stroke-dashoffset: 50; }
+
+  @keyframes pulseRing {
+    0%,100% { box-shadow: 0 0 0 0 rgba(20,184,166,0.3); }
+    50% { box-shadow: 0 0 0 24px rgba(20,184,166,0); }
   }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .checkmark {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: #14b8a6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    animation: scaleIn 0.5s cubic-bezier(0.32, 0.72, 0, 1) 0.2s both;
-  }
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.5); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  .checkmark svg {
-    width: 36px;
-    height: 36px;
-    stroke: white;
-    stroke-width: 3;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  h1 {
-    font-family: '"Clash Display"', '"Plus Jakarta Sans"', sans-serif;
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.75rem;
-    color: #0f172a;
-  }
-  p {
-    color: #64748b;
-    line-height: 1.6;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .phone-highlight {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #f0fdfa;
-    border: 1px solid #99f6e4;
-    border-radius: 2rem;
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #0d9488;
-    text-decoration: none;
-    transition: all 0.3s var(--ease-spring);
-    margin-bottom: 2rem;
-  }
-  .phone-highlight:hover {
-    background: #ccfbf1;
-    transform: scale(1.02);
-  }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #0d9488;
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    padding: 0.875rem 2rem;
-    border-radius: 2rem;
-    text-decoration: none;
-    transition: all 0.3s var(--ease-spring);
-    box-shadow: 0 4px 24px rgba(13,148,136,0.25);
-  }
-  .btn:hover {
-    background: #0f766e;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 32px rgba(13,148,136,0.35);
-  }
+  .pulse-ring { animation: pulseRing 2.5s ease-in-out infinite; }
 </style>
 </head>
-<body>
+<body class="bg-warm min-h-screen flex items-center justify-center p-4">
 
-<div class="card">
-  <div class="checkmark">
-    <svg viewBox="0 0 24 24">
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
+<div class="w-full max-w-md text-center">
+
+  <!-- Checkmark -->
+  <div class="animate-pop mb-6">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand-100 pulse-ring">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <circle cx="22" cy="22" r="20" stroke="#0d9488" stroke-width="3" fill="none" stroke-dasharray="50" stroke-dashoffset="0" opacity="0.2"/>
+        <path d="M12 23l6 6 14-14" stroke="#0d9488" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="check-circle"/>
+      </svg>
+    </div>
   </div>
 
-  <h1>¡Listo! Recibimos tu factura.</h1>
-  <p>
-    Nuestro equipo la está analizando ahora mismo.
-    Te mandaremos los resultados por WhatsApp en menos de 5 minutos.
+  <!-- Message -->
+  <h1 class="font-display font-bold text-[1.8rem] sm:text-[2.2rem] leading-[1.15] tracking-[-0.02em] text-deep mb-3 animate-fade-up">
+    ¡Pago confirmado!
+  </h1>
+  <p class="text-slate-500 text-[16px] leading-relaxed mb-2 animate-fade-up" style="animation-delay:0.15s">
+    Tu pago de <strong class="text-deep">$29 USD</strong> ha sido registrado exitosamente.
+  </p>
+  <p class="text-slate-400 text-[14px] leading-relaxed mb-8 animate-fade-up" style="animation-delay:0.25s">
+    En un momento nos comunicamos contigo por WhatsApp para enviarte tus dos cartas de disputa.
   </p>
 
-  <a href="tel:+1XXXXXXXXXX" class="phone-highlight">  <!-- TODO: Replace with real phone -->
-    <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor"><path d="M222,158.4l-46.9-20a15.6,15.6,0,0,0-15.1,1.3l-25.1,16.7a76.5,76.5,0,0,1-35.2-35h0L116.4,96a15.8,15.8,0,0,0,1.4-15.1L97.6,34a15.7,15.7,0,0,0-16.8-9.1A56.2,56.2,0,0,0,32,80c0,79.4,64.6,144,144,144a56.2,56.2,0,0,0,55.1-48.8A15.7,15.7,0,0,0,222,158.4Z"/></svg>
-    (XXX) XXX-XXXX
+  <!-- Steps -->
+  <div class="card mb-6 animate-fade-up" style="animation-delay:0.35s">
+    <div class="flex items-center gap-3 text-left mb-3">
+      <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-check text-brand-600 text-[16px]"></i></div>
+      <p class="text-[14px] text-slate-700">Pago procesado</p>
+    </div>
+    <div class="flex items-center gap-3 text-left mb-3">
+      <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-clock-countdown text-amber-600 text-[16px]"></i></div>
+      <p class="text-[14px] text-slate-700">Analizando tu factura</p>
+    </div>
+    <div class="flex items-center gap-3 text-left">
+      <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-whatsapp-logo text-slate-400 text-[16px]"></i></div>
+      <p class="text-[14px] text-slate-500">Te contactamos por WhatsApp</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <a href="https://wa.me/12139054680?text=Hola%2C%20acabo%20de%20hacer%20mi%20pago%20de%20%2429%20USD" target="_blank"
+     class="btn-wa bg-wa text-white font-semibold text-[15px] px-7 py-3.5 rounded-full shadow-lg animate-fade-up"
+     style="animation-delay:0.45s">
+    <i class="ph-fill ph-whatsapp-logo text-[20px]"></i>
+    Abrir WhatsApp
   </a>
 
-  <br>
-  <a href="/" class="btn">
-    <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg>
-    Volver al inicio
-  </a>
+  <p class="text-[12px] text-slate-400 mt-4 animate-fade-up" style="animation-delay:0.5s">
+    Si no recibes nuestras cartas en 15 minutos, escríbenos.
+  </p>
+
 </div>
-
-<!-- Conversion Tracking -->
-<script>
-  // GA4 conversion event
-  gtag('event', 'conversion', {
-    'send_to': 'AW-CONVERSION_ID/thank-you' // TODO: Replace with Google Ads conversion ID
-  });
-
-  // Meta Pixel conversion event
-  fbq('track', 'Lead', {
-    content_name: 'medillaforms_thank_you',
-    content_category: 'conversion'
-  });
-
-  // Fires 2 seconds after page load to ensure scripts are ready
-  setTimeout(function() {
-    console.log('✅ Conversion tracked: Lead + PageView');
-  }, 2000);
-</script>
 
 </body>
 </html>
