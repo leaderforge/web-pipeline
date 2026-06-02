@@ -47,8 +47,9 @@ import { enforceGuardrails } from "./middleware/legal.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Raw body for Stripe webhook signature verification
+// Raw body for webhook signature verification (MUST be before express.json())
 app.use("/stripe/webhook", express.raw({ type: "application/json" }));
+app.use("/webhook/whatsapp", express.raw({ type: "*/*" }));
 app.use(express.json());
 
 // =============================================================================
@@ -79,16 +80,17 @@ app.get("/api/internal/ping", (req, res) => {
 app.post("/webhook/whatsapp", async (req, res) => {
   const signature = req.headers["telnyx-signature-ed25519"];
   const timestamp = req.headers["telnyx-timestamp"];
-  const rawBody = JSON.stringify(req.body);
+  const rawBody = req.body.toString(); // Raw body (express.raw middleware)
 
-  // Verify Ed25519 signature
+  // Verify Ed25519 signature on RAW body
   if (!whatsapp.verifySignature(rawBody, signature, timestamp)) {
     console.warn("⚠️ Webhook signature verification failed");
-    // Still return 200 to prevent Telnyx retry storms
     return res.status(200).json({ status: "signature_failed" });
   }
 
-  const { data } = req.body;
+  // Parse raw body AFTER signature verification
+  const parsed = JSON.parse(rawBody);
+  const { data } = parsed;
   const eventType = data?.event_type;
   const eventId = data?.id;
 
