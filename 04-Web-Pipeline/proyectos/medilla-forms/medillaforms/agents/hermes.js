@@ -23,24 +23,6 @@ export class HermesAgent {
   // FASE 3 — Present the hook and payment options
   // ===========================================================================
   async presentHook() {
-    // ── ADMIN WHITELIST: skip payment for admin/test numbers ──
-    // Numbers split to avoid secret redaction
-    const DP = "+1" + "95" + "17" + "33" + "61" + "05";  // Daniel
-    const BP = "+1" + "21" + "39" + "05" + "46" + "80";  // Bot
-    const ADMIN_NUMBERS = [DP, BP];
-    if (ADMIN_NUMBERS.includes(this.phone)) {
-      console.log(`👑 Admin number ${this.phone.slice(-4)} — skipping payment`);
-      // Simulate payment confirmed so _skipToDelivery works
-      this.session.payment_confirmed = true;
-      this.session.payment_method = "admin";
-      await pool.query(
-        `UPDATE sessions SET payment_confirmed = true, payment_method = 'admin', updated_at = NOW() WHERE id = $1`,
-        [this.session.id]
-      );
-      await this._skipToDelivery();
-      return;
-    }
-
     // ── PRECHECK: if payment already confirmed (prepaid/landing flow), skip to delivery ──
     if (this.session.payment_confirmed) {
       await this._skipToDelivery();
@@ -64,16 +46,11 @@ export class HermesAgent {
     const hookMessage = await this.deepseek.chat(
       "closer_hook",
       history,
-      `Acabo de analizar la factura médica del usuario y encontré ${errorsFound} posible(s) error(es). ` +
-      `Ahorro estimado si se disputa: aproximadamente $${savings}.\n\n` +
-      `REGLAS ESTRICTAS:\n` +
-      `1. NO menciones qué errores encontraste. NO des detalles de códigos, montos, ni cargos específicos.\n` +
-      `2. NO digas cuánto pagó el hospital ni el monto total de la factura.\n` +
-      `3. Di SOLO: cuántos errores encontraste y el ahorro estimado aproximado.\n` +
-      `4. Ofrece las cartas de disputa por $29 USD (pago único, tarjeta o Zelle).\n` +
-      `5. Sé breve (2-3 mensajes máximo). El usuario no ha pagado aún. Los detalles vienen DESPUÉS.\n` +
-      `6. Termina preguntando: "¿Quieres que prepare tus cartas? Son $29 USD. ¿Tarjeta o Zelle?"\n` +
-      `7. NO menciones explicaciones, NO ofrezcas educar, NO hables de charity care aún.`,
+      `DATOS DEL ANÁLISIS (usa estos números exactos):\n` +
+      `- Errores encontrados: ${errorsFound}\n` +
+      `- Ahorro estimado: $${savings}\n\n` +
+      `El usuario NO ha pagado. Preséntale SOLO el número de errores y ahorro, luego ofrece las cartas.` +
+      `NO inventes plazos. NO pidas comprobante. Las reglas completas están en tu sistema.`,
       { errors_found: String(errorsFound), potential_savings: String(savings) }
     );
 
