@@ -71,7 +71,7 @@ app.get("/health", async (req, res) => {
 
 // Internal ping for Hermes health monitor
 app.get("/api/internal/ping", (req, res) => {
-  res.json({ pong: true, ts: new Date().toISOString(), commit: "40a8c7e-bypass-v2" });
+  res.json({ pong: true, ts: new Date().toISOString(), commit: "messaging_profile_id_fix" });
 });
 
 // =============================================================================

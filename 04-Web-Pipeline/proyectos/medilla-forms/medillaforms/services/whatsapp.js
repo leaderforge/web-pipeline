@@ -9,6 +9,7 @@ class WhatsAppService {
     this.apiKey = process.env.TELNYX_API_KEY || "";
     this.publicKey = process.env.TELNYX_PUBLIC_KEY || "";
     this.fromNumber = process.env.TELNYX_PHONE_NUMBER || "";
+    this.profileId = process.env.TELNYX_MESSAGING_PROFILE_ID || "";
     this.baseUrl = "https://api.telnyx.com/v2";
   }
 
@@ -41,7 +42,7 @@ class WhatsAppService {
           from: this.fromNumber,
           to,
           text,
-          messaging_profile_id: this.fromNumber,
+          messaging_profile_id: this.profileId,
           type: "whatsapp",
         }),
       });
@@ -87,7 +88,7 @@ class WhatsAppService {
           to,
           text: caption || "",
           media_url: mediaUrl,
-          messaging_profile_id: this.fromNumber,
+          messaging_profile_id: this.profileId,
           type: "whatsapp",
         }),
       });
