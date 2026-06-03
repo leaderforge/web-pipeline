@@ -301,34 +301,68 @@ app.post("/telegram/webhook", async (req, res) => {
   }
 
   // Parse "listo <session_code>" command (Zelle confirmation)
-  // The code is the first 8 chars of the UUID — look up full session
-  const listoMatch = text.match(/^listo\s+([\w-]+)/i);
+  const listoMatch = text.match(/listo\s+([\w-]+)/i);
   if (listoMatch) {
-    const code = listoMatch[1];
+    const code = listoMatch[1].trim();
 
-    // Find session by UUID prefix (first 8 chars)
-    const sessionResult = await pool.query(
-      `SELECT id FROM sessions
+    // Find session by UUID prefix — try multiple queries from strict to loose
+    let sessionResult = await pool.query(
+      `SELECT id, state, payment_method FROM sessions
        WHERE id::text LIKE $1 || '%'
        AND payment_confirmed = false
        AND state IN ('waiting_zelle', 'waiting_payment')
-       LIMIT 1`,
+       ORDER BY created_at DESC LIMIT 1`,
       [code]
     );
 
+    // Fallback: try any session with zelle pending (maybe state is wrong)
     if (sessionResult.rowCount === 0) {
-      await telegram.sendMessage(
-        `❌ No se encontró sesión pendiente con código ${code}. Verifica el ID.`
+      sessionResult = await pool.query(
+        `SELECT id, state, payment_method FROM sessions
+         WHERE id::text LIKE $1 || '%'
+         AND zelle_pending = true
+         AND payment_confirmed = false
+         ORDER BY created_at DESC LIMIT 1`,
+        [code]
       );
-      return res.status(200).json({ status: "ok", confirmed: false });
+    }
+
+    // Last resort: try any unpaid session with this prefix
+    if (sessionResult.rowCount === 0) {
+      sessionResult = await pool.query(
+        `SELECT id, state, payment_method FROM sessions
+         WHERE id::text LIKE $1 || '%'
+         AND payment_confirmed = false
+         ORDER BY created_at DESC LIMIT 1`,
+        [code]
+      );
+    }
+
+    if (sessionResult.rowCount === 0) {
+      // Show available sessions for debugging
+      const allPending = await pool.query(
+        `SELECT substring(id::text,1,8) as code, state, payment_method, zelle_pending
+         FROM sessions WHERE payment_confirmed = false
+         ORDER BY created_at DESC LIMIT 5`
+      );
+      const codes = allPending.rows.map(r => `${r.code} (${r.state}${r.zelle_pending ? ', zelle' : ''})`).join(', ');
+      await telegram.sendMessage(
+        `❌ No se encontró sesión pendiente con código ${code}.\n\n` +
+        `Sesiones pendientes: ${codes || 'ninguna'}\n\n` +
+        `Revisa que el código sea correcto y que la sesión esté activa.`
+      );
+      return res.status(200).json({ status: "ok", confirmed: false, available: allPending.rows.map(r => r.code) });
     }
 
     const sessionId = sessionResult.rows[0].id;
+    const sessionState = sessionResult.rows[0].state;
+    console.log(`🔑 Zelle confirm: session ${sessionId.slice(0,8)} (state=${sessionState})`);
+
     const found = await confirmPayment(sessionId, "zelle", null);
 
     await telegram.sendMessage(
       found
-        ? `✅ Pago confirmado para sesión ${sessionId.slice(0, 8)}. Enviando cartas...`
+        ? `✅ Pago Zelle confirmado para sesión ${sessionId.slice(0, 8)}. Enviando cartas...`
         : `❌ Error al confirmar sesión ${sessionId.slice(0, 8)}.`
     );
 

@@ -46,15 +46,36 @@ export class IntakeAgent {
       return;
     }
 
-    // --- Number of pages ---
-    if (this._matches(textLower, ["página", "pagina", "hoja", "foto", "fotografía", "page", "photo", "picture"]) ||
-        /^\d+$/.test(text.trim())) {
-      const num = parseInt(text.trim());
-      if (num > 0 && num <= 20) {
-        await this._confirmPageCount(num);
-      } else {
-        await this._askPageCount();
+    // --- Number of pages (detect ANY number in response) ---
+    // After the bot asks "¿Cuántas páginas?", ANY number in the response = page count
+    const numberMatch = text.match(/\b(\d+)\b/);
+    const spokenNumbers = {
+      "una":1,"uno":1,"un":1,"dos":2,"tres":3,"cuatro":4,"cinco":5,
+      "seis":6,"siete":7,"ocho":8,"nueve":9,"diez":10,
+      "once":11,"doce":12,"trece":13,"catorce":14,"quince":15
+    };
+    
+    let detectedNum = null;
+    // Try digit match first
+    if (numberMatch) {
+      const n = parseInt(numberMatch[1]);
+      if (n >= 1 && n <= 20) detectedNum = n;
+    }
+    // Try spoken number
+    if (!detectedNum) {
+      for (const [word, val] of Object.entries(spokenNumbers)) {
+        if (textLower.includes(word)) { detectedNum = val; break; }
       }
+    }
+    // Also match page-related keywords even without number (assume 1)
+    if (!detectedNum && this._matches(textLower, ["página", "pagina", "hoja", "foto", "fotografía", "page", "photo", "picture"])) {
+      // Mentioned pages but no number → ask
+      await this._askPageCount();
+      return;
+    }
+
+    if (detectedNum) {
+      await this._confirmPageCount(detectedNum);
       return;
     }
 

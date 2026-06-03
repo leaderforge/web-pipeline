@@ -162,19 +162,18 @@ export class CloserAgent {
       // Step 6: Report to Google Sheets
       await this._reportToSheets();
 
-      // Step 7: Update session state
+      // Step 7: Update session state — keep OPEN for follow-up questions
       await pool.query(
         `UPDATE sessions
-         SET state = 'closed',
-             session_closed_at = NOW(),
+         SET state = 'delivered',
              sheets_reported = true,
              updated_at = NOW()
          WHERE id = $1`,
         [this.session.id]
       );
-      this.session.state = "closed";
+      this.session.state = "delivered";
 
-      console.log(`✅ Session ${this.session.id.slice(0, 8)} completed successfully`);
+      console.log(`✅ Session ${this.session.id.slice(0, 8)} — letters delivered, session stays open for follow-up`);
 
     } catch (e) {
       console.error("❌ Delivery error:", e);
@@ -301,7 +300,7 @@ export class CloserAgent {
   }
 
   // ===========================================================================
-  // Handle post-delivery messages
+  // Handle post-delivery messages — user returns after receiving letters
   // ===========================================================================
   async handlePostDelivery(text) {
     const textLower = text.toLowerCase();
@@ -315,7 +314,6 @@ export class CloserAgent {
         "Entiendo. Proceso su devolución sin problema — tiene 7 días de garantía.\n\n" +
         "¿Me diría brevemente por qué el servicio no fue lo que esperaba? Me ayuda a mejorar."
       );
-      // Refund would be processed manually or via Stripe API
       await telegram.sendMessage(
         `⚠️ <b>Solicitud de refund</b>\nSesión: <code>${this.session.id.slice(0, 8)}</code>\n` +
         `WhatsApp: ***${this.phone.slice(-4)}\nHospital: ${this.session.hospital_name || "N/A"}\n` +
@@ -325,13 +323,24 @@ export class CloserAgent {
       return;
     }
 
-    // Follow-up questions
+    // Follow-up questions — user already has their letters, keep context
     const history = buildConversationHistory(this.session.conversation_log);
+    const contextInfo = {
+      hospital_name: this.session.hospital_name || "",
+      patient_name: this.session.patient_name || "",
+      payment_method: this.session.payment_method || "",
+      errors_found: String(this.session.errors_found || 0),
+    };
+
     const response = await this.deepseek.chat(
       "closer_delivery",
       history,
-      text,
-      { hospital_name: this.session.hospital_name || "" }
+      `[POST-ENTREGA] El usuario YA recibió sus cartas de disputa. ` +
+      `Hospital: ${contextInfo.hospital_name}. Paciente: ${contextInfo.patient_name}. ` +
+      `Responde de forma cálida y natural a su mensaje: "${text}"\n\n` +
+      `Mantén el contexto de la conversación. NO lo trates como nuevo usuario. ` +
+      `Ya pagó, ya recibió las cartas. Ahora solo necesita seguimiento.`,
+      contextInfo
     );
     await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(response));
     await appendToConversationLog(this.session.id, "assistant", response);
