@@ -19,6 +19,15 @@ class TelegramService {
   }
 
   // ---------------------------------------------------------------------------
+  // Format phone number as clickable WhatsApp link for Telegram
+  // ---------------------------------------------------------------------------
+  _formatWhatsAppLink(phone) {
+    const raw = (phone || "").replace(/[^0-9]/g, "");
+    if (!raw) return "N/A";
+    return `<a href="https://wa.me/${raw}">+${raw}</a>`;
+  }
+
+  // ---------------------------------------------------------------------------
   // Send message to Daniel
   // ---------------------------------------------------------------------------
   async sendMessage(text, disableNotification = false) {
@@ -56,14 +65,13 @@ class TelegramService {
   // 📨 New inbound message notification
   // ---------------------------------------------------------------------------
   async notifyNewMessage(phone, text, isNewSession = false, hasMedia = false) {
-    const phoneLast4 = (phone || "").slice(-4);
     const emoji = hasMedia ? "📸" : "💬";
     const label = isNewSession ? "🆕 NUEVO" : "📨 Mensaje";
     const preview = (text || "").slice(0, 120) || (hasMedia ? "[Foto/Archivo]" : "[Audio/Voice]");
 
     await this.sendMessage(
       `${emoji} <b>${label} — MedillaForms</b>\n\n` +
-      `WhatsApp: ***${phoneLast4}\n` +
+      `WhatsApp: ${this._formatWhatsAppLink(phone)}\n` +
       `Mensaje: ${preview}`,
       false
     );
@@ -125,11 +133,10 @@ class TelegramService {
   // 💰 Zelle pending notification
   // ---------------------------------------------------------------------------
   async notifyZellePending(session) {
-    const phoneLast4 = (session.whatsapp_number || "").slice(-4);
     await this.sendMessage(
       `💰 <b>Zelle pendiente — MedillaForms</b>\n\n` +
       `Monto esperado: <b>$29.00</b>\n` +
-      `WhatsApp: ***${phoneLast4}\n` +
+      `WhatsApp: ${this._formatWhatsAppLink(session.whatsapp_number)}\n` +
       `Hospital: ${session.hospital_name || "No analizado aún"}\n` +
       `Errores: ${session.errors_found || "No analizado aún"}\n` +
       `Sesión: <code>${session.id}</code>\n\n` +
@@ -169,10 +176,9 @@ class TelegramService {
   // 📷 Image not legible (3 failed attempts)
   // ---------------------------------------------------------------------------
   async alertImageNotLegible(phone, attempts) {
-    const phoneLast4 = (phone || "").slice(-4);
     await this.sendMessage(
       `📷 <b>Imagen no legible — ${attempts} intentos</b>\n\n` +
-      `WhatsApp: ***${phoneLast4}\n` +
+      `WhatsApp: ${this._formatWhatsAppLink(phone)}\n` +
       `El usuario ha intentado ${attempts} veces enviar una foto y no se ha podido leer.\n\n` +
       `<i>Considera contactarlo manualmente.</i>`,
       false

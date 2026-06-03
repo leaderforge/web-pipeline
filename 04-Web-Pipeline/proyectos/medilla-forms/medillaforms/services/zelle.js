@@ -36,12 +36,13 @@ class ZelleService {
    */
   buildPendingNotification(session) {
     const code = this.getConfirmationCode(session.id);
-    const phoneLast4 = (session.whatsapp_number || "").slice(-4);
+    const rawPhone = (session.whatsapp_number || "").replace(/[^0-9]/g, "");
+    const phoneLink = rawPhone ? `<a href="https://wa.me/${rawPhone}">+${rawPhone}</a>` : "N/A";
 
     return (
       `💰 <b>Zelle pendiente — MedillaForms</b>\n\n` +
       `Monto esperado: <b>$${this.amount.toFixed(2)}</b>\n` +
-      `WhatsApp: ***${phoneLast4}\n` +
+      `WhatsApp: ${phoneLink}\n` +
       `Hospital: ${session.hospital_name || "No analizado aún"}\n` +
       `Errores: ${session.errors_found || "No analizado aún"}\n` +
       `Sesión: <code>${session.id}</code>\n\n` +

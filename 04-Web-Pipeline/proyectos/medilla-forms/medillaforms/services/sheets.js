@@ -128,10 +128,17 @@ class SheetsService {
       if (!session.payment_confirmed) resultado = "Abandonó";
       if (session.payment_confirmed && !session.sheets_reported) resultado = "Pagó — sin cartas";
 
+      // Format WhatsApp number for Sheets =HYPERLINK formula
+      const rawPhone = (session.whatsapp_number || "").replace(/[^0-9]/g, "");
+      const phoneDisplay = rawPhone ? `+${rawPhone}` : "N/A";
+      const phoneLink = rawPhone
+        ? `=HYPERLINK("https://wa.me/${rawPhone}";"${phoneDisplay}")`
+        : "N/A";
+
       const row = [
         dateStr,
         (session.id || "").slice(0, 8),
-        `***-***-${(session.whatsapp_number || "").slice(-4)}`,
+        phoneLink,
         session.user_state || "N/A",
         session.hospital_name || "N/A",
         (session.photos || []).length || 1,

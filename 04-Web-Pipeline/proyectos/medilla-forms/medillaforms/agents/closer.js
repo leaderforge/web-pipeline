@@ -317,7 +317,8 @@ export class CloserAgent {
       );
       await telegram.sendMessage(
         `⚠️ <b>Solicitud de refund</b>\nSesión: <code>${this.session.id.slice(0, 8)}</code>\n` +
-        `WhatsApp: ***${this.phone.slice(-4)}\nHospital: ${this.session.hospital_name || "N/A"}\n` +
+        `WhatsApp: <a href="https://wa.me/${this.phone.replace(/[^0-9]/g, "")}">${this.phone}</a>\n` +
+        `Hospital: ${this.session.hospital_name || "N/A"}\n` +
         `Método de pago: ${this.session.payment_method}\n` +
         `<i>Procesar manualmente si fue Zelle.</i>`
       );
