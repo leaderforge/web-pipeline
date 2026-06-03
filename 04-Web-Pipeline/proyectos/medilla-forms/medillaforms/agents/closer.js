@@ -101,21 +101,7 @@ export class CloserAgent {
         }
       }
 
-      // Step 2: Notify user letters are coming
-      await this.whatsapp.sendText(this.phone,
-        "¡Perfecto! Estoy preparando sus cartas de disputa personalizadas. " +
-        "Recibirá dos imágenes:\n" +
-        "📄 Una en español (para usted)\n" +
-        "📄 Una en inglés (para el hospital)\n\n" +
-        "Un momento por favor..."
-      );
-
-      await pool.query(
-        `UPDATE sessions SET state = 'delivering', updated_at = NOW() WHERE id = $1`,
-        [this.session.id]
-      );
-
-      // Step 3: Generate letters (analysis already loaded above)
+      // Step 2: Generate letters immediately (no intermediate message)
       const signerData = {
         name: finalSignerName,
         relationship: finalSignerRel,
@@ -129,6 +115,11 @@ export class CloserAgent {
         esBuffer = letters.es_bytes;
         enBuffer = letters.en_bytes;
         console.log(`📄 Letters generated: ES=${esBuffer.length}B, EN=${enBuffer.length}B`);
+
+        await pool.query(
+          `UPDATE sessions SET state = 'delivering', updated_at = NOW() WHERE id = $1`,
+          [this.session.id]
+        );
       } catch (e) {
         // Playwright not available — fallback to text
         console.warn(`⚠️ Playwright failed, falling back to text: ${e.message}`);
@@ -195,9 +186,11 @@ export class CloserAgent {
     await this.whatsapp.sendText(this.phone,
       `📝 *Instrucciones para enviar su disputa:*\n\n` +
       `1️⃣ Imprima la carta en INGLÉS (la segunda imagen)\n` +
-      `2️⃣ Fírmela con su nombre completo\n` +
-      `3️⃣ Envíela por *correo certificado* al departamento de facturación de *${hospital}*\n` +
-      `4️⃣ Guarde el recibo del correo certificado\n` +
+      `2️⃣ Fírmela debajo del nombre que ya aparece en la carta\n` +
+      `3️⃣ Puede enviarla de dos formas:\n` +
+      `   • *Correo certificado* al departamento de facturación de *${hospital}* (recomendado — tiene comprobante de entrega)\n` +
+      `   • *En persona* en la ventanilla de facturación del hospital (pida que le sellen una copia como recibido)\n` +
+      `4️⃣ Guarde el comprobante de envío o la copia sellada\n` +
       `5️⃣ Conserve una copia de la carta firmada\n\n` +
       `El hospital suele responder en un plazo de 30 días.\n\n` +
       `¿Tiene alguna duda sobre el proceso?`
@@ -386,7 +379,8 @@ export class CloserAgent {
         `   "En California existe el Department of Managed Health Care que recibe quejas de pacientes."\n` +
         `✅ NUNCA digas "presente una queja" — di "las quejas se pueden presentar ante...".\n` +
         `✅ Cierra SIEMPRE con: "Para determinar si su caso aplica, le recomiendo consultar con un abogado en ${userState}."\n` +
-        `✅ Responde de forma cálida y humana.` +
+        `✅ Responde de forma cálida y humana.\n` +
+        `⛔ NUNCA ofrezcas seguimiento del caso. Nuestro servicio terminó al entregar las cartas.` +
         factsContext,
         contextInfo
       );
@@ -425,7 +419,8 @@ export class CloserAgent {
         `- Responde con información ÚTIL basada en los DATOS OBJETIVOS proporcionados.\n` +
         `- Si no tienes datos para responder algo específico, di: "Esa información específica la desconozco".\n` +
         `- NO inventes datos, plazos ni procedimientos.\n` +
-        `- Mantén el contexto. NO trates al usuario como nuevo.` +
+        `- Mantén el contexto. NO trates al usuario como nuevo.\n` +
+        `⛔ NUNCA ofrezcas seguimiento del caso. Nuestro servicio terminó al entregar las cartas.` +
         researchContext,
         contextInfo
       );
@@ -449,7 +444,9 @@ export class CloserAgent {
       `Hospital: ${hospital}. Paciente: ${contextInfo.patient_name}. ` +
       `Responde de forma cálida y natural a su mensaje: "${text}"\n\n` +
       `Mantén el contexto de la conversación. NO lo trates como nuevo usuario. ` +
-      `Ya pagó, ya recibió las cartas. Ahora solo necesita seguimiento.`,
+      `Ya pagó, ya recibió las cartas.\n` +
+      `⛔ NUNCA ofrezcas seguimiento del caso. Nuestro servicio terminó. ` +
+      `Si el usuario no tiene más preguntas, despídete con calidez.`,
       contextInfo
     );
 
