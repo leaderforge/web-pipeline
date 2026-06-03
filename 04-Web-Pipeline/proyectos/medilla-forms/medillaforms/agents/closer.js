@@ -333,23 +333,13 @@ export class CloserAgent {
       return;
     }
 
-    // ── Research-mode question ─────────────────────────────────
-    // Try local KB first, then Firecrawl
+    // ═══════════════════════════════════════════════════════════
+    // CAPA 1 — Clasificar la pregunta
+    // ═══════════════════════════════════════════════════════════
+    const category = await this._classifyQuestion(text);
+
     const userState = this.session.user_state || "CA";
     const hospital = this.session.hospital_name || "";
-
-    let researchedAnswer = null;
-    if (firecrawl.canCall(this.session.id)) {
-      const context = { hospital_name: hospital, user_state: userState };
-      const result = await firecrawl.searchMedicalBillingInfo(text, context);
-      if (result) {
-        firecrawl.incrementCallCount(this.session.id);
-        researchedAnswer = result.data;
-        console.log(`🔍 Research result [${result.source}]: ${String(researchedAnswer).slice(0, 100)}...`);
-      }
-    }
-
-    // Build context for DeepSeek response
     const history = buildConversationHistory(this.session.conversation_log);
     const contextInfo = {
       hospital_name: hospital,
@@ -359,22 +349,106 @@ export class CloserAgent {
       state: userState,
     };
 
-    const researchContext = researchedAnswer
-      ? `\n\n📚 INFORMACIÓN DE INVESTIGACIÓN (FUENTE REAL):\n${String(researchedAnswer)}\n\nUsa esta información para responder. Cita la fuente si es relevante.`
-      : "";
+    // ═══════════════════════════════════════════════════════════
+    // CAPA 2 — Manejar según tipo
+    // ═══════════════════════════════════════════════════════════
 
+    // ── LEGAL ⚖️ → hechos objetivos + derivar a abogado ─────
+    if (category === "LEGAL") {
+      // Try to find objective public information
+      let objectiveFacts = "";
+      if (firecrawl.canCall(this.session.id)) {
+        const context = { hospital_name: hospital, user_state: userState };
+        const result = await firecrawl.searchMedicalBillingInfo(text, context);
+        if (result) {
+          firecrawl.incrementCallCount(this.session.id);
+          // CAPA 3 — Sanitize: convertir consejos en hechos objetivos
+          objectiveFacts = await this._sanitizeResearchContent(result.data, userState);
+          console.log(`⚖️ Legal question — sanitized facts: ${objectiveFacts.slice(0, 120)}...`);
+        }
+      }
+
+      const factsContext = objectiveFacts
+        ? `\n\n📚 DATOS OBJETIVOS (FUENTE PÚBLICA):\n${objectiveFacts}\n\nUsa estos datos como hechos descriptivos. NO los conviertas en consejos legales.`
+        : "";
+
+      const response = await this.deepseek.chat(
+        "closer_delivery",
+        history,
+        `[POST-ENTREGA — PREGUNTA LEGAL] El usuario YA recibió sus cartas. ` +
+        `Hospital: ${hospital}. Estado: ${userState}. ` +
+        `Mensaje del usuario: "${text}"\n\n` +
+        `REGLAS ESTRICTAS:\n` +
+        `⛔ NO eres abogado. NO des consejos legales.\n` +
+        `⛔ NO digas "usted debe", "le recomiendo que", "tiene derecho a".\n` +
+        `✅ Si hay datos objetivos (protecciones, recursos, leyes), menciónalos como HECHOS:\n` +
+        `   "En California existe el Department of Managed Health Care que recibe quejas de pacientes."\n` +
+        `✅ NUNCA digas "presente una queja" — di "las quejas se pueden presentar ante...".\n` +
+        `✅ Cierra SIEMPRE con: "Para determinar si su caso aplica, le recomiendo consultar con un abogado en ${userState}."\n` +
+        `✅ Responde de forma cálida y humana.` +
+        factsContext,
+        contextInfo
+      );
+
+      const sanitized = sanitizeAgentResponse(response);
+      await this.whatsapp.sendText(this.phone, sanitized);
+      await appendToConversationLog(this.session.id, "assistant", response);
+      return;
+    }
+
+    // ── FACTURACIÓN 📋 → investigar con Firecrawl ─────────────
+    if (category === "FACTURACION") {
+      let researchedAnswer = null;
+      if (firecrawl.canCall(this.session.id)) {
+        const context = { hospital_name: hospital, user_state: userState };
+        const result = await firecrawl.searchMedicalBillingInfo(text, context);
+        if (result) {
+          firecrawl.incrementCallCount(this.session.id);
+          // CAPA 3 — Sanitize antes de pasar a DeepSeek
+          researchedAnswer = await this._sanitizeResearchContent(result.data, userState);
+          console.log(`📋 Facturación research [${result.source}]: ${String(researchedAnswer).slice(0, 100)}...`);
+        }
+      }
+
+      const researchContext = researchedAnswer
+        ? `\n\n📚 INFORMACIÓN DE INVESTIGACIÓN (DATOS OBJETIVOS):\n${String(researchedAnswer)}\n\nUsa estos datos para responder. NO los conviertas en consejos.`
+        : `\n\n⚠️ No se encontró información específica sobre esta consulta. Si no sabes la respuesta, dilo honestamente: "Desconozco ese dato específico".`;
+
+      const response = await this.deepseek.chat(
+        "closer_delivery",
+        history,
+        `[POST-ENTREGA — FACTURACIÓN] El usuario YA recibió sus cartas. ` +
+        `Hospital: ${hospital}. Paciente: ${contextInfo.patient_name}. Estado: ${userState}. ` +
+        `Responde de forma cálida y natural a: "${text}"\n\n` +
+        `REGLAS:\n` +
+        `- Responde con información ÚTIL basada en los DATOS OBJETIVOS proporcionados.\n` +
+        `- Si no tienes datos para responder algo específico, di: "Esa información específica la desconozco".\n` +
+        `- NO inventes datos, plazos ni procedimientos.\n` +
+        `- Mantén el contexto. NO trates al usuario como nuevo.` +
+        researchContext,
+        contextInfo
+      );
+
+      const sanitized = sanitizeAgentResponse(response);
+      await this.whatsapp.sendText(this.phone, sanitized);
+      await appendToConversationLog(this.session.id, "assistant", response);
+
+      // If user seems done → close
+      if (this._matches(textLower, ["gracias", "thank", "ok", "perfecto", "listo", "bye", "adiós"])) {
+        await this._closeSession();
+      }
+      return;
+    }
+
+    // ── GENERAL 💬 → respuesta normal ────────────────────────
     const response = await this.deepseek.chat(
       "closer_delivery",
       history,
-      `[POST-ENTREGA] El usuario YA recibió sus cartas de disputa. ` +
-      `Hospital: ${hospital}. Paciente: ${contextInfo.patient_name}. Estado: ${userState}. ` +
+      `[POST-ENTREGA — GENERAL] El usuario YA recibió sus cartas de disputa. ` +
+      `Hospital: ${hospital}. Paciente: ${contextInfo.patient_name}. ` +
       `Responde de forma cálida y natural a su mensaje: "${text}"\n\n` +
-      `REGLAS:\n` +
-      `- NO eres abogado. Si la pregunta requiere asesoría legal, derívalo a consultar un abogado en ${userState}.\n` +
-      `- Responde con información ÚTIL y PRECISA basada en datos reales.\n` +
-      `- Si la pregunta no tiene relación con facturación médica, responde amablemente pero mantén el foco.\n` +
-      `- Mantén el contexto de la conversación. NO lo trates como nuevo usuario. Ya pagó, ya recibió las cartas.` +
-      researchContext,
+      `Mantén el contexto de la conversación. NO lo trates como nuevo usuario. ` +
+      `Ya pagó, ya recibió las cartas. Ahora solo necesita seguimiento.`,
       contextInfo
     );
 
@@ -382,11 +456,98 @@ export class CloserAgent {
     await this.whatsapp.sendText(this.phone, sanitized);
     await appendToConversationLog(this.session.id, "assistant", response);
 
-    // If user seems done (gracias, ok, bye) → close
-    if (this._matches(textLower, [
-      "gracias", "thank", "ok", "perfecto", "listo", "bye", "adiós",
-    ])) {
+    if (this._matches(textLower, ["gracias", "thank", "ok", "perfecto", "listo", "bye", "adiós"])) {
       await this._closeSession();
+    }
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CAPA 1 — Clasificar pregunta: LEGAL / FACTURACION / GENERAL
+  // ═════════════════════════════════════════════════════════════
+  async _classifyQuestion(text) {
+    const textLower = text.toLowerCase();
+
+    // Fast keyword pre-check for clear categories
+    const LEGAL_KEYWORDS = [
+      "demanda", "demandar", "demando", "abogado", "denunciar", "denuncia",
+      "ilegal", "corte", "tribunal", "juez", "judicial", "ley", "derecho",
+      "obligación", "queja formal", "reportar", "violación", "fraud",
+      "negligencia", "malpractice", "sue", "lawsuit", "attorney",
+    ];
+
+    const FACTURACION_KEYWORDS = [
+      "cpt", "código", "error", "costo", "precio", "cargo", "medicare",
+      "seguro", "cobertura", "deducible", "copago", "factura", "billing",
+      "hospital", "clínica", "procedimiento", "servicio", "tarifa",
+      "descuento", "caridad", "charity", "financiera", "pago", "plan",
+      "códigos", "upcoding", "duplicado", "desagregación",
+    ];
+
+    const isLegal = LEGAL_KEYWORDS.some(kw => textLower.includes(kw));
+    const isFacturacion = FACTURACION_KEYWORDS.some(kw => textLower.includes(kw));
+
+    // Clear cases
+    if (isLegal && !isFacturacion) return "LEGAL";
+    if (isFacturacion && !isLegal) return "FACTURACION";
+    if (!isLegal && !isFacturacion) return "GENERAL";
+
+    // Ambiguous: both or neither matched clearly — use DeepSeek reasoning
+    const systemPrompt = `Eres un clasificador de preguntas. Analiza el mensaje y clasifícalo en UNA categoría.`;
+
+    try {
+      const classification = await this.deepseek.chat(
+        "closer_delivery",
+        [],
+        `Clasifica esta pregunta de un usuario que YA recibió sus cartas de disputa médica:\n\n` +
+        `"${text}"\n\n` +
+        `Categorías:\n` +
+        `- LEGAL: pregunta sobre demandas, abogados, derechos legales, denuncias, cortes, leyes\n` +
+        `- FACTURACION: pregunta sobre códigos CPT, precios, errores de facturación, seguros, cargos médicos\n` +
+        `- GENERAL: agradecimientos, despedidas, preguntas sobre el proceso, tiempos de espera, siguiente paso\n\n` +
+        `Responde ÚNICAMENTE con una palabra: LEGAL, FACTURACION o GENERAL.`,
+        {}
+      );
+
+      const cat = (classification || "").trim().toUpperCase();
+      if (cat.includes("LEGAL")) return "LEGAL";
+      if (cat.includes("FACTURACION")) return "FACTURACION";
+      return "GENERAL";
+    } catch {
+      // Fallback: if both matched, default to LEGAL (safer)
+      return isLegal ? "LEGAL" : "GENERAL";
+    }
+  }
+
+  // ═════════════════════════════════════════════════════════════
+  // CAPA 3 — Sanitizar contenido de investigación
+  // Convierte consejos/imperativos en hechos objetivos
+  // ═════════════════════════════════════════════════════════════
+  async _sanitizeResearchContent(rawContent, userState) {
+    if (!rawContent) return "";
+
+    try {
+      const sanitized = await this.deepseek.chat(
+        "closer_delivery",
+        [],
+        `Reescribe el siguiente texto convirtiendo CONSEJOS e IMPERATIVOS en HECHOS OBJETIVOS.\n\n` +
+        `TEXTO ORIGINAL:\n${String(rawContent).slice(0, 2000)}\n\n` +
+        `REGLAS DE TRANSFORMACIÓN:\n` +
+        `- "You should file a complaint" → "Complaints can be filed with..."\n` +
+        `- "Patients have the right to sue" → "Legal options available to patients include..."\n` +
+        `- "You must request an itemized bill" → "Patients can request an itemized bill"\n` +
+        `- "Your hospital is violating..." → "Hospitals are required to..."\n` +
+        `- "Demand a reduction" → "Reductions may be requested"\n` +
+        `- ELIMINA frases como "you deserve", "fight back", "don't let them"\n` +
+        `- CONVIERTE todo a voz pasiva o tercera persona\n` +
+        `- MANTÉN los datos factuales: números, nombres de agencias, leyes, plazos legales\n` +
+        `- Si el texto menciona protecciones al consumidor en ${userState}, consérvalas como dato objetivo\n` +
+        `- NO añadas información nueva. Solo transforma el tono.`,
+        {}
+      );
+
+      return sanitized || String(rawContent).slice(0, 1500);
+    } catch {
+      return String(rawContent).slice(0, 1500);
     }
   }
 
