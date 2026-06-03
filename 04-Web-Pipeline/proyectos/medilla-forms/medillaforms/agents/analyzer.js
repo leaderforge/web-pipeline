@@ -37,8 +37,9 @@ export class AnalyzerAgent {
       // Build CPT reference lookup for the AI
       const cptRef = this._buildCptReference();
 
-      // Step 1: GPT-4o Vision analysis
-      const result = await this.openai.analyzeBill(imageBuffer, cptRef);
+      // Step 1: GPT-4o Vision analysis — include user's state for better reference pricing
+      const userState = this.session.user_state || "CA";
+      const result = await this.openai.analyzeBill(imageBuffer, cptRef, userState);
 
       if (result.error) {
         await this._handleAnalysisError(result.error);

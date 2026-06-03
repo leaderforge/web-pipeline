@@ -16,7 +16,7 @@ class OpenAIService {
   // ---------------------------------------------------------------------------
   // GPT-4o Vision — Analyze medical bill image
   // ---------------------------------------------------------------------------
-  async analyzeBill(imageBuffer, cptReference = "") {
+  async analyzeBill(imageBuffer, cptReference = "", userState = "CA") {
     if (!process.env.OPENAI_API_KEY) {
       console.warn("⚠️ OPENAI_API_KEY not set — returning mock analysis");
       return this._mockAnalysis();
@@ -24,10 +24,11 @@ class OpenAIService {
 
     const base64 = imageBuffer.toString("base64");
 
-    // Build prompt with CPT reference rates injected
+    // Build prompt with CPT reference rates and state injected
     const promptWithRates = cptReference
       ? cptReference + "\n\n---\n\n" + ANALYZER_PROMPT
       : ANALYZER_PROMPT;
+    const promptWithState = promptWithRates + `\n\nESTADO DEL PACIENTE: ${userState}. Usa las protecciones al consumidor y tarifas de referencia de este estado para tu análisis.`;
 
     try {
       const response = await this.client.chat.completions.create({
@@ -37,7 +38,7 @@ class OpenAIService {
           {
             role: "user",
             content: [
-              { type: "text", text: promptWithRates },
+              { type: "text", text: promptWithState },
               {
                 type: "image_url",
                 image_url: {

@@ -522,12 +522,16 @@ async function handleIncomingMedia(phone, media, session, eventId) {
     const receivedCount = getStoredCount(phone);
     const expected = session.photos_expected;
 
-    // ── CASE A: First photo, unknown page count → ASK ──
+    // ── CASE A: First photo, unknown if there are more → ASK ──
     if (!expected) {
+      await pool.query(
+        `UPDATE sessions SET state = 'awaiting_photos', updated_at = NOW() WHERE id = $1`,
+        [session.id]
+      );
+      session.state = "awaiting_photos";
       await whatsapp.sendText(phone,
-        "¿Cuántas páginas tiene tu factura en total? 📄\n\n" +
-        "Así sé cuántas esperar antes de analizarla. " +
-        "Ejemplo: si son 3 páginas, responde \"3\"."
+        "📄 Recibí tu primera página.\n\n" +
+        "¿Es toda la factura o tienes más páginas para enviarme?"
       );
       return;
     }
@@ -542,8 +546,21 @@ async function handleIncomingMedia(phone, media, session, eventId) {
       return;
     }
 
-    // ── CASE C: All expected received (or exceeded) → ANALYZE ──
-    await processAllPhotos(phone, session);
+    // ── CASE C: All expected received → CONFIRM then ask for STATE ──
+    await pool.query(
+      `UPDATE sessions SET photos_confirmed = true, state = 'awaiting_state', updated_at = NOW() WHERE id = $1`,
+      [session.id]
+    );
+    session.photos_confirmed = true;
+    session.state = "awaiting_state";
+    const allPhotos = getStoredPhotos(phone);
+    await whatsapp.sendText(phone,
+      `¡${allPhotos.length} ${allPhotos.length === 1 ? "página lista" : "páginas listas"}! ✅\n\n` +
+      `Antes de continuar con la revisión, para cotejar la información de su factura ` +
+      `con costos de esos servicios y productos en el estado correspondiente, ` +
+      `dígame: ¿en qué estado de Estados Unidos fue atendido el paciente?`
+    );
+    return;
 
   } catch (err) {
     console.error("❌ Media processing error:", err);
@@ -679,6 +696,18 @@ async function routeText(phone, text, session, returningContext = "") {
       break;
     }
 
+    case "awaiting_photos": {
+      // ── User is responding to "¿Es toda la factura o tienes más páginas?" ──
+      await handleAwaitingPhotos(phone, text, session);
+      break;
+    }
+
+    case "awaiting_state": {
+      // ── User is responding to "¿En qué estado fue atendido?" ──
+      await handleAwaitingState(phone, text, session);
+      break;
+    }
+
     case "prepaid": {
       // ── User paid via landing, now messaging for the first time ──
       await handlePrepaidSession(phone, text, session);
@@ -764,8 +793,115 @@ async function routeText(phone, text, session, returningContext = "") {
 }
 
 // =============================================================================
-// Handle Prepaid Session (user paid via landing, now on WhatsApp)
+// Handle Awaiting Photos — user responds to "¿Es toda la factura o más?"
+// Uses DeepSeek reasoning to understand natural language response
 // =============================================================================
+async function handleAwaitingPhotos(phone, text, session) {
+  const storedCount = getStoredCount(phone);
+  
+  // Use DeepSeek to understand if user is done or expects more photos
+  const reasoning = await deepseek.chat(
+    "intake",
+    [],
+    `El usuario acaba de enviar ${storedCount} foto(s) de su factura médica. ` +
+    `Le pregunté: "¿Es toda la factura o tienes más páginas para enviarme?"\n\n` +
+    `El usuario respondió: "${text}"\n\n` +
+    `Analiza su respuesta y determina:\n` +
+    `1. ¿El usuario indica que YA ENVIÓ TODO? (ej: "sí es todo", "solo esa", "es toda", "nada más", "sí") → responde "DONE"\n` +
+    `2. ¿El usuario indica que FALTAN MÁS? Extrae CUÁNTAS más faltan. Si dice "faltan 3" → responde "MORE:3". Si dice genérico "aún faltan" sin número → responde "MORE:?"\n` +
+    `3. Si es ambiguo o no queda claro → responde "UNCLEAR"\n\n` +
+    `RESPONDE SOLO CON EL CÓDIGO: DONE, MORE:N, o UNCLEAR. Nada más.`,
+    {}
+  );
+
+  const answer = (reasoning || "").trim().toUpperCase();
+  console.log(`📄 Awaiting photos — user: "${text.slice(0,50)}" → AI: ${answer}`);
+
+  if (answer.startsWith("DONE")) {
+    // User confirmed all photos sent → ask for state
+    const count = storedCount;
+    await pool.query(
+      `UPDATE sessions SET photos_confirmed = true, photos_expected = $2, state = 'awaiting_state', updated_at = NOW() WHERE id = $1`,
+      [session.id, count]
+    );
+    session.photos_confirmed = true;
+    session.photos_expected = count;
+    session.state = "awaiting_state";
+    await whatsapp.sendText(phone,
+      `¡Perfecto! ${count} ${count === 1 ? "página lista" : "páginas listas"} ✅\n\n` +
+      `Antes de continuar con la revisión, para cotejar la información de su factura ` +
+      `con costos de esos servicios y productos en el estado correspondiente, ` +
+      `dígame: ¿en qué estado de Estados Unidos fue atendido el paciente?`
+    );
+    return;
+  }
+
+  if (answer.startsWith("MORE:")) {
+    const moreStr = answer.split(":")[1]?.trim();
+    const more = parseInt(moreStr);
+    if (more > 0 && more <= 20) {
+      // User specified exact count
+      const total = storedCount + more;
+      await pool.query(
+        `UPDATE sessions SET photos_expected = $2, updated_at = NOW() WHERE id = $1`,
+        [session.id, total]
+      );
+      session.photos_expected = total;
+      await whatsapp.sendText(phone,
+        `Entendido. Entonces son ${total} páginas en total. ` +
+        `Ya recibí ${storedCount}, envíame las ${more} restantes cuando estés listo.`
+      );
+    } else {
+      // User said more but we don't know how many
+      await whatsapp.sendText(phone,
+        `Entendido, aún faltan páginas. Envíamelas cuando estés listo y me confirmas cuando hayas terminado.`
+      );
+    }
+    return;
+  }
+
+  // UNCLEAR or fallback — ask again naturally
+  await whatsapp.sendText(phone,
+    `Perdón, no me quedó claro. ¿Ya me enviaste todas las páginas de tu factura ` +
+    `o todavía te faltan algunas?`
+  );
+}
+
+// =============================================================================
+// Handle Awaiting State — user responds with US state name
+// =============================================================================
+async function handleAwaitingState(phone, text, session) {
+  // Use DeepSeek to extract state from natural language
+  const stateResponse = await deepseek.chat(
+    "intake",
+    [],
+    `El usuario respondió a la pregunta "¿en qué estado de Estados Unidos fue atendido el paciente?"\n\n` +
+    `Su respuesta: "${text}"\n\n` +
+    `Extrae el estado de EE.UU. en formato de 2 letras (CA, TX, FL, NY, AZ, NV, IL, etc.).\n` +
+    `Si menciona una ciudad (ej: "Dallas") → infiere el estado (TX).\n` +
+    `Si no se puede determinar → responde "??".\n\n` +
+    `RESPONDE SOLO CON EL CÓDIGO DE 2 LETRAS. Nada más.`,
+    {}
+  );
+
+  const stateCode = (stateResponse || "").trim().toUpperCase().slice(0, 2);
+  const validStates = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"];
+  
+  if (validStates.includes(stateCode)) {
+    await pool.query(
+      `UPDATE sessions SET user_state = $2, updated_at = NOW() WHERE id = $1`,
+      [session.id, stateCode]
+    );
+    session.user_state = stateCode;
+    console.log(`📍 State set to ${stateCode} for session ${session.id.slice(0,8)}`);
+  } else {
+    // Fallback: keep whatever was already set or default to CA
+    console.log(`📍 Could not determine state from: "${text}" → keeping default`);
+  }
+
+  // Now trigger analysis
+  await processAllPhotos(phone, session);
+}
 async function handlePrepaidSession(phone, text, session) {
   // This is their first message after paying. Welcome them and ask for the bill.
   // We skip intake + payment flow entirely.

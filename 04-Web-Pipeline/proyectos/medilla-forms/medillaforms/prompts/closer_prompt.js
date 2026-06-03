@@ -19,6 +19,7 @@ El ahorro estimado total es de aproximadamente {potential_savings} si se disputa
 
 [Mensaje 2 — Oferta]:
 "Lo que recibiría:
+1️⃣ Explicación detallada de cada concepto en discrepancia
 📄 Una carta en español — para que usted entienda cada punto
 📄 Una carta en inglés — lista para firmar y enviar al hospital
 
