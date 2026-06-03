@@ -155,6 +155,24 @@ class FirecrawlService {
           for (const [abbr, state] of Object.entries(data.states || {})) {
             if (queryLower.includes(abbr.toLowerCase()) ||
                 queryLower.includes(state.name.toLowerCase())) {
+              // Check if query is about deadlines/expiration
+              const isDeadlineQuery = /caduc|plazo|deadline|expir|statute|limitation|venc|prescrip|cuánto tiempo|how long|time limit|años|years|meses|months/i.test(queryLower);
+              
+              if (isDeadlineQuery && state.dispute_deadlines) {
+                const dd = state.dispute_deadlines;
+                return {
+                  data: `${state.name}:\n` +
+                    `- Estatuto de limitación: ${dd.statute_of_limitations}\n` +
+                    `- Plazo para facturar: ${dd.billing_deadline}\n` +
+                    `- Apelación de seguro: ${dd.insurance_appeal}\n` +
+                    `- Charity care: ${dd.charity_care_application}\n` +
+                    `- No Surprises Act: ${dd.no_surprises_act_idr}\n` +
+                    `- ${dd.important_warning}`,
+                  confidence: 0.9,
+                  source: file,
+                };
+              }
+              
               return {
                 data: `${state.name}: ${state.protections.join("; ")}`,
                 confidence: 0.85,

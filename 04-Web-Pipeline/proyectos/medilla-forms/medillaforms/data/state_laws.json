@@ -1,7 +1,7 @@
 {
   "_description": "State-level patient protections and billing regulations. Reference only — never cite as legal authority. Always recommend consulting a licensed attorney.",
   "_disclaimer": "Esta información es EDUCATIVA únicamente. No constituye asesoría legal.",
-  "_updated": "2026-05-25",
+  "_updated": "2026-06-04",
   "states": {
     "CA": {
       "name": "California",
@@ -13,7 +13,17 @@
       ],
       "charity_care_threshold": "400% FPL",
       "key_agency": "Department of Health Care Access and Information (HCAI)",
-      "complaint_url": "https://hcai.ca.gov/consumer"
+      "complaint_url": "https://hcai.ca.gov/consumer",
+      "dispute_deadlines": {
+        "statute_of_limitations": "4 years (written contracts). Clock starts from last payment or service date. After 4 years, providers cannot sue but may still contact you. CA also has a 12-month limit for debt collectors to file lawsuits under recent medical debt protections.",
+        "billing_deadline": "No strict state deadline for initial billing. Providers should bill within a reasonable time (typically 30-90 days).",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review after internal appeal denial.",
+        "charity_care_application": "240 days from first bill (CA Hospital Fair Pricing Act).",
+        "no_surprises_act_idr": "120 days from initial bill to initiate Independent Dispute Resolution under federal No Surprises Act.",
+        "credit_reporting": "As of January 1, 2025, medical debt CANNOT be reported to credit agencies in California. If reported, the debt becomes void.",
+        "itemized_bill": "Must be provided within 30 days of request.",
+        "important_warning": "NUNCA haga un pago parcial o promesa de pago por escrito en una deuda antigua sin consultar a un abogado — puede reiniciar el plazo de prescripción."
+      }
     },
     "TX": {
       "name": "Texas",
@@ -25,7 +35,17 @@
       ],
       "charity_care_threshold": "Varies by hospital",
       "key_agency": "Texas Department of Insurance",
-      "complaint_url": "https://www.tdi.texas.gov/consumer/surprise-balance-billing.html"
+      "complaint_url": "https://www.tdi.texas.gov/consumer/surprise-balance-billing.html",
+      "dispute_deadlines": {
+        "statute_of_limitations": "4 years (written contracts). Clock starts from last payment or service date.",
+        "billing_deadline": "10 MONTHS from service date (Tex. Health & Safety Code §146.002-003). If provider misses this deadline, they CANNOT collect from you or your family. This is one of the strongest billing deadline protections in the U.S.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "Varies by hospital. Nonprofit hospitals must provide charity care per IRS 501(r).",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Hospitals must provide written itemized bill within 30 days of receiving payment. Providers cannot pursue collections until this is provided.",
+        "unconscionable_pricing": "Freestanding ERs cannot charge more than 200% of average local hospital ER rates for similar services.",
+        "important_warning": "En Texas, si el proveedor no le factura dentro de 10 meses, no pueden cobrarle. Revise la fecha de servicio. NUNCA haga pagos parciales en deudas viejas sin asesoría legal."
+      }
     },
     "FL": {
       "name": "Florida",
@@ -37,7 +57,16 @@
       ],
       "charity_care_threshold": "Varies by hospital",
       "key_agency": "Florida Agency for Health Care Administration (AHCA)",
-      "complaint_url": "https://ahca.myflorida.com"
+      "complaint_url": "https://ahca.myflorida.com",
+      "dispute_deadlines": {
+        "statute_of_limitations": "5 years (written contracts). Clock starts from last payment or service date.",
+        "billing_deadline": "Doctors have up to 5 years to bill. Insurance contracts may impose shorter deadlines (typically 90 days). Old charges can surface years later — always review past bills.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "Varies by hospital. Nonprofit hospitals must provide charity care per IRS 501(r).",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Must be provided upon request — clear, itemized, with explanation of charges in plain language (Fla. Stat. §381.026).",
+        "important_warning": "En Florida los médicos tienen hasta 5 AÑOS para facturar. Pueden aparecer cobros de años anteriores. Siempre revise la fecha de servicio."
+      }
     },
     "AZ": {
       "name": "Arizona",
@@ -45,11 +74,21 @@
         "No Surprises Act (federal) applies to emergency services",
         "Arizona Surprise Billing Law requires dispute resolution for out-of-network bills",
         "Itemized bill available upon request",
-        "Nonprofit hospitals required to provide charity care per IRS 501(r)"
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)",
+        "Medical Debt Relief Program (Prop 209, 2022) — interest rate cap on medical debt"
       ],
       "charity_care_threshold": "Varies by hospital",
       "key_agency": "Arizona Department of Insurance and Financial Institutions",
-      "complaint_url": "https://difi.az.gov"
+      "complaint_url": "https://difi.az.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "6 years (written contracts). Clock starts from last payment or service date.",
+        "billing_deadline": "No strict state deadline for initial billing. Providers should bill within a reasonable time.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "Varies by hospital. AZ also has the nation's largest medical debt relief program (Undue Medical Debt partnership) for patients under 400% FPL.",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "prop_209": "Arizona Proposition 209 (2022) caps interest rates on medical debt. Application varies by court.",
+        "important_warning": "Prop 209 limita los intereses en deudas médicas. Consulte a un abogado si tiene deudas médicas viejas en AZ — las cortes aplican la ley de forma inconsistente."
+      }
     },
     "NY": {
       "name": "New York",
@@ -61,7 +100,16 @@
       ],
       "charity_care_threshold": "300% FPL (some hospitals up to 400%)",
       "key_agency": "New York State Department of Financial Services",
-      "complaint_url": "https://www.dfs.ny.gov/complaint"
+      "complaint_url": "https://www.dfs.ny.gov/complaint",
+      "dispute_deadlines": {
+        "statute_of_limitations": "3 years for medical debt (N.Y. CPLR §213-b — medical debt aligns with consumer debt). This is one of the SHORTEST statutes in the U.S. for medical bills.",
+        "billing_deadline": "No strict state deadline. Providers should bill within a reasonable time.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "Under NY Hospital Financial Assistance Law, hospitals must provide charity care for patients under 300% FPL (some up to 400%).",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution under NY Surprise Bill Law (which predates and exceeds the federal No Surprises Act).",
+        "itemized_bill": "Must be provided upon request.",
+        "important_warning": "Nueva York tiene el plazo MÁS CORTO: solo 3 años. Si su deuda médica tiene más de 3 años, es posible que ya no puedan demandarlo. NUNCA haga pagos en deudas prescritas."
+      }
     },
     "NV": {
       "name": "Nevada",
@@ -69,11 +117,21 @@
         "No Surprises Act (federal) applies to emergency services",
         "Nevada requires hospitals to post chargemaster prices online",
         "Itemized bill available upon request",
-        "Nonprofit hospitals required to provide charity care per IRS 501(r)"
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)",
+        "SB248 (2021) — debt collectors must send 60-day advance notice before collecting medical debt"
       ],
       "charity_care_threshold": "Varies by hospital",
       "key_agency": "Nevada Division of Insurance",
-      "complaint_url": "https://doi.nv.gov"
+      "complaint_url": "https://doi.nv.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "4 years (open accounts / written contracts). Clock starts from last payment or service date.",
+        "billing_deadline": "No strict state deadline for initial billing. Providers should bill within a reasonable time.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "Varies by hospital. Nonprofit hospitals must provide charity care per IRS 501(r).",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "sb248_protection": "SB248 (2021): Before collecting any medical debt, debt collectors MUST send a 60-day advance written notice including provider name, date of debt, amount, and statement that debt was assigned for collection.",
+        "important_warning": "En Nevada, los cobradores DEBEN notificarle con 60 días de anticipación antes de intentar cobrar una deuda médica. Si no recibe esa notificación, podría ser una violación."
+      }
     },
     "IL": {
       "name": "Illinois",
@@ -85,17 +143,29 @@
       ],
       "charity_care_threshold": "Varies by hospital (many at 200-300% FPL)",
       "key_agency": "Illinois Department of Public Health",
-      "complaint_url": "https://dph.illinois.gov"
+      "complaint_url": "https://dph.illinois.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "10 years (written contracts) — THE LONGEST in the U.S. Also 5 years for oral contracts. Clock starts from last payment or service date.",
+        "billing_deadline": "No strict state deadline. Providers should bill within a reasonable time.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "Nonprofit hospitals must provide charity care per Community Benefits Act. Threshold varies (typically 200-300% FPL).",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Must be provided upon request.",
+        "important_warning": "ILLINOIS TIENE EL PLAZO MÁS LARGO: 10 AÑOS. Esto significa que pueden demandarlo por facturas médicas de hasta una década. No asuma que una factura vieja 'ya caducó'. Siempre verifique antes de hacer pagos en deudas antiguas."
+      }
+    }
+  },
+  "federal_reference": {
+    "no_surprises_act": {
+      "description": "Federal law effective January 1, 2022. Protects patients from surprise medical bills in emergencies and at in-network facilities.",
+      "idr_deadline": "120 days from initial bill to initiate Independent Dispute Resolution",
+      "insurance_appeal_internal": "180 days from denial (ACA requirement)",
+      "insurance_appeal_external": "60 days after internal appeal denial",
+      "itemized_bill": "Providers must provide good-faith estimate for uninsured/self-pay patients"
     },
-    "TX": {
-      "name": "Texas",
-      "protections": [
-        "No Surprises Act (federal) for emergency services",
-        "SB 1264 protects against surprise medical bills",
-        "Hospital price transparency required"
-      ],
-      "charity_care_threshold": "Varies by hospital",
-      "key_agency": "Texas Department of Insurance"
+    "credit_reporting": {
+      "description": "As of 2023, medical debt under $500 is not reported. Debts under 1 year old are not reported. Paid medical debt is removed immediately.",
+      "cfpb_rule_2025": "CFPB rule (effective 2025) prohibits including medical debt on credit reports entirely — currently under legal challenge."
     }
   }
 }
