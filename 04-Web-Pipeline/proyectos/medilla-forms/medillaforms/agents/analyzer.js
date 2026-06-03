@@ -95,6 +95,9 @@ export class AnalyzerAgent {
         this._calculateAge(enriched.patient_dob || enriched.fecha_nacimiento);
       const isMinor = patientAge > 0 && patientAge < 18;
 
+      // Extract invoice/bill ID if GPT-4o found it
+      const facturaId = enriched.factura_id || null;
+
       // Step 5: Save analysis to session
       await pool.query(
         `UPDATE sessions
@@ -106,6 +109,7 @@ export class AnalyzerAgent {
              user_state = $7,
              patient_name = $8,
              patient_is_minor = $9,
+             factura_id = $10,
              photos = photos || '[]'::jsonb,
              state = 'analyzed',
              updated_at = NOW()
@@ -120,6 +124,7 @@ export class AnalyzerAgent {
           enriched.estado || "CA",
           patientName,
           isMinor,
+          facturaId,
         ]
       );
 
@@ -132,6 +137,7 @@ export class AnalyzerAgent {
       this.session.user_state = enriched.estado || "CA";
       this.session.patient_name = patientName;
       this.session.patient_is_minor = isMinor;
+      this.session.factura_id = facturaId;
 
       // Step 6: Present hook (FASE 3)
       const hermes = new HermesAgent(this.whatsapp, null, this.session);

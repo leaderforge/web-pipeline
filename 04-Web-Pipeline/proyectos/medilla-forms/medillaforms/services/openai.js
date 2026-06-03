@@ -105,6 +105,7 @@ class OpenAIService {
       fecha_servicio: "2026-05-15",
       tipo_servicio: "emergencia",
       estado: "CA",
+      factura_id: "INV-2026-0042",
       total_facturado: 4500.0,
       total_paciente_debe: 1200.0,
       total_seguro_pagado: 3300.0,

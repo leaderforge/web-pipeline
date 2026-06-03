@@ -77,6 +77,7 @@ function buildHtml(analysis, signerData, lang) {
   const fecha = formatDate(analysis.fecha_servicio, lang);
   const total = formatCurrency(analysis.total_facturado || 0);
   const ahorro = formatCurrency(analysis.ahorro_total_estimado || 0);
+  const facturaId = analysis.factura_id || (lang === "es" ? "No disponible" : "Not available");
   const errores = analysis.errores_detectados || [];
   const items = analysis.items || [];
   const disclaimer = getLetterFooterDisclaimer(lang);
@@ -170,6 +171,7 @@ function buildHtml(analysis, signerData, lang) {
     .replace(/\{fecha\}/g, fecha)
     .replace(/\{total_facturado\}/g, total)
     .replace(/\{ahorro_estimado\}/g, ahorro)
+    .replace(/\{factura_id\}/g, facturaId)
     .replace(/\{errores_rows\}/g, erroresRows)
     .replace(/\{items_rows\}/g, itemsRows)
     .replace(/\{today\}/g, today)
@@ -292,6 +294,7 @@ function getFallbackTemplate(lang) {
         <p><strong>Fecha:</strong> {today}</p>
         <p><strong>Proveedor:</strong> {hospital}</p>
         <p><strong>Paciente:</strong> {customer_name}</p>
+        <p><strong>ID Factura:</strong> {factura_id}</p>
         <p><strong>Fecha de servicio:</strong> {fecha}</p>
         <p><strong>Total facturado:</strong> {total_facturado}</p>
       </div>
@@ -329,6 +332,7 @@ function getFallbackTemplate(lang) {
         <p><strong>Date:</strong> {today}</p>
         <p><strong>Provider:</strong> {hospital}</p>
         <p><strong>Patient:</strong> {customer_name}</p>
+        <p><strong>Invoice #:</strong> {factura_id}</p>
         <p><strong>Date of Service:</strong> {fecha}</p>
         <p><strong>Total Billed:</strong> {total_facturado}</p>
       </div>

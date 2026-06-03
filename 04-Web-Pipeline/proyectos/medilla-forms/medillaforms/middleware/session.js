@@ -40,6 +40,7 @@ export async function initDB() {
         potential_savings     DECIMAL(12,2) DEFAULT 0,
         total_billed          DECIMAL(12,2) DEFAULT 0,
         hospital_name         VARCHAR(255),
+        factura_id            VARCHAR(100),
         user_state            VARCHAR(5),
         stripe_session_id     VARCHAR(255),
         payment_method        VARCHAR(20),
@@ -65,6 +66,9 @@ export async function initDB() {
       CREATE INDEX IF NOT EXISTS idx_sessions_payment ON sessions(payment_confirmed, payment_method);
     `);
     console.log("✅ Database tables initialized");
+
+    // Ensure factura_id column exists (for databases created before this migration)
+    await client.query(`ALTER TABLE sessions ADD COLUMN IF NOT EXISTS factura_id VARCHAR(100)`);
   } finally {
     client.release();
   }

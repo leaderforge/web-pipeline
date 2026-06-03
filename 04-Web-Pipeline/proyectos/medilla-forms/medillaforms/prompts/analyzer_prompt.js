@@ -17,6 +17,7 @@ Responde ÚNICAMENTE con un JSON válido con esta estructura exacta:
   "fecha_servicio": "YYYY-MM-DD o null",
   "tipo_servicio": "emergencia|hospitalizacion|consulta|laboratorio|imagen|cirugia|otro",
   "estado": "CA|TX|FL|AZ|NY|NV|IL|otro (abreviación de 2 letras)",
+  "factura_id": "número de factura o account number que aparezca en el documento, o null si no se ve",
   "total_facturado": 0.00,
   "total_paciente_debe": 0.00,
   "total_seguro_pagado": 0.00,
@@ -64,6 +65,7 @@ G = Fuera de red / Balance billing
 
 REGLAS IMPORTANTES:
 - Si no puedes leer algo, usa null. NO inventes datos.
+- Busca el número de factura (invoice #, account #, bill #) en el documento. Si lo encuentras, ponlo en factura_id. Si no es visible, null.
 - Sé conservador con detección de errores. Solo reporta si tienes >70% confianza.
 - Si la factura es de farmacia, veterinaria, o cotización (no factura real): severidad = "invalida"
 - Si la imagen no es una factura médica: es_factura_medica = false
