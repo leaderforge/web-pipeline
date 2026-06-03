@@ -9,6 +9,7 @@ import { deepseek } from "../services/deepseek.js";
 import { generateLetters, generateTextLetters } from "../services/generator.js";
 import { sheets } from "../services/sheets.js";
 import { telegram } from "../services/telegram.js";
+import { firecrawl } from "../services/firecrawl.js";
 
 export class CloserAgent {
   constructor(whatsapp, deepseekSvc, stripeSvc, session) {
@@ -323,27 +324,107 @@ export class CloserAgent {
       return;
     }
 
-    // Follow-up questions — user already has their letters, keep context
+    // ── Despedida / cierre ─────────────────────────────────────
+    if (this._matches(textLower, [
+      "gracias", "thank you", "ok gracias", "perfecto", "entendido",
+      "listo", "adiós", "bye", "hasta luego", "nos vemos",
+    ])) {
+      await this._closeSession();
+      return;
+    }
+
+    // ── Research-mode question ─────────────────────────────────
+    // Try local KB first, then Firecrawl
+    const userState = this.session.user_state || "CA";
+    const hospital = this.session.hospital_name || "";
+
+    let researchedAnswer = null;
+    if (firecrawl.canCall(this.session.id)) {
+      const context = { hospital_name: hospital, user_state: userState };
+      const result = await firecrawl.searchMedicalBillingInfo(text, context);
+      if (result) {
+        firecrawl.incrementCallCount(this.session.id);
+        researchedAnswer = result.data;
+        console.log(`🔍 Research result [${result.source}]: ${String(researchedAnswer).slice(0, 100)}...`);
+      }
+    }
+
+    // Build context for DeepSeek response
     const history = buildConversationHistory(this.session.conversation_log);
     const contextInfo = {
-      hospital_name: this.session.hospital_name || "",
+      hospital_name: hospital,
       patient_name: this.session.patient_name || "",
       payment_method: this.session.payment_method || "",
       errors_found: String(this.session.errors_found || 0),
+      state: userState,
     };
+
+    const researchContext = researchedAnswer
+      ? `\n\n📚 INFORMACIÓN DE INVESTIGACIÓN (FUENTE REAL):\n${String(researchedAnswer)}\n\nUsa esta información para responder. Cita la fuente si es relevante.`
+      : "";
 
     const response = await this.deepseek.chat(
       "closer_delivery",
       history,
       `[POST-ENTREGA] El usuario YA recibió sus cartas de disputa. ` +
-      `Hospital: ${contextInfo.hospital_name}. Paciente: ${contextInfo.patient_name}. ` +
+      `Hospital: ${hospital}. Paciente: ${contextInfo.patient_name}. Estado: ${userState}. ` +
       `Responde de forma cálida y natural a su mensaje: "${text}"\n\n` +
-      `Mantén el contexto de la conversación. NO lo trates como nuevo usuario. ` +
-      `Ya pagó, ya recibió las cartas. Ahora solo necesita seguimiento.`,
+      `REGLAS:\n` +
+      `- NO eres abogado. Si la pregunta requiere asesoría legal, derívalo a consultar un abogado en ${userState}.\n` +
+      `- Responde con información ÚTIL y PRECISA basada en datos reales.\n` +
+      `- Si la pregunta no tiene relación con facturación médica, responde amablemente pero mantén el foco.\n` +
+      `- Mantén el contexto de la conversación. NO lo trates como nuevo usuario. Ya pagó, ya recibió las cartas.` +
+      researchContext,
       contextInfo
     );
-    await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(response));
+
+    const sanitized = sanitizeAgentResponse(response);
+    await this.whatsapp.sendText(this.phone, sanitized);
     await appendToConversationLog(this.session.id, "assistant", response);
+
+    // If user seems done (gracias, ok, bye) → close
+    if (this._matches(textLower, [
+      "gracias", "thank", "ok", "perfecto", "listo", "bye", "adiós",
+    ])) {
+      await this._closeSession();
+    }
+  }
+
+  // ===========================================================================
+  // Close session: warm goodbye + clear placeholder data
+  // ===========================================================================
+  async _closeSession() {
+    await this.whatsapp.sendText(this.phone,
+      "Ha sido un placer ayudarle. Si en el futuro necesita revisar otra factura médica, " +
+      "aquí estaré. ¡Mucha suerte con su disputa! 🏥✨"
+    );
+
+    // Clear placeholder data but preserve user identity
+    await pool.query(
+      `UPDATE sessions
+       SET customer_name = NULL,
+           patient_name = NULL,
+           photos = '[]'::jsonb,
+           photos_expected = NULL,
+           photos_confirmed = FALSE,
+           analysis_result = NULL,
+           errors_found = 0,
+           potential_savings = 0,
+           total_billed = 0,
+           hospital_name = NULL,
+           factura_id = NULL,
+           signer_name = NULL,
+           signer_relationship = NULL,
+           carta_es_url = NULL,
+           carta_en_url = NULL,
+           state = 'closed',
+           session_closed_at = NOW(),
+           updated_at = NOW()
+       WHERE id = $1`,
+      [this.session.id]
+    );
+
+    console.log(`🧹 Session ${this.session.id.slice(0, 8)} — data cleared, user identity preserved`);
   }
 
   // ===========================================================================

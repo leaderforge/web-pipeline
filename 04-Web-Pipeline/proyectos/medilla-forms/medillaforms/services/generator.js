@@ -77,7 +77,18 @@ function buildHtml(analysis, signerData, lang) {
   const fecha = formatDate(analysis.fecha_servicio, lang);
   const total = formatCurrency(analysis.total_facturado || 0);
   const ahorro = formatCurrency(analysis.ahorro_total_estimado || 0);
-  const facturaId = analysis.factura_id || (lang === "es" ? "No disponible" : "Not available");
+  const facturaId = analysis.factura_id || null;
+
+  // Build factura_id row — only if found
+  let facturaIdRow = "";
+  if (facturaId) {
+    if (lang === "es") {
+      facturaIdRow = `<div>\n        <p class="label">ID de Factura</p>\n        <p class="value">${facturaId}</p>\n      </div>`;
+    } else {
+      facturaIdRow = `<div>\n        <p class="label">Invoice / Account #</p>\n        <p class="value">${facturaId}</p>\n      </div>`;
+    }
+  }
+
   const errores = analysis.errores_detectados || [];
   const items = analysis.items || [];
   const disclaimer = getLetterFooterDisclaimer(lang);
@@ -171,7 +182,7 @@ function buildHtml(analysis, signerData, lang) {
     .replace(/\{fecha\}/g, fecha)
     .replace(/\{total_facturado\}/g, total)
     .replace(/\{ahorro_estimado\}/g, ahorro)
-    .replace(/\{factura_id\}/g, facturaId)
+    .replace(/\{factura_id_row\}/g, facturaIdRow)
     .replace(/\{errores_rows\}/g, erroresRows)
     .replace(/\{items_rows\}/g, itemsRows)
     .replace(/\{today\}/g, today)
@@ -233,6 +244,9 @@ function generateTextLetters(analysis, signerData) {
   const isMinor = signerData.isMinor || false;
   const displayName = isMinor ? `${patientName} (menor) — Firmante: ${signerName}` : signerName;
 
+  const facturaId = analysis.factura_id || null;
+  const facturaLine = facturaId ? `\nID Factura: ${facturaId}` : "";
+
   let erroresTextEs = "";
   let erroresTextEn = "";
   (analysis.errores_detectados || []).forEach((err) => {
@@ -245,7 +259,7 @@ function generateTextLetters(analysis, signerData) {
 
   const esText =
     `[MEDILLAFORMS — CARTA DE DISPUTA]\n\n` +
-    `Fecha: ${fecha}\nProveedor: ${hospital}\nPaciente: ${displayName}\n\n` +
+    `Fecha: ${fecha}\nProveedor: ${hospital}\nPaciente: ${displayName}${facturaLine}\n\n` +
     `Estimado departamento de facturación:\n\n` +
     `Le escribo para solicitar una revisión detallada de mi factura médica ` +
     `por un total de ${total}. Tras un análisis exhaustivo, he identificado ` +
@@ -257,7 +271,7 @@ function generateTextLetters(analysis, signerData) {
 
   const enText =
     `[MEDILLAFORMS — DISPUTE LETTER]\n\n` +
-    `Date: ${fecha}\nProvider: ${hospital}\nPatient: ${displayName}\n\n` +
+    `Date: ${fecha}\nProvider: ${hospital}\nPatient: ${displayName}${facturaLine}\n\n` +
     `Dear billing department:\n\n` +
     `I am writing to request a detailed review of my medical bill ` +
     `totaling ${total}. After thorough analysis, I have identified ` +
@@ -294,7 +308,7 @@ function getFallbackTemplate(lang) {
         <p><strong>Fecha:</strong> {today}</p>
         <p><strong>Proveedor:</strong> {hospital}</p>
         <p><strong>Paciente:</strong> {customer_name}</p>
-        <p><strong>ID Factura:</strong> {factura_id}</p>
+        {factura_id_row}
         <p><strong>Fecha de servicio:</strong> {fecha}</p>
         <p><strong>Total facturado:</strong> {total_facturado}</p>
       </div>
@@ -332,7 +346,7 @@ function getFallbackTemplate(lang) {
         <p><strong>Date:</strong> {today}</p>
         <p><strong>Provider:</strong> {hospital}</p>
         <p><strong>Patient:</strong> {customer_name}</p>
-        <p><strong>Invoice #:</strong> {factura_id}</p>
+        {factura_id_row}
         <p><strong>Date of Service:</strong> {fecha}</p>
         <p><strong>Total Billed:</strong> {total_facturado}</p>
       </div>
