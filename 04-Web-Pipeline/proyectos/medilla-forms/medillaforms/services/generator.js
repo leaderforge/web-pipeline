@@ -77,17 +77,10 @@ function buildHtml(analysis, signerData, lang) {
   const fecha = formatDate(analysis.fecha_servicio, lang);
   const total = formatCurrency(analysis.total_facturado || 0);
   const ahorro = formatCurrency(analysis.ahorro_total_estimado || 0);
-  const facturaId = analysis.factura_id || null;
+  const facturaId = analysis.factura_id || "—";
 
-  // Build factura_id row — only if found
-  let facturaIdRow = "";
-  if (facturaId) {
-    if (lang === "es") {
-      facturaIdRow = `<div>\n        <p class="label">ID de Factura</p>\n        <p class="value">${facturaId}</p>\n      </div>`;
-    } else {
-      facturaIdRow = `<div>\n        <p class="label">Invoice / Account #</p>\n        <p class="value">${facturaId}</p>\n      </div>`;
-    }
-  }
+  // ── Factura ID label and value ──────────────────────────────────
+  const facturaIdLabel = lang === "es" ? "Factura #" : "Invoice #";
 
   const errores = analysis.errores_detectados || [];
   const items = analysis.items || [];
@@ -100,10 +93,20 @@ function buildHtml(analysis, signerData, lang) {
   const patientName = signerData.patientName || signerName;
   const isMinor = signerData.isMinor || false;
 
-  // ── Patient display name ──────────────────────────────────────
+  // Patient display name
   const displayPatient = isMinor && patientName
     ? `${patientName} (${lang === "es" ? "menor de edad" : "minor"})`
     : patientName || signerName;
+
+  // Care-of line (only for minors signed by someone else)
+  let careOfLine = "";
+  if (isMinor && signerRel !== "self") {
+    if (lang === "es") {
+      careOfLine = `<div class="care-of">En representaci\u00f3n de: ${patientName}, menor de edad</div>`;
+    } else {
+      careOfLine = `<div class="care-of">On behalf of: ${patientName}, a minor</div>`;
+    }
+  }
 
   // ── Intro paragraph (adapted by relationship) ─────────────────
   let introText = "";
@@ -172,6 +175,7 @@ function buildHtml(analysis, signerData, lang) {
   // Replace placeholders
   const html = template
     .replace(/\{customer_name\}/g, displayPatient)
+    .replace(/\{care_of_line\}/g, careOfLine)
     .replace(/\{signer_name\}/g, signerName)
     .replace(/\{signer_rel\}/g, signerRel === "parent" ? (lang === "es" ? "padre/madre" : "parent") 
                                 : signerRel === "legal_guardian" ? (lang === "es" ? "tutor legal" : "legal guardian")
@@ -182,7 +186,9 @@ function buildHtml(analysis, signerData, lang) {
     .replace(/\{fecha\}/g, fecha)
     .replace(/\{total_facturado\}/g, total)
     .replace(/\{ahorro_estimado\}/g, ahorro)
-    .replace(/\{factura_id_row\}/g, facturaIdRow)
+    .replace(/\{factura_id_label\}/g, facturaIdLabel)
+    .replace(/\{factura_id\}/g, facturaId)
+    .replace(/\{factura_id_row\}/g, "")  // Remove legacy placeholder
     .replace(/\{errores_rows\}/g, erroresRows)
     .replace(/\{items_rows\}/g, itemsRows)
     .replace(/\{today\}/g, today)
