@@ -139,6 +139,25 @@ tailwind.config = {
   .social-link.wa:hover { color:#25D366; background:rgba(37,211,102,0.15); }
   .social-link.tk:hover { color:#ff0050; background:rgba(255,0,80,0.15); }
 </style>
+
+<!-- Meta Pixel — MedillaForms -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1013474687698574');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1013474687698574&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel -->
+
 </head>
 
 <body class="bg-warm text-deep font-sans antialiased">
@@ -660,6 +679,7 @@ tailwind.config = {
     if (exitShown) return;
     if (e.clientY > 10) return;
     exitShown = true;
+    track('ViewContent',{content_name:'exit_popup_24',content_category:'offer'});
     exitPopup.style.pointerEvents = 'auto';
     exitPopup.style.opacity = '1';
     var inner = exitPopup.querySelector('div > div');
@@ -670,6 +690,8 @@ tailwind.config = {
   var lastScrollY = 0;
   var lastScrollTime = Date.now();
   var deepScrolled = false;
+  var depth50fired = false;
+  var depth75fired = false;
   var ticking = false;
   document.addEventListener('scroll', function() {
     if (exitShown || ticking) return;
@@ -680,6 +702,10 @@ tailwind.config = {
       var docH = document.documentElement.scrollHeight - window.innerHeight;
       var pct = docH > 0 ? sy / docH : 0;
 
+      // Scroll depth events for Meta Pixel
+      if (!depth50fired && pct > 0.50) { depth50fired = true; track('ScrollDepth',{percent:50}); }
+      if (!depth75fired && pct > 0.75) { depth75fired = true; track('ScrollDepth',{percent:75}); }
+
       if (pct > 0.50) deepScrolled = true;
 
       if (deepScrolled) {
@@ -689,6 +715,7 @@ tailwind.config = {
 
         if (delta > 80 && speed > 400) {
           exitShown = true;
+          track('ViewContent',{content_name:'exit_popup_24_mobile',content_category:'offer'});
           exitPopup.style.pointerEvents = 'auto';
           exitPopup.style.opacity = '1';
           var inner = exitPopup.querySelector('div > div');
