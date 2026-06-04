@@ -93,10 +93,15 @@ function buildHtml(analysis, signerData, lang) {
   const patientName = signerData.patientName || signerName;
   const isMinor = signerData.isMinor || false;
 
-  // Patient display name
-  const displayPatient = isMinor && patientName
-    ? `${patientName} (${lang === "es" ? "menor de edad" : "minor"})`
-    : patientName || signerName;
+  // Patient display name (WHO is signing, not WHO the patient is)
+  // Adults: signer IS the patient → show patient name
+  // Minors: signer is parent/guardian → show signer name, patient goes in care-of line
+  let displayPatient;
+  if (isMinor && signerRel !== "self") {
+    displayPatient = signerName;  // The adult signing
+  } else {
+    displayPatient = patientName || signerName;  // Patient signing for themselves
+  }
 
   // Care-of line (only for minors signed by someone else)
   let careOfLine = "";
