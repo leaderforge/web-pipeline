@@ -211,9 +211,10 @@ app.post("/webhook/calls", async (req, res) => {
     const payload = data?.payload || {};
     const callControlId = payload.call_control_id;
     const fromNumber = payload.from || payload.caller_id_number || "Desconocido";
+    const dialedNumber = payload.to || payload.destination_number || "Desconocido";
     const callerName = payload.caller_id_name || "";
 
-    console.log(`📞 Call webhook: ${eventType} from ${fromNumber} ccid=${callControlId?.slice(0, 12)}`);
+    console.log(`📞 Call webhook: ${eventType} from ${fromNumber} → ${dialedNumber} ccid=${callControlId?.slice(0, 12)}`);
 
     // ── call.initiated: answer immediately + notify Daniel ──
     if (eventType === "call.initiated") {
@@ -224,7 +225,7 @@ app.post("/webhook/calls", async (req, res) => {
       }]);
 
       // Fire-and-forget: notify Daniel via Telegram
-      telegram.notifyIncomingCall(fromNumber, callerName).catch((e) =>
+      telegram.notifyIncomingCall(fromNumber, dialedNumber, callerName).catch((e) =>
         console.error("❌ Telegram notify failed:", e.message)
       );
       return;

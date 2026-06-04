@@ -206,12 +206,13 @@ class TelegramService {
   // ---------------------------------------------------------------------------
   // 📞 Incoming call notification
   // ---------------------------------------------------------------------------
-  async notifyIncomingCall(fromNumber, callerName = "") {
+  async notifyIncomingCall(fromNumber, dialedNumber, callerName = "") {
     const nameStr = callerName ? ` (${callerName})` : "";
+    const label = dialedNumber.includes("888") ? "Llamada entrante — MedillaForms Website" : "Llamada entrante — WhatsApp MedillaForms";
     await this.sendMessage(
-      `📞 <b>Llamada entrante — MedillaForms Website</b>\n\n` +
+      `📞 <b>${label}</b>\n\n` +
       `Desde: ${this._formatWhatsAppLink(fromNumber)}${nameStr}\n` +
-      `Número marcado: +1 (888) 809-0921\n\n` +
+      `Marcó al: ${dialedNumber}\n\n` +
       `<i>La llamada se está redirigiendo a tu teléfono personal.</i>`,
       false
     );
