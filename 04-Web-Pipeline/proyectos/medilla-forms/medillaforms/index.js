@@ -200,6 +200,110 @@ app.post("/webhook/whatsapp", async (req, res) => {
 });
 
 // =============================================================================
+// Telnyx Voice Calls Webhook (POST /webhook/calls)
+// Handles incoming calls to +1-888-809-0921 → forward to Daniel + notify
+// =============================================================================
+app.post("/webhook/calls", async (req, res) => {
+  try {
+    const parsed = JSON.parse(req.body.toString());
+    const { data } = parsed;
+    const eventType = data?.event_type;
+    const payload = data?.payload || {};
+    const callControlId = payload.call_control_id;
+    const fromNumber = payload.from || payload.caller_id_number || "Desconocido";
+    const callerName = payload.caller_id_name || "";
+
+    console.log(`📞 Call webhook: ${eventType} from ${fromNumber} ccid=${callControlId?.slice(0, 12)}`);
+
+    // ── call.initiated: answer immediately + notify Daniel ──
+    if (eventType === "call.initiated") {
+      // Respond with Telnyx Call Control answer command
+      res.status(200).json([{
+        action: "answer",
+        client_state: Buffer.from(JSON.stringify({ from: fromNumber })).toString("base64"),
+      }]);
+
+      // Fire-and-forget: notify Daniel via Telegram
+      telegram.notifyIncomingCall(fromNumber, callerName).catch((e) =>
+        console.error("❌ Telegram notify failed:", e.message)
+      );
+      return;
+    }
+
+    // ── call.answered: now bridge to Daniel's phone ──
+    if (eventType === "call.answered") {
+      res.status(200).json([]); // ack immediately
+
+      const TELNYX_API_KEY = process.env.TELNYX_API_KEY || "";
+      const DANIEL_PHONE = process.env.DANIEL_PERSONAL_PHONE || "+19517336105";
+      const MEDILLA_TFN = process.env.MEDILLA_TFN || "+18888090921";
+
+      // 1. Create outbound call to Daniel
+      console.log(`📞 Dialing Daniel at ${DANIEL_PHONE}...`);
+      const dialRes = await fetch("https://api.telnyx.com/v2/calls", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TELNYX_API_KEY}`,
+        },
+        body: JSON.stringify({
+          to: DANIEL_PHONE,
+          from: MEDILLA_TFN,
+          connection_id: payload.connection_id || "",
+          // Use the incoming call's answer bridge
+        }),
+      });
+
+      const dialData = await dialRes.json();
+      const dialCallId = dialData?.data?.call_control_id;
+
+      if (!dialCallId) {
+        console.error("❌ Failed to create outbound call:", JSON.stringify(dialData).slice(0, 200));
+        // Hang up the incoming call
+        await fetch(`https://api.telnyx.com/v2/calls/${callControlId}/actions/hangup`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${TELNYX_API_KEY}` },
+        }).catch(() => {});
+        return;
+      }
+
+      console.log(`📞 Outbound call created: ${dialCallId.slice(0, 12)}`);
+
+      // 2. Answer the outbound call
+      await fetch(`https://api.telnyx.com/v2/calls/${dialCallId}/actions/answer`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${TELNYX_API_KEY}` },
+      });
+
+      // 3. Wait briefly then bridge both calls
+      await new Promise((r) => setTimeout(r, 2000));
+
+      const bridgeRes = await fetch(
+        `https://api.telnyx.com/v2/calls/${callControlId}/actions/bridge`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${TELNYX_API_KEY}`,
+          },
+          body: JSON.stringify({ call_control_id: dialCallId }),
+        }
+      );
+
+      const bridgeData = await bridgeRes.json();
+      console.log(`🔗 Bridge result: ${JSON.stringify(bridgeData).slice(0, 100)}`);
+      return;
+    }
+
+    // ── Other events (call.hangup, etc.) — just ack ──
+    res.status(200).json([]);
+  } catch (e) {
+    console.error("❌ Call webhook error:", e);
+    res.status(200).json([]); // Always 200 to avoid Telnyx retries
+  }
+});
+
+// =============================================================================
 // Stripe Webhook (POST /stripe/webhook)
 // =============================================================================
 app.post("/stripe/webhook", async (req, res) => {
@@ -708,6 +812,30 @@ async function routeText(phone, text, session, returningContext = "") {
     await whatsapp.sendText(phone,
       "Mi función es ayudarle exclusivamente con su facturación médica. " +
       "¿Hay algo sobre los cargos de su factura en lo que pueda servirle?"
+    );
+    return;
+  }
+
+  // ── 👤 HUMAN ESCALATION: user wants to talk to a real person ──
+  const humanEscalationPhrases = [
+    "hablar con un humano", "hablar con alguien", "hablar con una persona",
+    "persona real", "gerente", "supervisor", "agente", "representante",
+    "atención personal", "atención humana", "servicio al cliente",
+    "talk to a human", "talk to a person", "real person", "manager",
+    "supervisor", "agent", "representative", "customer service",
+    "speak to someone", "talk to someone else", "escalar",
+    "no eres real", "no eres una persona", "bot", "eres un robot",
+  ];
+  if (humanEscalationPhrases.some(p => textLower.includes(p))) {
+    console.log(`👤 Human escalation: ${phone} (state: ${session.state})`);
+    await whatsapp.sendText(phone,
+      "Entendido. Un momento, te conecto con una persona de nuestro equipo. 🧑‍💻\n\n" +
+      "Mientras tanto, toda la información de tu caso está guardada."
+    );
+    await telegram.notifyHumanRequest(session, text);
+    // Also save to conversation log
+    await appendToConversationLog(session.id, "assistant",
+      "[El usuario solicitó hablar con un humano. Se notificó a Daniel.]"
     );
     return;
   }

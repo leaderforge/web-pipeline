@@ -187,6 +187,37 @@ class TelegramService {
   }
 
   // ---------------------------------------------------------------------------
+  // 👤 Human escalation — user wants to talk to a real person
+  // ---------------------------------------------------------------------------
+  async notifyHumanRequest(session, text = "") {
+    const raw = (session.whatsapp_number || "").replace(/[^0-9]/g, "");
+    const preview = (text || "").slice(0, 100);
+    await this.sendMessage(
+      `👤 <b>Solicitud de atención humana — MedillaForms</b>\n\n` +
+      `WhatsApp: ${this._formatWhatsAppLink(session.whatsapp_number)}\n` +
+      `Sesión: <code>${session.id?.slice(0, 8) || "N/A"}</code>\n` +
+      `Estado: ${session.state || "intake"}\n` +
+      `Mensaje del usuario: ${preview}\n\n` +
+      `<b>👆 Toca el número de WhatsApp arriba para atenderlo directamente.</b>`,
+      false
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 📞 Incoming call notification
+  // ---------------------------------------------------------------------------
+  async notifyIncomingCall(fromNumber, callerName = "") {
+    const nameStr = callerName ? ` (${callerName})` : "";
+    await this.sendMessage(
+      `📞 <b>Llamada entrante — MedillaForms Website</b>\n\n` +
+      `Desde: ${this._formatWhatsAppLink(fromNumber)}${nameStr}\n` +
+      `Número marcado: +1 (888) 809-0921\n\n` +
+      `<i>La llamada se está redirigiendo a tu teléfono personal.</i>`,
+      false
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // 🟡 Daily summary
   // ---------------------------------------------------------------------------
   async sendDailySummary(stats) {
