@@ -473,9 +473,21 @@ async function handleIncomingMedia(phone, media, session, eventId) {
   const mediaItem = media[0];
   const mediaUrl = mediaItem?.url;
   const isMetaId = mediaItem?.is_meta_id;
-  
+
   if (!mediaUrl && !isMetaId) {
     await whatsapp.sendText(phone, "No pude leer la imagen. ¿Podría reenviarla?");
+    return;
+  }
+
+  // ── INVOICE GATE: user sent a photo instead of writing the invoice # ──
+  if (session.state === "awaiting_invoice") {
+    await whatsapp.sendText(phone,
+      "Gracias por la foto. Sin embargo, necesito que me *escriba* el número de factura para continuar.\n\n" +
+      "Revise la esquina superior derecha de su factura original. Busque algo como:\n" +
+      "• *Invoice #:* INV-2025-0042\n" +
+      "• *Account #:* 12345678\n\n" +
+      "Escríbame ese número y continúo al instante."
+    );
     return;
   }
 

@@ -7,6 +7,7 @@ import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { openai } from "../services/openai.js";
+import { deepseek } from "../services/deepseek.js";
 import { telegram } from "../services/telegram.js";
 import { HermesAgent } from "./hermes.js";
 
@@ -261,52 +262,134 @@ export class AnalyzerAgent {
 
   // ===========================================================================
   // Handle invoice number response — user provides Invoice # after gate
+  // Uses DeepSeek to understand natural language (same pattern as handleAwaitingPhotos)
   // ===========================================================================
   async handleInvoiceResponse(text) {
-    const trimmed = text.trim();
+    const sessionId = this.session.id || "unknown";
+    const attempt = this.session.invoice_attempts || 0;
 
-    // Validate it looks like an invoice/account number (alphanumeric, 4-30 chars)
-    const looksLikeInvoice = /^[A-Za-z0-9\-_#]{4,30}$/.test(trimmed);
+    // Increment attempt counter
+    this.session.invoice_attempts = attempt + 1;
 
-    if (!looksLikeInvoice) {
+    // ── STALLING DETECTION (>3 messages without invoice) ──
+    if (attempt >= 3) {
       await this.whatsapp.sendText(this.phone,
-        "Eso no parece un número de factura. Revise su factura original y busque algo como:\n\n" +
-        "• *Invoice #:* INV-2025-0042\n" +
-        "• *Account #:* 12345678\n" +
-        "• *Bill #:* B-9876543\n\n" +
-        "Generalmente está en la esquina superior derecha. ¿Podría intentarlo de nuevo?"
+        "Parece que está teniendo dificultad para encontrar el número de factura. No se preocupe.\n\n" +
+        "📸 *Opción fácil:* envíeme otra foto de su factura, pero esta vez enfoque la *esquina superior derecha* — " +
+        "ahí suele aparecer el Invoice #.\n\n" +
+        "Si prefiere, también puede escribir lo que ve en esa sección y yo lo identifico."
+      );
+      this.session.invoice_attempts = 0; // Reset counter after offering help
+      return;
+    }
+
+    // ── Use DeepSeek to understand user's intent ──
+    const reasoning = await deepseek.chat(
+      "intake",
+      [],
+      `El usuario está en el paso donde le pedí el *número de factura* (Invoice #, Account #, Bill #) ` +
+      `de su factura médica.\n\n` +
+      `El usuario respondió: "${text}"\n\n` +
+      `Analiza su respuesta y clasifícala en UNA de estas categorías:\n\n` +
+      `1. Si el usuario PROPORCIONÓ un número de factura o account number → responde "INVOICE:<número>" ` +
+      `(extrae SOLO el código alfanumérico, sin texto extra. Ej: si dice "Creo que es INV-2025-0042" → "INVOICE:INV-2025-0042")\n` +
+      `2. Si el usuario hace una PREGUNTA sobre dónde encontrarlo, cómo se ve, o pide ayuda → responde "QUESTION" ` +
+      `(ej: "¿dónde encuentro eso?", "no lo veo", "¿cómo se ve?", "¿me puedes ayudar?")\n` +
+      `3. Si el usuario NO está hablando del invoice o cambió de tema → responde "UNRELATED"\n` +
+      `4. Si el usuario está evadiendo, pide tiempo o la respuesta es ambigua → responde "STALLING" ` +
+      `(ej: "dame un momento", "luego te lo paso", "ahorita", "ok")\n\n` +
+      `RESPONDE SOLO CON EL CÓDIGO: INVOICE:<número>, QUESTION, UNRELATED, o STALLING. Nada más.`,
+      {}
+    );
+
+    const answer = (reasoning || "").trim().toUpperCase();
+    console.log(`📋 Invoice gate [${sessionId.slice(0,8)}] attempt ${attempt}: "${text.slice(0,60)}" → ${answer}`);
+
+    // ── INVOICE:<id> — user provided it! ──────────────────────
+    if (answer.startsWith("INVOICE:")) {
+      const facturaId = answer.split(":")[1]?.trim();
+      if (!facturaId || facturaId.length < 2) {
+        // Extraction failed somehow
+        await this._askForInvoiceAgain();
+        return;
+      }
+
+      // Save invoice ID to session
+      await pool.query(
+        `UPDATE sessions 
+         SET factura_id = $2, state = 'analyzed', updated_at = NOW() 
+         WHERE id = $1`,
+        [this.session.id, facturaId]
+      );
+      this.session.factura_id = facturaId;
+      this.session.state = "analyzed";
+      this.session.invoice_attempts = 0;
+
+      // Update analysis_result
+      const analysis = this.session.analysis_result || {};
+      analysis.factura_id = facturaId;
+      await pool.query(
+        `UPDATE sessions SET analysis_result = $2 WHERE id = $1`,
+        [this.session.id, JSON.stringify(analysis)]
+      );
+      this.session.analysis_result = analysis;
+
+      await this.whatsapp.sendText(this.phone,
+        `¡Perfecto! Número de factura *${facturaId}* registrado. ✅\n\n` +
+        `Ahora continúo con el análisis de su caso...`
+      );
+      await appendToConversationLog(this.session.id, "user", text);
+      await appendToConversationLog(this.session.id, "assistant", `Invoice received: ${facturaId} (DeepSeek extracted)`);
+
+      // Continue to hook (FASE 3)
+      const { HermesAgent } = await import("./hermes.js");
+      const hermes = new HermesAgent(this.whatsapp, null, this.session);
+      await hermes.presentHook();
+      return;
+    }
+
+    // ── QUESTION — user needs help finding it ────────────────
+    if (answer === "QUESTION") {
+      await this.whatsapp.sendText(this.phone,
+        "Entiendo, no se preocupe. El número de factura aparece en su factura original del hospital. Busque:\n\n" +
+        "📄 *Parte superior derecha* de la primera página.\n" +
+        "🔍 Palabras clave: *Invoice #*, *Account #*, *Bill #*, *Statement #*.\n" +
+        "🔢 Es un código alfanumérico (letras y números), algo como:\n" +
+        "   • `INV-2025-0042`\n" +
+        "   • `ACCT-12345678`\n" +
+        "   • `B-9876543`\n\n" +
+        "Si no lo encuentra, puede enviarme otra foto enfocando la esquina superior derecha de la factura y yo lo identifico por usted."
+      );
+      await appendToConversationLog(this.session.id, "user", text);
+      await appendToConversationLog(this.session.id, "assistant", "Invoice gate: guided user to find invoice");
+      return;
+    }
+
+    // ── UNRELATED — user is off-topic ────────────────────────
+    if (answer === "UNRELATED") {
+      await this.whatsapp.sendText(this.phone,
+        "Antes de continuar, necesito un dato importante de su factura:\n\n" +
+        "📋 *El número de factura (Invoice # o Account #)*\n\n" +
+        "Aparece en la esquina superior derecha de su factura original. " +
+        "Sin este número, el hospital no puede identificar su caso.\n\n" +
+        "¿Podría revisar su factura y enviármelo?"
       );
       return;
     }
 
-    // Save invoice ID to session
-    const facturaId = trimmed.toUpperCase();
-    await pool.query(
-      `UPDATE sessions 
-       SET factura_id = $2, state = 'analyzed', updated_at = NOW() 
-       WHERE id = $1`,
-      [this.session.id, facturaId]
+    // ── STALLING / AMBIGUOUS / DEFAULT ───────────────────────
+    await this.whatsapp.sendText(this.phone,
+      "Cuando esté listo, envíeme el número de factura. " +
+      "Está en su factura original, en la parte superior derecha. " +
+      "Es algo como *INV-2025-0042* o *Account #: 12345678*."
     );
-    this.session.factura_id = facturaId;
-    this.session.state = "analyzed";
+  }
 
-    // Also update analysis_result with factura_id
-    const analysis = this.session.analysis_result || {};
-    analysis.factura_id = facturaId;
-    await pool.query(
-      `UPDATE sessions SET analysis_result = $2 WHERE id = $1`,
-      [this.session.id, JSON.stringify(analysis)]
+  async _askForInvoiceAgain() {
+    await this.whatsapp.sendText(this.phone,
+      "No logré identificar el número de factura en su mensaje. ¿Podría escribirlo exactamente como aparece en su factura?\n\n" +
+      "Por ejemplo: *INV-2025-0042* o *ABC-12345678*"
     );
-    this.session.analysis_result = analysis;
-
-    await this.whatsapp.sendText(this.phone, `¡Perfecto! Número de factura *${facturaId}* registrado. ✅\n\nAhora continúo con el análisis...`);
-    await appendToConversationLog(this.session.id, "user", text);
-    await appendToConversationLog(this.session.id, "assistant", `Invoice received: ${facturaId}`);
-
-    // Continue to hook (FASE 3)
-    const { HermesAgent } = await import("./hermes.js");
-    const hermes = new HermesAgent(this.whatsapp, null, this.session);
-    await hermes.presentHook();
   }
 
   // ===========================================================================
