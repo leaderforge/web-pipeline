@@ -236,11 +236,10 @@ app.post("/webhook/calls", async (req, res) => {
       res.status(200).json([]); // ack immediately
 
       const TELNYX_API_KEY = process.env.TELNYX_API_KEY || "";
-      const DANIEL_PHONE = process.env.DANIEL_PERSONAL_PHONE || "+19517336105";
-      const MEDILLA_TFN = process.env.MEDILLA_TFN || "+18888090921";
+      const DANIEL_PHONE = process.env.DANIEL_PERSONAL_PHONE || "+195****6105";
 
-      // 1. Create outbound call to Daniel
-      console.log(`📞 Dialing Daniel at ${DANIEL_PHONE}...`);
+      // 1. Create outbound call to Daniel using the number the customer dialed as caller ID
+      console.log(`📞 Dialing Daniel at ${DANIEL_PHONE} from ${dialedNumber}...`);
       const dialRes = await fetch("https://api.telnyx.com/v2/calls", {
         method: "POST",
         headers: {
@@ -249,9 +248,8 @@ app.post("/webhook/calls", async (req, res) => {
         },
         body: JSON.stringify({
           to: DANIEL_PHONE,
-          from: MEDILLA_TFN,
+          from: dialedNumber,
           connection_id: payload.connection_id || "",
-          // Use the incoming call's answer bridge
         }),
       });
 
