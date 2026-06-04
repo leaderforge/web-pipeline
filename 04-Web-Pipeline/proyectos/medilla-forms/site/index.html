@@ -653,15 +653,52 @@ tailwind.config = {
   exitPopup.style.pointerEvents = 'none';
   document.body.appendChild(exitPopup);
 
+  // Desktop exit intent — mouse leaves viewport top
   document.addEventListener('mouseout', function(e) {
     if (exitShown) return;
-    if (e.clientY > 10) return; // Only trigger when mouse actually leaves the top
+    if (e.clientY > 10) return;
     exitShown = true;
     exitPopup.style.pointerEvents = 'auto';
     exitPopup.style.opacity = '1';
     var inner = exitPopup.querySelector('div > div');
     if (inner) inner.style.transform = 'scale(1)';
   });
+
+  // Mobile exit intent — rapid scroll-up after deep scroll
+  var lastScrollY = 0;
+  var lastScrollTime = Date.now();
+  var deepScrolled = false;
+  var ticking = false;
+  document.addEventListener('scroll', function() {
+    if (exitShown || ticking) return;
+    ticking = true;
+    requestAnimationFrame(function() {
+      var now = Date.now();
+      var sy = window.scrollY;
+      var docH = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = docH > 0 ? sy / docH : 0;
+
+      if (pct > 0.50) deepScrolled = true;
+
+      if (deepScrolled) {
+        var delta = lastScrollY - sy;       // + = scrolling up
+        var dt = (now - lastScrollTime) / 1000; // seconds
+        var speed = dt > 0 ? delta / dt : 0;   // px/s
+
+        if (delta > 80 && speed > 400) {
+          exitShown = true;
+          exitPopup.style.pointerEvents = 'auto';
+          exitPopup.style.opacity = '1';
+          var inner = exitPopup.querySelector('div > div');
+          if (inner) inner.style.transform = 'scale(1)';
+        }
+      }
+
+      lastScrollY = sy;
+      lastScrollTime = now;
+      ticking = false;
+    });
+  }, {passive: true});
 })();</script>
 
 </body>
