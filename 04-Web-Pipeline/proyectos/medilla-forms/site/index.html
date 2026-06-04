@@ -126,13 +126,18 @@ tailwind.config = {
   }
 
   .social-link {
-    width:40px; height:40px;
+    width:44px; height:44px;
     display:flex; align-items:center; justify-content:center;
     border-radius:50%;
     transition:all 0.3s var(--ease-spring);
+    background:rgba(255,255,255,0.08);
     color:#94a3b8;
   }
-  .social-link:hover { background:rgba(0,0,0,0.05); color:#0f172a; transform:scale(1.1); }
+  .social-link:hover { background:rgba(255,255,255,0.15); transform:scale(1.15); }
+  .social-link.ig:hover { color:#E4405F; background:rgba(228,64,95,0.15); }
+  .social-link.fb:hover { color:#1877F2; background:rgba(24,119,242,0.15); }
+  .social-link.wa:hover { color:#25D366; background:rgba(37,211,102,0.15); }
+  .social-link.tk:hover { color:#ff0050; background:rgba(255,0,80,0.15); }
 </style>
 </head>
 
@@ -183,9 +188,7 @@ tailwind.config = {
             <source src="assets/video/animation-reveal.webm" type="video/webm">
             <source src="assets/video/animation-reveal.mp4" type="video/mp4">
           </video>
-          <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);color:white;padding:6px 16px;border-radius:50px;font-size:12px;font-weight:600;white-space:nowrap;">
-            Sofía revisando su factura en WhatsApp
-          </div>
+
         </div>
 
         <div class="space-y-2.5">
@@ -202,7 +205,7 @@ tailwind.config = {
           <span class="hidden sm:block w-px h-5 bg-slate-200"></span>
           <span class="flex items-center gap-1.5"><i class="ph ph-lock-simple text-brand-500 text-[16px]"></i>Tus datos seguros</span>
           <span class="hidden sm:block w-px h-5 bg-slate-200"></span>
-          <span class="flex items-center gap-1.5"><i class="ph ph-clock-counter-clockwise text-brand-500 text-[16px]"></i>7 días de garantía</span>
+
         </div>
       </div>
 
@@ -352,7 +355,7 @@ tailwind.config = {
     <div class="reveal text-center mb-10">
       <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700 mb-4">Qué incluye</span>
       <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] leading-[1.12] tracking-[-0.02em] mb-3">
-        Esto es lo que encuentras cuando<br class="hidden sm:block">revisamos tu factura
+        Esto es lo que encuentras<br class="hidden sm:block">cuando revisamos tu factura
       </h2>
     </div>
 
@@ -485,7 +488,7 @@ tailwind.config = {
 
       <div class="reveal reveal-d3"><div class="card">
         <p class="font-semibold text-[15px] mb-1">«Suena demasiado bueno.»</p>
-        <p class="text-[14px] text-slate-500">Por eso el análisis es <strong>gratis.</strong> No pagas hasta ver qué encontramos. 7 días de garantía de devolución.</p>
+        <p class="text-[14px] text-slate-500">Por eso el análisis es <strong>gratis.</strong> No pagas hasta ver qué encontramos.</p>
       </div></div>
     </div>
   </div>
@@ -511,7 +514,7 @@ tailwind.config = {
       <div class="card text-center py-5 px-8 min-w-[160px]"><p class="text-[12px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Ahorro típico</p><p class="font-display font-bold text-[2.2rem] text-emerald-600">$500–<br>$5,000</p><p class="text-[12px] text-slate-400">por factura</p></div>
     </div>
 
-    <p class="text-[14px] text-slate-400 max-w-[500px] mx-auto">100x de retorno promedio. <strong class="text-deep">7 días de garantía.</strong></p>
+    <p class="text-[14px] text-slate-400 max-w-[500px] mx-auto">Ahorro típico basado en facturas con errores.</p>
 
     <div class="pt-3 space-y-3">
       <a href="https://wa.me/12139054680?text=Hola%2C%20quiero%20revisar%20mi%20factura%20m%C3%A9dica" target="_blank" rel="noopener" class="btn-wa bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-[16px] sm:text-[18px] px-7 py-4 rounded-full shadow-[0_4px_32px_rgba(37,211,102,0.35)] no-underline w-full sm:w-auto">
@@ -567,15 +570,18 @@ tailwind.config = {
         <p class="text-slate-400 text-[13px] leading-relaxed max-w-[240px]">Servicio educativo de análisis de facturas médicas para la comunidad hispana en EE.UU.</p>
 
         <!-- Social Media -->
-        <div class="flex items-center gap-2 mt-4">
-          <a href="https://www.instagram.com/medillaforms" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">
-            <i class="ph ph-instagram-logo text-[20px]"></i>
+        <div class="flex items-center gap-3 mt-4">
+          <a href="https://www.instagram.com/medillaforms" target="_blank" rel="noopener" class="social-link ig" aria-label="Instagram">
+            <i class="ph ph-instagram-logo text-[24px]"></i>
           </a>
-          <a href="https://www.facebook.com/medillaforms" target="_blank" rel="noopener" class="social-link" aria-label="Facebook">
-            <i class="ph ph-facebook-logo text-[20px]"></i>
+          <a href="https://www.facebook.com/medillaforms" target="_blank" rel="noopener" class="social-link fb" aria-label="Facebook">
+            <i class="ph ph-facebook-logo text-[24px]"></i>
           </a>
-          <a href="https://wa.me/12139054680" target="_blank" rel="noopener" class="social-link" aria-label="WhatsApp">
-            <i class="ph ph-whatsapp-logo text-[20px]"></i>
+          <a href="https://www.tiktok.com/@medillaforms" target="_blank" rel="noopener" class="social-link tk" aria-label="TikTok">
+            <i class="ph ph-tiktok-logo text-[24px]"></i>
+          </a>
+          <a href="https://wa.me/12139054680" target="_blank" rel="noopener" class="social-link wa" aria-label="WhatsApp">
+            <i class="ph ph-whatsapp-logo text-[24px]"></i>
           </a>
         </div>
       </div>
@@ -584,23 +590,23 @@ tailwind.config = {
         <p class="font-semibold text-white text-[13px] uppercase tracking-wider mb-3">Contacto</p>
         <div class="space-y-2.5 text-[13px] text-slate-400">
           <p class="flex items-center gap-2"><i class="ph ph-whatsapp-logo text-green-400 text-[15px]"></i>+1 (213) 905-4680</p>
-          <p class="flex items-center gap-2"><i class="ph ph-envelope text-slate-500 text-[15px]"></i>ayuda@medillaforms.com</p>
+          <p class="flex items-center gap-2"><i class="ph ph-envelope text-slate-500 text-[15px]"></i>contact@medillaforms.com</p>
         </div>
       </div>
 
       <div>
         <p class="font-semibold text-white text-[13px] uppercase tracking-wider mb-3">Legal</p>
         <div class="space-y-2 text-[13px]">
-          <a href="#" class="block text-slate-400 hover:text-white transition-colors">Términos y Condiciones</a>
-          <a href="#" class="block text-slate-400 hover:text-white transition-colors">Política de Privacidad</a>
-          <a href="#" class="block text-slate-400 hover:text-white transition-colors">Política de Reembolso</a>
+          <a href="terminos.html" class="block text-slate-400 hover:text-white transition-colors">Términos y Condiciones</a>
+          <a href="privacidad.html" class="block text-slate-400 hover:text-white transition-colors">Política de Privacidad</a>
+          <a href="reembolso.html" class="block text-slate-400 hover:text-white transition-colors">Política de Reembolso</a>
         </div>
       </div>
     </div>
 
     <div class="border-t border-white/10 pt-7">
       <p class="text-[12px] text-slate-500 leading-relaxed max-w-[720px]">
-        <strong>Disclaimer:</strong> MedillaForms es un servicio educativo. No somos abogados. La información es de carácter general. Las cartas de disputa son plantillas generadas con asistencia educativa que el cliente revisa, firma y envía. No representamos clientes ante hospitales, aseguradoras, ni tribunales. Resultados varían según cada caso. 7 días de garantía de reembolso.
+        <strong>Disclaimer:</strong> MedillaForms es un servicio de generación de documentos educativos. No somos abogados ni firma legal. Las cartas de disputa son plantillas generadas con asistencia tecnológica que el cliente revisa, firma y envía bajo su propia responsabilidad. No representamos clientes ante hospitales, aseguradoras, ni tribunales. Los resultados varían según cada caso y dependen exclusivamente de las políticas del proveedor médico.
       </p>
       <p class="text-[12px] text-slate-600 mt-3">© 2026 MedillaForms. Todos los derechos reservados.</p>
     </div>
@@ -639,7 +645,7 @@ tailwind.config = {
   var exitShown = false;
   var exitPopup = document.createElement('div');
   exitPopup.id = 'exit-popup';
-  exitPopup.innerHTML = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.4s cubic-bezier(0.32,0.72,0,1)"><div style="background:#fff;border-radius:1.5rem;padding:2rem 1.5rem;max-width:380px;width:100%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1)"><button onclick="document.getElementById(\'exit-popup\').style.opacity=\'0\';setTimeout(function(){document.getElementById(\'exit-popup\').remove()},400)" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:4px 8px">&times;</button><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px">Oferta especial</span><p style="font-family:\'Clash Display\',\'Plus Jakarta Sans\',sans-serif;font-weight:700;font-size:1.6rem;line-height:1.15;color:#0f172a;margin-bottom:8px">¡Espera!</p><p style="color:#64748b;font-size:15px;line-height:1.5;margin-bottom:20px">Llévate tus dos cartas de disputa por <strong style="color:#0d9488">$24 USD</strong> en vez de $29.</p><a href="https://buy.stripe.com/test_bJe28ldVa5B78ZRblU0RG05" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#0f172a;color:#fff;font-weight:600;font-size:15px;padding:12px 28px;border-radius:50px;text-decoration:none;transition:all 0.3s">Pagar $24 USD <span style="font-size:14px">→</span></a><p style="color:#94a3b8;font-size:11px;margin-top:12px">Pago seguro con Stripe · 7 días de garantía</p></div></div>';
+  exitPopup.innerHTML = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.4s cubic-bezier(0.32,0.72,0,1)"><div style="background:#fff;border-radius:1.5rem;padding:2rem 1.5rem;max-width:380px;width:100%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1)"><button onclick="document.getElementById(\'exit-popup\').style.opacity=\'0\';setTimeout(function(){document.getElementById(\'exit-popup\').remove()},400)" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:4px 8px">&times;</button><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px">Oferta especial</span><p style="font-family:\'Clash Display\',\'Plus Jakarta Sans\',sans-serif;font-weight:700;font-size:1.6rem;line-height:1.15;color:#0f172a;margin-bottom:8px">¡Espera!</p><p style="color:#64748b;font-size:15px;line-height:1.5;margin-bottom:20px">Llévate tus dos cartas de disputa por <strong style="color:#0d9488">$24 USD</strong> en vez de $29.</p><a href="https://buy.stripe.com/test_bJe28ldVa5B78ZRblU0RG05" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#0f172a;color:#fff;font-weight:600;font-size:15px;padding:12px 28px;border-radius:50px;text-decoration:none;transition:all 0.3s">Pagar $24 USD <span style="font-size:14px">→</span></a><p style="color:#94a3b8;font-size:11px;margin-top:12px">Pago seguro con Stripe</p></div></div>';
   exitPopup.style.opacity = '0';
   exitPopup.style.position = 'fixed';
   exitPopup.style.inset = '0';
