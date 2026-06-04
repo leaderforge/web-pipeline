@@ -182,17 +182,18 @@ export class CloserAgent {
   // ===========================================================================
   async _sendInstructions() {
     const hospital = this.session.hospital_name || "el hospital";
+    const facturaId = this.session.factura_id || "su número de factura";
 
     await this.whatsapp.sendText(this.phone,
       `📝 *Instrucciones para enviar su disputa:*\n\n` +
       `1️⃣ Imprima la carta en INGLÉS (la segunda imagen)\n` +
       `2️⃣ Fírmela debajo del nombre que ya aparece en la carta\n` +
-      `3️⃣ Puede enviarla de dos formas:\n` +
-      `   • *Correo certificado* al departamento de facturación de *${hospital}* (recomendado — tiene comprobante de entrega)\n` +
-      `   • *En persona* en la ventanilla de facturación del hospital (pida que le sellen una copia como recibido)\n` +
-      `4️⃣ Guarde el comprobante de envío o la copia sellada\n` +
-      `5️⃣ Conserve una copia de la carta firmada\n\n` +
-      `El hospital suele responder en un plazo de 30 días.\n\n` +
+      `3️⃣ Busque en su factura original la *dirección de facturación* de *${hospital}* (aparece como \"Billing Department\", \"Remitir pagos a\" o \"Payment Address\")\n` +
+      `4️⃣ Meta la carta firmada en un sobre y escriba esa dirección\n` +
+      `5️⃣ Envíela por *correo certificado* (Certified Mail) en cualquier oficina de USPS. Cuesta ~$5 y le dan comprobante de entrega\n` +
+      `6️⃣ Guarde el comprobante y una copia de la carta firmada\n\n` +
+      `El hospital tiene 30 días para responder por ley.\n\n` +
+      `*Su número de factura:* \`${facturaId}\` — inclúyalo si el hospital se lo pide.\n\n` +
       `¿Tiene alguna duda sobre el proceso?`
     );
   }
@@ -305,7 +306,7 @@ export class CloserAgent {
       "dinero", "cancel", "money back", "return",
     ])) {
       await this.whatsapp.sendText(this.phone,
-        "Entiendo. Proceso su devolución sin problema — tiene 7 días de garantía.\n\n" +
+        "Entiendo. Proceso su devolución sin problema.\n\n" +
         "¿Me diría brevemente por qué el servicio no fue lo que esperaba? Me ayuda a mejorar."
       );
       await telegram.sendMessage(

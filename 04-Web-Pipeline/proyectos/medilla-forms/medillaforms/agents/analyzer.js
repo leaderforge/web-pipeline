@@ -98,6 +98,56 @@ export class AnalyzerAgent {
       // Extract invoice/bill ID if GPT-4o found it
       const facturaId = enriched.factura_id || null;
 
+      // ═══ INVOICE ID GATE ════════════════════════════════════
+      // If no invoice/account number was detected, STOP and ask user.
+      // Without this, the dispute letter is incomplete — hospitals require it.
+      if (!facturaId) {
+        // Store partial analysis temporarily, mark session as waiting for invoice
+        await pool.query(
+          `UPDATE sessions
+           SET analysis_result = $2,
+               errors_found = $3,
+               potential_savings = $4,
+               total_billed = $5,
+               hospital_name = $6,
+               user_state = $7,
+               patient_name = $8,
+               patient_is_minor = $9,
+               photos = photos || '[]'::jsonb,
+               state = 'awaiting_invoice',
+               updated_at = NOW()
+           WHERE id = $1`,
+          [
+            this.session.id,
+            JSON.stringify(enriched),
+            (enriched.errores_detectados || []).length,
+            enriched.ahorro_total_estimado || 0,
+            enriched.total_facturado || 0,
+            enriched.hospital || "N/A",
+            enriched.estado || "CA",
+            patientName,
+            isMinor,
+          ]
+        );
+
+        // Update local session
+        this.session.analysis_result = enriched;
+        this.session.state = "awaiting_invoice";
+
+        await this.whatsapp.sendText(this.phone,
+          `Revisé sus fotos y ya tengo información valiosa. Pero hay algo que necesito para continuar:\\n\\n` +
+          `📋 *El número de factura (Invoice # o Account #).*\\n\\n` +
+          `Este número aparece en su factura original, generalmente en la esquina superior derecha, con un formato como:\\n` +
+          `• \"Invoice #: INV-2025-0042\"\\n` +
+          `• \"Account #: 12345678\"\\n` +
+          `• \"Bill #: B-9876543\"\\n\\n` +
+          `Es importante porque el hospital lo usa para identificar su caso. Sin él, la carta de disputa no puede ser procesada.\\n\\n` +
+          `*¿Podría revisar su factura y enviarme ese número?*`
+        );
+        await appendToConversationLog(this.session.id, "assistant", "Invoice gate: asking for invoice #");
+        return;
+      }
+
       // Step 5: Save analysis to session
       await pool.query(
         `UPDATE sessions
@@ -207,6 +257,56 @@ export class AnalyzerAgent {
     }
 
     return enriched;
+  }
+
+  // ===========================================================================
+  // Handle invoice number response — user provides Invoice # after gate
+  // ===========================================================================
+  async handleInvoiceResponse(text) {
+    const trimmed = text.trim();
+
+    // Validate it looks like an invoice/account number (alphanumeric, 4-30 chars)
+    const looksLikeInvoice = /^[A-Za-z0-9\-_#]{4,30}$/.test(trimmed);
+
+    if (!looksLikeInvoice) {
+      await this.whatsapp.sendText(this.phone,
+        "Eso no parece un número de factura. Revise su factura original y busque algo como:\n\n" +
+        "• *Invoice #:* INV-2025-0042\n" +
+        "• *Account #:* 12345678\n" +
+        "• *Bill #:* B-9876543\n\n" +
+        "Generalmente está en la esquina superior derecha. ¿Podría intentarlo de nuevo?"
+      );
+      return;
+    }
+
+    // Save invoice ID to session
+    const facturaId = trimmed.toUpperCase();
+    await pool.query(
+      `UPDATE sessions 
+       SET factura_id = $2, state = 'analyzed', updated_at = NOW() 
+       WHERE id = $1`,
+      [this.session.id, facturaId]
+    );
+    this.session.factura_id = facturaId;
+    this.session.state = "analyzed";
+
+    // Also update analysis_result with factura_id
+    const analysis = this.session.analysis_result || {};
+    analysis.factura_id = facturaId;
+    await pool.query(
+      `UPDATE sessions SET analysis_result = $2 WHERE id = $1`,
+      [this.session.id, JSON.stringify(analysis)]
+    );
+    this.session.analysis_result = analysis;
+
+    await this.whatsapp.sendText(this.phone, `¡Perfecto! Número de factura *${facturaId}* registrado. ✅\n\nAhora continúo con el análisis...`);
+    await appendToConversationLog(this.session.id, "user", text);
+    await appendToConversationLog(this.session.id, "assistant", `Invoice received: ${facturaId}`);
+
+    // Continue to hook (FASE 3)
+    const { HermesAgent } = await import("./hermes.js");
+    const hermes = new HermesAgent(this.whatsapp, null, this.session);
+    await hermes.presentHook();
   }
 
   // ===========================================================================

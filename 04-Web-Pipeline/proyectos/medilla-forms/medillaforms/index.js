@@ -738,6 +738,13 @@ async function routeText(phone, text, session, returningContext = "") {
       break;
     }
 
+    case "awaiting_invoice": {
+      // ── User is responding to invoice ID request ──
+      const analyzer = new AnalyzerAgent(whatsapp, openai, session);
+      await analyzer.handleInvoiceResponse(text);
+      break;
+    }
+
     case "analyzing":
     case "analyzed": {
       // User sent text while analyzing or between analysis and hook
