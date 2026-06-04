@@ -111,26 +111,28 @@ export class HermesAgent {
   // ===========================================================================
   async handlePaymentChoice(text) {
     const textLower = text.toLowerCase();
+    const amount = this.session.amount || 29;
+    const isDiscount = amount === 24;
 
     // User chose Stripe
     if (textLower.includes("tarjeta") || textLower.includes("stripe") || textLower.includes("1") ||
         textLower.includes("crédito") || textLower.includes("debito") || textLower.includes("card")) {
-      return await this._handleStripeChoice();
+      return await this._handleStripeChoice(isDiscount);
     }
 
     // User chose Zelle
     if (textLower.includes("zelle") || textLower.includes("2") || textLower.includes("transferencia")) {
-      return await this._handleZelleChoice();
+      return await this._handleZelleChoice(amount);
     }
 
     // User is still deciding — present options
     if (textLower.includes("opciones") || textLower.includes("cómo pago") || textLower.includes("como pago") ||
         textLower.includes("pagar") || textLower.includes("método")) {
-      const zelleInfo = zelle.getPaymentInstructions();
+      const zelleInfo = zelle.getPaymentInstructions(amount);
       await this.whatsapp.sendText(this.phone,
         `Tiene dos opciones:\n\n` +
         `1️⃣ Tarjeta de crédito/débito — Procesamiento automático e inmediato.\n\n` +
-        `2️⃣ Zelle:\nNúmero: ${zelleInfo.phone}\nNombre: ${zelleInfo.name}\nMonto: $29.00\n` +
+        `2️⃣ Zelle:\nNúmero: ${zelleInfo.phone}\nNombre: ${zelleInfo.name}\nMonto: $${amount}.00\n` +
         `Una vez realizada la transferencia, avíseme y verificaremos su pago para continuar.\n\n` +
         `¿Cómo prefiere realizar su pago?`
       );
@@ -148,12 +150,12 @@ export class HermesAgent {
   // ===========================================================================
   // Handle Stripe payment choice
   // ===========================================================================
-  async _handleStripeChoice() {
+  async _handleStripeChoice(isDiscount = false) {
     try {
       const checkoutUrl = await stripeSvc.createCheckoutSession(
         this.phone,
         this.session.id,
-        false
+        isDiscount
       );
 
       await this.whatsapp.sendText(this.phone,
@@ -175,7 +177,7 @@ export class HermesAgent {
       await telegramSvc.alertStripeFailure(e.message);
       await this.whatsapp.sendText(this.phone,
         "Disculpe, hubo un problema al generar el link de pago. ¿Quiere intentar con Zelle mientras tanto?\n\n" +
-        `Zelle: ${zelle.phone} / ${zelle.name} / $29.00`
+        `Zelle: ${zelle.phone} / ${zelle.name} / $${this.session.amount || 29}.00`
       );
     }
   }
@@ -183,8 +185,8 @@ export class HermesAgent {
   // ===========================================================================
   // Handle Zelle payment choice
   // ===========================================================================
-  async _handleZelleChoice() {
-    const zelleInfo = zelle.getPaymentInstructions();
+  async _handleZelleChoice(amount = 29) {
+    const zelleInfo = zelle.getPaymentInstructions(amount);
 
     await this.whatsapp.sendText(this.phone,
       `Perfecto. Una vez que realice la transferencia, avíseme aquí y estaremos verificando su pago.\n\n` +

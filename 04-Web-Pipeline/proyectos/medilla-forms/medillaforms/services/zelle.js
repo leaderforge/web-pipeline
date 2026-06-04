@@ -13,13 +13,14 @@ class ZelleService {
 
   /**
    * Get Zelle payment instructions for the user.
+   * @param {number} amount - Payment amount (default 29)
    */
-  getPaymentInstructions() {
+  getPaymentInstructions(amount = 29) {
     return {
       phone: this.phone,
       name: this.name,
-      amount: this.amount,
-      message: `Zelle:\nNúmero: ${this.phone}\nNombre: ${this.name}\nMonto: $${this.amount.toFixed(2)}\n\nUna vez realizada la transferencia, avíseme aquí y verificaremos su pago para continuar.`,
+      amount: amount,
+      message: `Zelle:\nNúmero: ${this.phone}\nNombre: ${this.name}\nMonto: $${amount.toFixed(2)}\n\nUna vez realizada la transferencia, avíseme aquí y verificaremos su pago para continuar.`,
     };
   }
 

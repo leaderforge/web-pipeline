@@ -133,9 +133,10 @@ class TelegramService {
   // 💰 Zelle pending notification
   // ---------------------------------------------------------------------------
   async notifyZellePending(session) {
+    const amount = session.amount || 29;
     await this.sendMessage(
       `💰 <b>Zelle pendiente — MedillaForms</b>\n\n` +
-      `Monto esperado: <b>$29.00</b>\n` +
+      `Monto esperado: <b>$${amount}.00</b>\n` +
       `WhatsApp: ${this._formatWhatsAppLink(session.whatsapp_number)}\n` +
       `Hospital: ${session.hospital_name || "No analizado aún"}\n` +
       `Errores: ${session.errors_found || "No analizado aún"}\n` +

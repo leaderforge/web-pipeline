@@ -26,6 +26,22 @@ export class IntakeAgent {
     const msgCount = (this.session.conversation_log || []).length;
     const textLower = text.toLowerCase();
 
+    // ═══ DETECT $24 EXIT INTENT ═══════════════════════════════
+    // If user clicked the exit popup on the landing page, they arrive
+    // with "Hola, vi la oferta de $24 USD" — tag session with discount
+    if (textLower.includes("$24") || textLower.includes("24 usd") ||
+        textLower.includes("oferta de 24") || textLower.includes("24 dólares") ||
+        textLower.includes("descuento") || textLower.includes("exit intent")) {
+      if (!this.session.amount || this.session.amount === 29) {
+        await pool.query(
+          `UPDATE sessions SET amount = 24, updated_at = NOW() WHERE id = $1`,
+          [this.session.id]
+        );
+        this.session.amount = 24;
+        console.log(`🏷️ Session ${this.session.id.slice(0,8)} tagged as $24 exit intent`);
+      }
+    }
+
     // --- First message (or returning user after 24h+) ---
     if (msgCount <= 1 || returningContext) {
       await this._sendWelcome(returningContext);
