@@ -242,8 +242,22 @@ async function handleLandingPayment(stripeSession) {
       return;
     }
 
-    // Normalize phone number
-    const phone = rawPhone.replace(/[\s\-\(\)]/g, "");
+    // Normalize phone number to international WhatsApp format
+    // Stripe custom field is free-text → users type many formats
+    let phone = rawPhone.replace(/[^\d+]/g, ""); // Strip all except digits and +
+    
+    // Handle common US formats
+    if (/^\d{10}$/.test(phone)) {
+      // 10 digits, no country code → prepend +1
+      phone = "+1" + phone;
+    } else if (/^1\d{10}$/.test(phone)) {
+      // 11 digits starting with 1 → add + prefix
+      phone = "+" + phone;
+    } else if (/^\d{11}$/.test(phone) && !phone.startsWith("1")) {
+      // 11 digits not starting with 1 → add + prefix
+      phone = "+" + phone;
+    }
+    // If already in +XXX format, keep as-is
 
     // Determine which amount was paid
     const amount = stripeSession.metadata?.amount
