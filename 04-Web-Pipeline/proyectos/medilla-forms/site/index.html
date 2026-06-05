@@ -666,25 +666,20 @@ src="https://www.facebook.com/tr?id=1013474687698574&ev=PageView&noscript=1"
   var exitShown = false;
   var exitPopup = document.createElement('div');
   exitPopup.id = 'exit-popup';
-  exitPopup.innerHTML = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.4s cubic-bezier(0.32,0.72,0,1)"><div style="background:#fff;border-radius:1.5rem;padding:2rem 1.5rem;max-width:380px;width:100%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1)"><button onclick="document.getElementById(\'exit-popup\').style.opacity=\'0\';setTimeout(function(){document.getElementById(\'exit-popup\').remove()},400)" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:4px 8px">&times;</button><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px">Oferta especial</span><p style="font-family:\'Clash Display\',\'Plus Jakarta Sans\',sans-serif;font-weight:700;font-size:1.6rem;line-height:1.15;color:#0f172a;margin-bottom:8px">¡Espera!</p><p style="color:#64748b;font-size:15px;line-height:1.5;margin-bottom:20px">Llévate tus dos cartas de disputa por <strong style="color:#0d9488">$24 USD</strong> en vez de $29.</p><a href="https://wa.me/12139054680?text=Hola%2C%20vi%20la%20oferta%20de%20%2424%20USD" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:600;font-size:15px;padding:12px 28px;border-radius:50px;text-decoration:none;transition:all 0.3s"><i class="ph ph-whatsapp-logo" style="font-size:20px"></i> Hablar por WhatsApp <span style="font-size:14px">→</span></a><p style="color:#94a3b8;font-size:11px;margin-top:12px">Te atendemos al instante · Sin compromiso</p></div></div>';
-  exitPopup.style.opacity = '0';
-  exitPopup.style.position = 'fixed';
-  exitPopup.style.inset = '0';
-  exitPopup.style.zIndex = '9999';
-  exitPopup.style.pointerEvents = 'none';
+  exitPopup.innerHTML = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.4s cubic-bezier(0.32,0.72,0,1)"><div style="background:#fff;border-radius:1.5rem;padding:2rem 1.5rem;max-width:380px;width:100%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1)"><button onclick="var p=document.getElementById(\'exit-popup\');var o=p.firstElementChild;o.style.opacity=\'0\';setTimeout(function(){p.style.display=\'none\'},400)" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:4px 8px">&times;</button><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px">Oferta especial</span><p style="font-family:\'Clash Display\',\'Plus Jakarta Sans\',sans-serif;font-weight:700;font-size:1.6rem;line-height:1.15;color:#0f172a;margin-bottom:8px">¡Espera!</p><p style="color:#64748b;font-size:15px;line-height:1.5;margin-bottom:20px">Llévate tus dos cartas de disputa por <strong style="color:#0d9488">$24 USD</strong> en vez de $29.</p><a href="https://wa.me/12139054680?text=Hola%2C%20vi%20la%20oferta%20de%20%2424%20USD" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:600;font-size:15px;padding:12px 28px;border-radius:50px;text-decoration:none;transition:all 0.3s"><i class="ph ph-whatsapp-logo" style="font-size:20px"></i> Hablar por WhatsApp <span style="font-size:14px">→</span></a><p style="color:#94a3b8;font-size:11px;margin-top:12px">Te atendemos al instante · Sin compromiso</p></div></div>';
+  exitPopup.style.display = 'none';
   document.body.appendChild(exitPopup);
 
   // Desktop exit intent — mouse truly leaves the document (not just a child element)
-  document.addEventListener('mouseout', function(e) {
+  document.documentElement.addEventListener('mouseleave', function(e) {
     if (exitShown) return;
-    // e.relatedTarget === null → mouse left the entire document
-    // e.clientY <= 5 → exited through the TOP edge
-    if (!e.relatedTarget && e.clientY <= 5) {
+    if (e.clientY <= 5) {
       exitShown = true;
       track('ViewContent',{content_name:'exit_popup_24',content_category:'offer'});
-      exitPopup.style.pointerEvents = 'auto';
-      exitPopup.style.opacity = '1';
-      var inner = exitPopup.querySelector('div > div');
+      exitPopup.style.display = 'block';
+      var overlay = exitPopup.firstElementChild;
+      if (overlay) overlay.style.opacity = '1';
+      var inner = overlay ? overlay.querySelector('div') : null;
       if (inner) inner.style.transform = 'scale(1)';
     }
   });
@@ -720,9 +715,10 @@ src="https://www.facebook.com/tr?id=1013474687698574&ev=PageView&noscript=1"
         if (delta > 40 && speed > 150) {
           exitShown = true;
           track('ViewContent',{content_name:'exit_popup_24_mobile',content_category:'offer'});
-          exitPopup.style.pointerEvents = 'auto';
-          exitPopup.style.opacity = '1';
-          var inner = exitPopup.querySelector('div > div');
+          exitPopup.style.display = 'block';
+          var overlay = exitPopup.firstElementChild;
+          if (overlay) overlay.style.opacity = '1';
+          var inner = overlay ? overlay.querySelector('div') : null;
           if (inner) inner.style.transform = 'scale(1)';
         }
       }
