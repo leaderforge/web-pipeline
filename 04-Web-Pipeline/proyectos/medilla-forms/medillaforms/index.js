@@ -192,7 +192,77 @@ app.post("/webhook/whatsapp", async (req, res) => {
   // Respond 200 immediately — process async
   res.status(200).json({ status: "accepted" });
 
-  // Fire-and-forget processing
+  // ═══════════════════════════════════════════════════════════════
+  // TEXT BUFFER — accumulate rapid-fire messages for 10s before processing
+  // Users often split thoughts across messages ("Sí" → "tarjeta")
+  // This joins them into one coherent message.
+  // ═══════════════════════════════════════════════════════════════
+  const BUF_TIMEOUT = 10_000; // 10 seconds
+  if (!_textBuffer) {
+    // Module-level cache: survives across webhook calls
+    globalThis.__medilla_textBuffer = new Map();
+  }
+  const _textBuffer = globalThis.__medilla_textBuffer;
+
+  // Only buffer plain text — images pass through immediately
+  const isTextOnly = !media || media.length === 0;
+
+  if (isTextOnly && text) {
+    const existing = _textBuffer.get(finalPhone);
+    if (existing) {
+      // Accumulate and reset timer
+      clearTimeout(existing.timer);
+      existing.text += "\n" + text;
+      existing.timer = setTimeout(() => {
+        _textBuffer.delete(finalPhone);
+        const fullText = existing.text;
+        console.log(`📦 Text buffer flushed for ${finalPhone} (${fullText.length} chars)`);
+        processInbound(finalPhone, fullText, [], existing.contactName, "text", `buf_${Date.now()}`).catch((err) => {
+          console.error("❌ processInbound error:", err);
+          telegram.alertServerError(err).catch(() => {});
+        });
+      }, BUF_TIMEOUT);
+      console.log(`📦 Text buffer: appended to ${finalPhone} (${existing.text.length} chars), timer reset`);
+      return;
+    } else {
+      // First message — start timer
+      const entry = {
+        text: text,
+        contactName: contactName,
+        timer: setTimeout(() => {
+          _textBuffer.delete(finalPhone);
+          console.log(`📦 Text buffer flushed for ${finalPhone} (${text.length} chars)`);
+          processInbound(finalPhone, text, [], contactName, "text", `buf_${Date.now()}`).catch((err) => {
+            console.error("❌ processInbound error:", err);
+            telegram.alertServerError(err).catch(() => {});
+          });
+        }, BUF_TIMEOUT),
+      };
+      _textBuffer.set(finalPhone, entry);
+      console.log(`📦 Text buffer: started for ${finalPhone}, waiting ${BUF_TIMEOUT/1000}s`);
+      return;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // IMAGE/MEDIA — flush any pending text first, then process media
+  // ═══════════════════════════════════════════════════════════════
+  if (!isTextOnly) {
+    const pending = _textBuffer.get(finalPhone);
+    if (pending) {
+      clearTimeout(pending.timer);
+      _textBuffer.delete(finalPhone);
+      // Flush pending text WITH the media
+      console.log(`📸 Media received — flushing pending text + processing media for ${finalPhone}`);
+      processInbound(finalPhone, pending.text, media, pending.contactName || contactName, msgType, eventId).catch((err) => {
+        console.error("❌ processInbound error:", err);
+        telegram.alertServerError(err).catch(() => {});
+      });
+      return;
+    }
+  }
+
+  // Fire-and-forget processing (media without pending text)
   processInbound(finalPhone, text, media, contactName, msgType, eventId).catch((err) => {
     console.error("❌ processInbound error:", err);
     telegram.alertServerError(err).catch(() => {});
