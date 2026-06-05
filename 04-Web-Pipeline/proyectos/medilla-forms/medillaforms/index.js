@@ -922,6 +922,24 @@ async function routeText(phone, text, session, returningContext = "") {
 
     case "paid":
     case "delivering": {
+      // ── RACE CONDITION FIX: if payment confirmed + was in delivery,
+      // user likely already got letters → use post-delivery Q&A, not Educator
+      if (session.payment_confirmed && session.errors_found > 0 &&
+          (session.conversation_log || []).some(m =>
+            m && typeof m === "object" && m.role === "assistant" &&
+            String(m.content || "").includes("Instrucciones para enviar")
+          )) {
+        // Letters were already sent — route to post-delivery Q&A
+        await pool.query(
+          `UPDATE sessions SET state = 'delivered', updated_at = NOW() WHERE id = $1`,
+          [session.id]
+        );
+        session.state = "delivered";
+        const closer = new CloserAgent(whatsapp, deepseek, stripe, session);
+        await closer.handlePostDelivery(text);
+        break;
+      }
+
       const educator = new EducatorAgent(whatsapp, deepseek, firecrawl, session);
       await educator.handle(text);
       break;

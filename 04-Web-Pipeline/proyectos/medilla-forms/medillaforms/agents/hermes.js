@@ -10,6 +10,7 @@ import { telegram as telegramSvc } from "../services/telegram.js";
 import { deepseek } from "../services/deepseek.js";
 // buildConversationHistory imported above
 import { sanitizeAgentResponse } from "../middleware/legal.js";
+import { getKBContext } from "../services/knowledge.js";
 
 export class HermesAgent {
   constructor(whatsapp, deepseekSvc, session) {
@@ -221,13 +222,33 @@ export class HermesAgent {
 
     // ✅ Payment was just confirmed (by Daniel via Zelle, or Stripe webhook)
     if (this.session.payment_confirmed || this.session.state === 'paid') {
-      await this.whatsapp.sendText(this.phone,
-        "¡Su pago fue confirmado! En un momento le envío sus cartas. 🎉"
+      // Check if letters were already delivered
+      const alreadyDelivered = (this.session.conversation_log || []).some(m =>
+        m && typeof m === "object" && m.role === "assistant" &&
+        String(m.content || "").includes("Instrucciones para enviar")
       );
-      // confirmPayment() already triggered deliverLetters() and sent the WhatsApp
-      // "¡Confirmado!" message. This is the race-condition catch — the customer
-      // messaged right after Daniel confirmed. We just ack and update local state.
-      this.session.state = 'paid';
+
+      if (!alreadyDelivered) {
+        // Letters haven't been delivered yet — trigger delivery
+        await this.whatsapp.sendText(this.phone,
+          "¡Su pago fue confirmado! En un momento le envío sus cartas. 🎉"
+        );
+        const { CloserAgent } = await import("./closer.js");
+        const closer = new CloserAgent(this.whatsapp, this.deepseek, null, this.session);
+        await closer.deliver();
+        return;
+      }
+
+      // Letters already sent — route to post-delivery Q&A
+      await pool.query(
+        `UPDATE sessions SET state = 'delivered', updated_at = NOW() WHERE id = $1`,
+        [this.session.id]
+      );
+      this.session.state = 'delivered';
+      // Fall through: the index.js router will pick up 'delivered' state
+      await this.whatsapp.sendText(this.phone,
+        "¿En qué más puedo ayudarle? 🙂"
+      );
       return;
     }
 
@@ -299,12 +320,17 @@ export class HermesAgent {
       return;
     }
 
-    // General questions — use DeepSeek but with payment-waiting context
+    // General questions — use DeepSeek but with payment-waiting context + KB
     const history = buildConversationHistory(this.session.conversation_log);
+    const kbCtx = getKBContext(text, {
+      state: this.session.user_state || "",
+      hospital_name: this.session.hospital_name || "",
+    });
     const response = await this.deepseek.chat(
       "closer_hook",
       history,
-      text + "\n\n[IMPORTANTE: El cliente está en espera de verificación de pago Zelle. NO prometas que el pago está confirmado. Sé amable y responde su pregunta, pero recuérdale que su pago está siendo verificado y recibirá confirmación pronto.]",
+      text + "\n\n[IMPORTANTE: El cliente está en espera de verificación de pago Zelle. NO prometas que el pago está confirmado. Sé amable y responde su pregunta, pero recuérdale que su pago está siendo verificado y recibirá confirmación pronto.]" +
+      (kbCtx ? `\n\n📚 DATOS OBJETIVOS: ${kbCtx}` : ""),
       { hospital_name: this.session.hospital_name || "" }
     );
     await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(response));

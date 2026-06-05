@@ -7,6 +7,7 @@ import { pool, appendToConversationLog, buildConversationHistory } from "../midd
 import { sanitizeAgentResponse } from "../middleware/legal.js";
 import { deepseek } from "../services/deepseek.js";
 import { firecrawl } from "../services/firecrawl.js";
+import { getKBContext } from "../services/knowledge.js";
 import { CloserAgent } from "./closer.js";
 
 export class EducatorAgent {
@@ -56,16 +57,26 @@ export class EducatorAgent {
       return;
     }
 
-    // User asks a question → try to answer it
+    // User asks a question → KB-first answer
     const answer = await this._answerQuestion(text);
     if (answer) {
       await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(answer));
       await appendToConversationLog(this.session.id, "assistant", answer);
     } else {
-      // Fallback to DeepSeek
+      // Fallback to DeepSeek WITH knowledge base
       const history = buildConversationHistory(this.session.conversation_log);
       const context = this._buildContext();
-      const response = await this.deepseek.chat("educator", history, text, context);
+      const kbCtx = getKBContext(text, {
+        state: this.session.user_state || "",
+        hospital_name: this.session.hospital_name || "",
+        errors_found: String(this.session.errors_found || 0),
+      });
+      const response = await this.deepseek.chat(
+        "educator",
+        history,
+        text + (kbCtx ? `\n\n[BASE DE CONOCIMIENTO: Usa estos datos para responder si aplican]\n${kbCtx}` : ""),
+        context
+      );
       await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(response));
       await appendToConversationLog(this.session.id, "assistant", response);
     }
@@ -75,12 +86,28 @@ export class EducatorAgent {
   // Answer user question — try local KB first, then Firecrawl
   // ===========================================================================
   async _answerQuestion(text) {
-    // First try Firecrawl if it's a specific medical billing question
+    // ═══ BROADENED triggers — search KB + Firecrawl for any billing knowledge question ═══
     const firecrawlTriggers = [
+      // Financial / pricing
       "cuánto cuesta", "cuanto cuesta", "cuál es el precio", "cual es el precio",
       "charity care", "asistencia financiera", "financial assistance",
       "política", "politica", "requisito", "income", "ingreso", "FPL",
       "programa", "program", "elegible", "eligible",
+      // Deadlines / timelines
+      "plazo", "días", "día", "deadline", "cuánto tarda", "cuanto tarda",
+      "tiempo", "semanas", "meses", "año", "timeline", "estatuto",
+      "limitación", "vencimiento", "prescribe",
+      // State protections
+      "ley", "leyes", "protección", "protege", "derecho", "derechos",
+      "balance billing", "sorpresa", "surprise bill",
+      // Billing questions
+      "cpt", "código", "codigo", "medicare", "facturación", "billing",
+      "cargo", "cargos", "duplicado", "error", "disputa", "dispute",
+      // Hospital-specific
+      "hospital", "clínica", "clinica", "requisito del hospital",
+      // Deadlines expanded
+      "cuántos días", "cuantos dias", "fecha límite", "fecha limite",
+      "límite", "limite", "cuándo", "cuando",
     ];
 
     const shouldSearch = firecrawlTriggers.some((t) => text.toLowerCase().includes(t));
@@ -91,6 +118,25 @@ export class EducatorAgent {
         user_state: this.session.user_state || "",
       };
 
+      // 1. Try local KB first
+      const kbCtx = getKBContext(text, context);
+      if (kbCtx) {
+        console.log(`📚 Educator KB hit for: "${text.slice(0, 60)}"`);
+        await this.whatsapp.sendText(this.phone, "Un momento, déjeme verificar esa información... 🔍");
+        await appendToConversationLog(this.session.id, "assistant", "Un momento, déjeme verificar esa información...");
+
+        const history = buildConversationHistory(this.session.conversation_log);
+        const deepseekCtx = this._buildContext();
+        const response = await this.deepseek.chat(
+          "educator",
+          history,
+          text + `\n\n📚 BASE DE CONOCIMIENTO (USA ESTOS DATOS, NO LOS INVENTES):\n${kbCtx}`,
+          deepseekCtx
+        );
+        return sanitizeAgentResponse(response);
+      }
+
+      // 2. Fallback — Firecrawl web search
       await this.whatsapp.sendText(this.phone, "Un momento, déjeme verificar esa información... 🔍");
       await appendToConversationLog(this.session.id, "assistant", "Un momento, déjeme verificar esa información...");
 

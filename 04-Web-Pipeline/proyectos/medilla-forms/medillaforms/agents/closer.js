@@ -10,6 +10,7 @@ import { generateLetters, generateTextLetters } from "../services/generator.js";
 import { sheets } from "../services/sheets.js";
 import { telegram } from "../services/telegram.js";
 import { firecrawl } from "../services/firecrawl.js";
+import { getKBContext } from "../services/knowledge.js";
 
 export class CloserAgent {
   constructor(whatsapp, deepseekSvc, stripeSvc, session) {
@@ -344,6 +345,13 @@ export class CloserAgent {
       state: userState,
     };
 
+    // ═══ LOAD LOCAL KNOWLEDGE BASE ═══
+    const kbContext = getKBContext(text, {
+      state: userState,
+      hospital_name: hospital,
+      errors_found: String(this.session.errors_found || 0),
+    });
+
     // ═══════════════════════════════════════════════════════════
     // CAPA 2 — Manejar según tipo
     // ═══════════════════════════════════════════════════════════
@@ -382,7 +390,8 @@ export class CloserAgent {
         `✅ Cierra SIEMPRE con: "Para determinar si su caso aplica, le recomiendo consultar con un abogado en ${userState}."\n` +
         `✅ Responde de forma cálida y humana.\n` +
         `⛔ NUNCA ofrezcas seguimiento del caso. Nuestro servicio terminó al entregar las cartas.` +
-        factsContext,
+        factsContext +
+        kbContext,
         contextInfo
       );
 
@@ -422,7 +431,8 @@ export class CloserAgent {
         `- NO inventes datos, plazos ni procedimientos.\n` +
         `- Mantén el contexto. NO trates al usuario como nuevo.\n` +
         `⛔ NUNCA ofrezcas seguimiento del caso. Nuestro servicio terminó al entregar las cartas.` +
-        researchContext,
+        researchContext +
+        kbContext,
         contextInfo
       );
 
@@ -437,7 +447,7 @@ export class CloserAgent {
       return;
     }
 
-    // ── GENERAL 💬 → respuesta normal ────────────────────────
+    // ── GENERAL 💬 → respuesta normal con KB ────────────────────────
     const response = await this.deepseek.chat(
       "closer_delivery",
       history,
@@ -447,7 +457,8 @@ export class CloserAgent {
       `Mantén el contexto de la conversación. NO lo trates como nuevo usuario. ` +
       `Ya pagó, ya recibió las cartas.\n` +
       `⛔ NUNCA ofrezcas seguimiento del caso. Nuestro servicio terminó. ` +
-      `Si el usuario no tiene más preguntas, despídete con calidez.`,
+      `Si el usuario no tiene más preguntas, despídete con calidez.` +
+      kbContext,
       contextInfo
     );
 

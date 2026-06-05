@@ -8,6 +8,7 @@ import { addPhoto, confirmPhotos, clearBuffer, getStoredPhotos, getStoredCount, 
 import { deepseek } from "../services/deepseek.js";
 import { openai } from "../services/openai.js";
 import { zelle } from "../services/zelle.js";
+import { getKBContext } from "../services/knowledge.js";
 import { HermesAgent } from "./hermes.js";
 import { AnalyzerAgent } from "./analyzer.js";
 
@@ -135,13 +136,21 @@ export class IntakeAgent {
       return;
     }
 
-    // --- General questions → DeepSeek ---
+    // --- General questions → DeepSeek + KB ---
     const history = buildConversationHistory(this.session.conversation_log);
     const context = {
       user_state: this.session.user_state || "",
       returning_context: returningContext,
     };
-    const response = await this.deepseek.chat("intake", history, text, context);
+    const kbCtx = getKBContext(text, {
+      state: this.session.user_state || "",
+    });
+    const response = await this.deepseek.chat(
+      "intake",
+      history,
+      text + (kbCtx ? `\n\n📚 DATOS OBJETIVOS: ${kbCtx}` : ""),
+      context
+    );
     const cleaned = sanitizeAgentResponse(response);
     await this.whatsapp.sendText(this.phone, cleaned);
     await appendToConversationLog(this.session.id, "assistant", cleaned);
