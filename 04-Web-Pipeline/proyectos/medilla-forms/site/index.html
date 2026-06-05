@@ -674,19 +674,22 @@ src="https://www.facebook.com/tr?id=1013474687698574&ev=PageView&noscript=1"
   exitPopup.style.pointerEvents = 'none';
   document.body.appendChild(exitPopup);
 
-  // Desktop exit intent — mouse leaves viewport top
+  // Desktop exit intent — mouse truly leaves the document (not just a child element)
   document.addEventListener('mouseout', function(e) {
     if (exitShown) return;
-    if (e.clientY > 10) return;
-    exitShown = true;
-    track('ViewContent',{content_name:'exit_popup_24',content_category:'offer'});
-    exitPopup.style.pointerEvents = 'auto';
-    exitPopup.style.opacity = '1';
-    var inner = exitPopup.querySelector('div > div');
-    if (inner) inner.style.transform = 'scale(1)';
+    // e.relatedTarget === null → mouse left the entire document
+    // e.clientY <= 5 → exited through the TOP edge
+    if (!e.relatedTarget && e.clientY <= 5) {
+      exitShown = true;
+      track('ViewContent',{content_name:'exit_popup_24',content_category:'offer'});
+      exitPopup.style.pointerEvents = 'auto';
+      exitPopup.style.opacity = '1';
+      var inner = exitPopup.querySelector('div > div');
+      if (inner) inner.style.transform = 'scale(1)';
+    }
   });
 
-  // Mobile exit intent — rapid scroll-up after deep scroll
+  // Mobile exit intent — scroll-up after scrolling past 40% of page
   var lastScrollY = 0;
   var lastScrollTime = Date.now();
   var deepScrolled = false;
@@ -706,14 +709,15 @@ src="https://www.facebook.com/tr?id=1013474687698574&ev=PageView&noscript=1"
       if (!depth50fired && pct > 0.50) { depth50fired = true; track('ScrollDepth',{percent:50}); }
       if (!depth75fired && pct > 0.75) { depth75fired = true; track('ScrollDepth',{percent:75}); }
 
-      if (pct > 0.50) deepScrolled = true;
+      if (pct > 0.40) deepScrolled = true;
 
       if (deepScrolled) {
         var delta = lastScrollY - sy;       // + = scrolling up
         var dt = (now - lastScrollTime) / 1000; // seconds
-        var speed = dt > 0 ? delta / dt : 0;   // px/s
+        var speed = dt > 0.05 ? delta / dt : 0;   // px/s
 
-        if (delta > 80 && speed > 400) {
+        // Trigger on noticeable scroll-up (40px+ at 150px/s+)
+        if (delta > 40 && speed > 150) {
           exitShown = true;
           track('ViewContent',{content_name:'exit_popup_24_mobile',content_category:'offer'});
           exitPopup.style.pointerEvents = 'auto';
