@@ -78,31 +78,137 @@ export class CloserAgent {
     }
 
     try {
-      // Step 1: Brief education — explain the errors before generating letters
       const analysis = this.session.analysis_result || {};
       const errors = analysis.errores_detectados || [];
+      const totalBilled = analysis.total_facturado || this.session.total_billed || 0;
+      const totalSavings = analysis.ahorro_total_estimado || this.session.potential_savings || 0;
+      const hospitalName = this.session.hospital_name || "el hospital";
+      const facturaId = this.session.factura_id || "su factura";
+      const invoiceNumber = this.session.invoice_number || "";
+
+      // ═══════════════════════════════════════════════════════════
+      // STEP 1: DETAILED PROFESSIONAL ANALYSIS
+      // ═══════════════════════════════════════════════════════════
       if (errors.length > 0) {
-        const errorSummary = errors.map((e, i) =>
-          `${i + 1}. *${e.titulo || "Error detectado"}*: ${(e.descripcion || "").slice(0, 200)}`
-        ).join("\n\n");
+        let analysisMsg = `📋 *ANÁLISIS DE SU FACTURA*
 
-        await this.whatsapp.sendText(this.phone,
-          `Antes de preparar sus cartas, un resumen de lo que encontramos en su factura:\n\n${errorSummary}\n\n` +
-          `*Ahorro total estimado: $${(analysis.ahorro_total_estimado || 0).toLocaleString()}*\n\n` +
-          `Ahora preparo sus cartas. Un momento...`
-        );
-        await appendToConversationLog(this.session.id, "assistant", "Educator: error summary sent");
+`;
+        analysisMsg += `🏥 Hospital: *${hospitalName}*
+`;
+        if (invoiceNumber) analysisMsg += `🧾 Factura #: *${invoiceNumber}*
+`;
+        if (patientName && !isMinor) analysisMsg += `👤 Paciente: *${patientName}*
+`;
+        if (isMinor) analysisMsg += `👤 Paciente (menor): *${patientName}*
+`;
+        analysisMsg += `📊 Total facturado: *$${totalBilled.toLocaleString()}*
+`;
+        analysisMsg += `🔍 Errores encontrados: *${errors.length}*
+`;
+        analysisMsg += `💰 Ahorro estimado total: *$${totalSavings.toLocaleString()}*
 
-        // If charity care applies, mention it
-        if (analysis.charity_care_info) {
-          await this.whatsapp.sendText(this.phone,
-            `💡 Un dato adicional: *${this.session.hospital_name}* tiene un programa de asistencia financiera (charity care). Si sus ingresos son limitados, podría calificar para descuentos importantes.\n\n` +
-            `Es independiente de la disputa — puede aplicar a ambos. ¿Quiere que le explique cómo funciona?`
-          );
+`;
+
+        analysisMsg += `─── ERRORES DETECTADOS ───
+
+`;
+
+        for (let i = 0; i < errors.length; i++) {
+          const e = errors[i];
+          const idx = i + 1;
+          analysisMsg += `*${idx}. ${e.titulo || "Posible error"}*
+`;
+
+          if (e.item_referencia) {
+            analysisMsg += `   📌 Concepto: ${e.item_referencia}
+`;
+          }
+          if (e.descripcion) {
+            analysisMsg += `   📝 ${e.descripcion}
+`;
+          }
+          if (e.precio_facturado && e.precio_referencia) {
+            analysisMsg += `   💵 Facturado: *$${Number(e.precio_facturado).toLocaleString()}* — Referencia: ~$${Number(e.precio_referencia).toLocaleString()}
+`;
+            if (e.ahorro_estimado) {
+              analysisMsg += `   ✅ Ahorro en este cargo: *$${Number(e.ahorro_estimado).toLocaleString()}*
+`;
+            }
+          }
+          if (e.evidencia && e.evidencia !== "—" && e.evidencia !== "N/A") {
+            analysisMsg += `   📚 Fuente: ${e.evidencia.slice(0, 100)}
+`;
+          }
+          analysisMsg += `
+`;
         }
+
+        // State protections
+        if (analysis.state_protections) {
+          const sp = analysis.state_protections;
+          analysisMsg += `─── PROTECCIONES ESTATALES ───
+`;
+          analysisMsg += `📍 Estado: *${sp.name || this.session.user_state}*
+`;
+          if (sp.protections && sp.protections.slice) {
+            sp.protections.slice(0, 3).forEach(p => {
+              analysisMsg += `   • ${p}
+`;
+            });
+          }
+          analysisMsg += `
+`;
+        }
+
+        // Charity care
+        if (analysis.charity_care_info) {
+          const cc = analysis.charity_care_info;
+          analysisMsg += `─── ASISTENCIA FINANCIERA ───
+`;
+          analysisMsg += `🏥 *${cc.name || hospitalName}* tiene programa de asistencia financiera.
+`;
+          if (cc.threshold_fpl) {
+            analysisMsg += `📊 Umbral de ingresos: hasta *${cc.threshold_fpl}*
+`;
+          }
+          if (cc.details) {
+            analysisMsg += `📝 ${cc.details.slice(0, 150)}
+`;
+          }
+          analysisMsg += `
+`;
+        }
+
+        analysisMsg += `💡 _Este análisis es educativo. Revise cada punto y consulte con un profesional si tiene dudas legales._
+
+`;
+        analysisMsg += `Ahora preparo sus cartas de disputa con esta información. Un momento... 📄`;
+
+        await this.whatsapp.sendText(this.phone, analysisMsg);
+        await appendToConversationLog(this.session.id, "assistant", analysisMsg);
+      } else {
+        // No errors found
+        await this.whatsapp.sendText(this.phone,
+          `📋 *ANÁLISIS DE SU FACTURA*
+
+` +
+          `🏥 Hospital: *${hospitalName}*
+` +
+          `📊 Total facturado: *$${totalBilled.toLocaleString()}*
+` +
+          `🔍 Resultado: *No se detectaron errores evidentes de facturación.*
+
+` +
+          `Los códigos y precios están dentro de lo estándar para este tipo de servicios.
+
+` +
+          `De todas formas, aquí están sus cartas. Pueden ser útiles si el hospital le cobró algo que no esperaba.`
+        );
       }
 
-      // Step 2: Generate letters immediately (no intermediate message)
+      // ═══════════════════════════════════════════════════════════
+      // STEP 2: GENERATE LETTERS
+      // ═══════════════════════════════════════════════════════════
       const signerData = {
         name: finalSignerName,
         relationship: finalSignerRel,
@@ -127,35 +233,64 @@ export class CloserAgent {
         const textLetters = generateTextLetters(analysis, signerData);
 
         await this.whatsapp.sendText(this.phone,
-          `📄 *Carta en Español:*\n\n${textLetters.es_text.slice(0, 1500)}`
+          `📄 *Carta en Español:*
+
+${textLetters.es_text.slice(0, 1500)}`
         );
         await this.whatsapp.sendText(this.phone,
-          `📄 *Carta en Inglés:*\n\n${textLetters.en_text.slice(0, 1500)}`
+          `📄 *Carta en Inglés:*
+
+${textLetters.en_text.slice(0, 1500)}`
         );
 
-        // Still give instructions
         await this._sendInstructions();
         await this._reportToSheets();
         return;
       }
 
-      // Step 3: Send Spanish letter
-      await this.whatsapp.sendImage(this.phone, esBuffer,
+      // ═══════════════════════════════════════════════════════════
+      // STEP 3: SEND LETTERS (immediately for adults)
+      // ═══════════════════════════════════════════════════════════
+      // Spanish letter
+      const esResult = await this.whatsapp.sendImage(this.phone, esBuffer,
         "📄 Carta de disputa en ESPAÑOL — para su referencia"
       );
 
-      // Step 4: Send English letter
-      await this.whatsapp.sendImage(this.phone, enBuffer,
+      // English letter
+      const enResult = await this.whatsapp.sendImage(this.phone, enBuffer,
         "📄 Dispute letter in ENGLISH — para enviar al hospital"
       );
 
-      // Step 5: Send instructions
+      // Check if images failed
+      if (!esResult.ok || !enResult.ok) {
+        console.error("❌ Letter image delivery failed — sending text fallback");
+        const textLetters = generateTextLetters(analysis, signerData);
+
+        if (!esResult.ok) {
+          await this.whatsapp.sendText(this.phone,
+            `📄 *Carta en Español (texto):*
+
+${textLetters.es_text.slice(0, 1500)}`
+          );
+        }
+        if (!enResult.ok) {
+          await this.whatsapp.sendText(this.phone,
+            `📄 *Carta en Inglés (texto):*
+
+${textLetters.en_text.slice(0, 1500)}`
+          );
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════
+      // STEP 4: INSTRUCTIONS
+      // ═══════════════════════════════════════════════════════════
       await this._sendInstructions();
 
-      // Step 6: Report to Google Sheets
-      await this._reportToSheets();
+      // Step 5: Report to Google Sheets (non-blocking)
+      this._reportToSheets().catch(e => console.error("Sheets error:", e.message));
 
-      // Step 7: Update session state — keep OPEN for follow-up questions
+      // Step 6: Update state — OPEN for follow-up
       await pool.query(
         `UPDATE sessions
          SET state = 'delivered',
@@ -166,7 +301,7 @@ export class CloserAgent {
       );
       this.session.state = "delivered";
 
-      console.log(`✅ Session ${this.session.id.slice(0, 8)} — letters delivered, session stays open for follow-up`);
+      console.log(`✅ Session ${this.session.id.slice(0, 8)} — detailed analysis + letters delivered`);
 
     } catch (e) {
       console.error("❌ Delivery error:", e);
