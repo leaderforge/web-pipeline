@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedillaForms — Arquitectura Técnica</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a' },
+        warm: '#faf8f5',
+        deep: '#0f172a',
+      },
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"','system-ui','sans-serif'],
+        display: ['"Clash Display"','"Plus Jakarta Sans"','sans-serif'],
+      },
+    }
+  }
+}
+</script>
+
+<style>
+  @page { size: A4; margin: 0; }
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+
+  .section-card {
+    background: #fff;
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.03);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #0d9488, #14b8a6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .arch-node {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.875rem;
+    padding: 1rem 1.25rem;
+    transition: all 0.3s ease;
+  }
+  .arch-node.highlight {
+    border-color: #14b8a6;
+    background: linear-gradient(135deg, #f0fdfa, #fff);
+  }
+  .arch-node.deep {
+    border-color: #0f172a;
+    background: #0f172a;
+    color: #fff;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #cbd5e1, transparent);
+    margin: 2rem 0;
+  }
+
+  .stat-number {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>
+</head>
+<body class="bg-warm text-deep">
+
+<!-- HERO HEADER -->
+<header class="bg-deep text-white px-10 py-10">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.5rem;">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#14b8a6,#0d9488);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-weight:700;font-size:1.25rem;">M</div>
+    <span style="font-family:'Clash Display',sans-serif;font-weight:600;font-size:1.25rem;letter-spacing:-0.02em;">MedillaForms</span>
+  </div>
+  <h1 style="font-family:'Clash Display',sans-serif;font-size:2.25rem;font-weight:700;letter-spacing:-0.03em;line-height:1.15;margin-top:0.75rem;">
+    Arquitectura Técnica <span style="background:linear-gradient(135deg,#2dd4bf,#5eead4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">&</span> Stack Tecnológico
+  </h1>
+  <p style="color:#94a3b8;font-size:1rem;max-width:600px;margin-top:0.5rem;">
+    Sistema multiagente de análisis de facturas médicas con IA — desde WhatsApp hasta servidor propio.
+  </p>
+</header>
+
+<main class="px-10 py-8" style="max-width:900px;">
+
+<!-- SECTION 1: VISIÓN GENERAL -->
+<section class="section-card mb-6">
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+    <span style="font-size:1.5rem;">🏥</span>
+    <h2 style="font-family:'Clash Display',sans-serif;font-size:1.35rem;font-weight:600;">¿Qué resuelve MedillaForms?</h2>
+  </div>
+  <p style="color:#475569;line-height:1.65;font-size:0.925rem;">
+    El <strong>80% de las facturas médicas en EE.UU. contienen errores</strong>. Un paciente hispanohablante recibe una factura de $8,500 sin entender qué significan los códigos CPT, ICD-10 ni NDC. MedillaForms automatiza el análisis completo: el paciente manda una foto por WhatsApp y en 60 segundos recibe —en español— cada error detectado, cada sobrecargo y cuánto podría ahorrar. Si decide proceder, se generan dos cartas de disputa profesionales (español + inglés) por <strong>$29 USD</strong>.
+  </p>
+</section>
+
+<!-- SECTION 2: ARQUITECTURA -->
+<section class="section-card mb-6">
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.5rem;">
+    <span style="font-size:1.5rem;">⚙️</span>
+    <h2 style="font-family:'Clash Display',sans-serif;font-size:1.35rem;font-weight:600;">Arquitectura del Sistema</h2>
+  </div>
+
+  <!-- Architecture Flow -->
+  <div style="display:flex;flex-direction:column;gap:0.75rem;">
+
+    <!-- Row 1: WhatsApp Entry -->
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div class="arch-node highlight" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.2rem;">📱 WhatsApp</div>
+        <div style="font-size:0.75rem;color:#64748b;">Foto de factura + mensaje</div>
+      </div>
+      <span style="color:#94a3b8;font-size:1.5rem;">→</span>
+      <div class="arch-node highlight" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.2rem;">📡 Telnyx API</div>
+        <div style="font-size:0.75rem;color:#64748b;">Webhook inbound/outbound</div>
+      </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div style="text-align:center;color:#94a3b8;font-size:1.2rem;">↓</div>
+
+    <!-- Row 2: Railway -->
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div class="arch-node highlight" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.2rem;">🚂 Railway</div>
+        <div style="font-size:0.75rem;color:#64748b;">Backend Node.js · Webhook · Router</div>
+        <div style="display:flex;gap:0.35rem;justify-content:center;margin-top:0.35rem;flex-wrap:wrap;">
+          <span class="pill" style="background:#dbeafe;color:#1d4ed8;">Express</span>
+          <span class="pill" style="background:#fce7f3;color:#be185d;">Stripe SDK</span>
+          <span class="pill" style="background:#d1fae5;color:#065f46;">Buffer Proxy</span>
+        </div>
+      </div>
+      <span style="color:#94a3b8;font-size:1.5rem;">→</span>
+      <div class="arch-node highlight" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.2rem;">🧠 Claude API</div>
+        <div style="font-size:0.75rem;color:#64748b;">Análisis de códigos médicos</div>
+        <div style="display:flex;gap:0.35rem;justify-content:center;margin-top:0.35rem;flex-wrap:wrap;">
+          <span class="pill" style="background:#fef3c7;color:#92400e;">GPT-4o</span>
+          <span class="pill" style="background:#ede9fe;color:#6d28d9;">DeepSeek</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div style="text-align:center;color:#94a3b8;font-size:1.2rem;">↓</div>
+
+    <!-- Row 3: VPS + Hermes -->
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div class="arch-node deep" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#5eead4;margin-bottom:0.2rem;">🖥️ VPS Propio</div>
+        <div style="font-size:0.75rem;color:#94a3b8;">Linux · PM2 · systemd · NGINX</div>
+      </div>
+      <span style="color:#94a3b8;font-size:1.5rem;">⇄</span>
+      <div class="arch-node deep" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#5eead4;margin-bottom:0.2rem;">🤖 Hermes Agent</div>
+        <div style="font-size:0.75rem;color:#94a3b8;">Orquestador multiagente autónomo</div>
+        <div style="display:flex;gap:0.35rem;justify-content:center;margin-top:0.35rem;flex-wrap:wrap;">
+          <span class="pill" style="background:rgba(255,255,255,0.1);color:#5eead4;">S6 Supervisor</span>
+          <span class="pill" style="background:rgba(255,255,255,0.1);color:#5eead4;">Cron Jobs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div style="text-align:center;color:#94a3b8;font-size:1.2rem;">↓</div>
+
+    <!-- Row 4: Outputs -->
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div class="arch-node" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:0.2rem;">📄 Cartas de Disputa</div>
+        <div style="font-size:0.75rem;color:#64748b;">Español + Inglés · Printer-ready</div>
+      </div>
+      <span style="color:#94a3b8;font-size:1.5rem;">+</span>
+      <div class="arch-node" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:0.2rem;">💳 Stripe Live</div>
+        <div style="font-size:0.75rem;color:#64748b;">$29 USD · Payment Links · Webhooks</div>
+      </div>
+      <span style="color:#94a3b8;font-size:1.5rem;">+</span>
+      <div class="arch-node" style="flex:1;text-align:center;">
+        <div style="font-weight:700;font-size:0.9rem;color:#334155;margin-bottom:0.2rem;">🌐 Vercel Landing</div>
+        <div style="font-size:0.75rem;color:#64748b;">SEO · Pixel Meta · OG Tags</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SECTION 3: STACK DETALLADO -->
+<section class="section-card mb-6">
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+    <span style="font-size:1.5rem;">🧰</span>
+    <h2 style="font-family:'Clash Display',sans-serif;font-size:1.35rem;font-weight:600;">Stack Tecnológico Completo</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+
+    <!-- AI / LLMs -->
+    <div style="background:#f8fafc;border-radius:0.75rem;padding:1.25rem;">
+      <h3 style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.75rem;">🧠 Inteligencia Artificial</h3>
+      <ul style="list-style:none;padding:0;margin:0;font-size:0.825rem;color:#334155;line-height:2;">
+        <li>• <strong>Claude</strong> (Anthropic) — Análisis de códigos CPT/ICD-10/NDC</li>
+        <li>• <strong>GPT-4o</strong> (OpenAI) — Extracción de datos de factura</li>
+        <li>• <strong>DeepSeek</strong> — Razonamiento de pricing regional</li>
+        <li>• <strong>Sistema multiagente</strong> — Intake → Analyzer → Generator</li>
+      </ul>
+    </div>
+
+    <!-- Backend / Infra -->
+    <div style="background:#f8fafc;border-radius:0.75rem;padding:1.25rem;">
+      <h3 style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.75rem;">☁️ Backend & Infraestructura</h3>
+      <ul style="list-style:none;padding:0;margin:0;font-size:0.825rem;color:#334155;line-height:2;">
+        <li>• <strong>Railway</strong> — Deploy serverless Node.js + webhook</li>
+        <li>• <strong>VPS Linux</strong> — Servidor dedicado con PM2 + NGINX</li>
+        <li>• <strong>Hermes Agent</strong> — Agente IA autónomo 24/7</li>
+        <li>• <strong>S6-Overlay</strong> — Supervisión de procesos</li>
+      </ul>
+    </div>
+
+    <!-- Frontend -->
+    <div style="background:#f8fafc;border-radius:0.75rem;padding:1.25rem;">
+      <h3 style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.75rem;">🎨 Frontend & Diseño</h3>
+      <ul style="list-style:none;padding:0;margin:0;font-size:0.825rem;color:#334155;line-height:2;">
+        <li>• <strong>Vercel</strong> — Hosting estático con CDN global</li>
+        <li>• <strong>Tailwind CSS</strong> — Diseño responsive utility-first</li>
+        <li>• <strong>Phosphor Icons</strong> — Iconografía vectorial</li>
+        <li>• <strong>Google Fonts</strong> — Plus Jakarta Sans + Clash Display</li>
+      </ul>
+    </div>
+
+    <!-- APIs & Payments -->
+    <div style="background:#f8fafc;border-radius:0.75rem;padding:1.25rem;">
+      <h3 style="font-weight:700;font-size:0.9rem;color:#0f766e;margin-bottom:0.75rem;">💳 APIs & Pagos</h3>
+      <ul style="list-style:none;padding:0;margin:0;font-size:0.825rem;color:#334155;line-height:2;">
+        <li>• <strong>Stripe</strong> — Payment Links + Webhooks live</li>
+        <li>• <strong>Telnyx</strong> — WhatsApp Business API</li>
+        <li>• <strong>Resend</strong> — Email transaccional</li>
+        <li>• <strong>GitHub</strong> — CI/CD + version control</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- SECTION 4: MARKETING -->
+<section class="section-card mb-6">
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+    <span style="font-size:1.5rem;">📈</span>
+    <h2 style="font-family:'Clash Display',sans-serif;font-size:1.35rem;font-weight:600;">Estrategia de Marketing & Growth</h2>
+  </div>
+
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+
+    <div style="flex:1;min-width:180px;text-align:center;padding:1.25rem 0.75rem;background:#f0fdfa;border-radius:0.875rem;">
+      <div class="stat-number">Meta</div>
+      <div style="font-weight:600;font-size:0.9rem;color:#0f172a;margin-bottom:0.35rem;">Meta Ads + Pixel</div>
+      <p style="font-size:0.75rem;color:#64748b;margin:0;">Segmentación latinos USA · Retargeting · Conversiones</p>
+    </div>
+
+    <div style="flex:1;min-width:180px;text-align:center;padding:1.25rem 0.75rem;background:#f0fdfa;border-radius:0.875rem;">
+      <div class="stat-number">SEO</div>
+      <div style="font-weight:600;font-size:0.9rem;color:#0f172a;margin-bottom:0.35rem;">SEO Técnico</div>
+      <p style="font-size:0.75rem;color:#64748b;margin:0;">OG Tags · Canonical · Sitemap · Schema · Core Web Vitals</p>
+    </div>
+
+    <div style="flex:1;min-width:180px;text-align:center;padding:1.25rem 0.75rem;background:#f0fdfa;border-radius:0.875rem;">
+      <div class="stat-number">Social</div>
+      <div style="font-weight:600;font-size:0.9rem;color:#0f172a;margin-bottom:0.35rem;">Contenido Orgánico</div>
+      <p style="font-size:0.75rem;color:#64748b;margin:0;">Grupos Facebook · TikTok · Comunidades latinas · Video pipeline</p>
+    </div>
+
+    <div style="flex:1;min-width:180px;text-align:center;padding:1.25rem 0.75rem;background:#f0fdfa;border-radius:0.875rem;">
+      <div class="stat-number">Email</div>
+      <div style="font-weight:600;font-size:0.9rem;color:#0f172a;margin-bottom:0.35rem;">Outreach Directo</div>
+      <p style="font-size:0.75rem;color:#64748b;margin:0;">Nonprofits · Iglesias · Restaurantes · Aliados estratégicos</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- SECTION 5: HERRAMIENTAS DE MARKETING -->
+<section class="section-card mb-6">
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+    <span style="font-size:1.5rem;">🛠️</span>
+    <h2 style="font-family:'Clash Display',sans-serif;font-size:1.35rem;font-weight:600;">Herramientas de Marketing Desplegadas</h2>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Meta Pixel (Events Manager)</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Meta Ads Manager</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">WhatsApp Business API</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Stripe Payment Links</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Google Analytics</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Vercel Analytics</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Resend Email API</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Canva Pro</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">TikTok Creator</span>
+    <span class="pill" style="background:#d1fae5;color:#065f46;font-size:0.8rem;padding:0.4rem 0.9rem;">Programa de Referidos</span>
+  </div>
+</section>
+
+<!-- SECTION 6: RESULTADOS -->
+<section class="section-card">
+  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">
+    <span style="font-size:1.5rem;">📊</span>
+    <h2 style="font-family:'Clash Display',sans-serif;font-size:1.35rem;font-weight:600;">Infraestructura Operativa</h2>
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+
+    <div style="flex:1;min-width:140px;text-align:center;">
+      <div class="stat-number">24/7</div>
+      <div style="font-weight:600;font-size:0.85rem;color:#334155;">Disponibilidad</div>
+      <p style="font-size:0.725rem;color:#64748b;">Webhook activo · PM2 · Auto-restart</p>
+    </div>
+
+    <div style="flex:1;min-width:140px;text-align:center;">
+      <div class="stat-number">60s</div>
+      <div style="font-weight:600;font-size:0.85rem;color:#334155;">Análisis IA</div>
+      <p style="font-size:0.725rem;color:#64748b;">Tiempo de respuesta desde foto</p>
+    </div>
+
+    <div style="flex:1;min-width:140px;text-align:center;">
+      <div class="stat-number">3</div>
+      <div style="font-weight:600;font-size:0.85rem;color:#334155;">Modelos IA</div>
+      <p style="font-size:0.725rem;color:#64748b;">Claude · GPT-4o · DeepSeek</p>
+    </div>
+
+    <div style="flex:1;min-width:140px;text-align:center;">
+      <div class="stat-number">5</div>
+      <div style="font-weight:600;font-size:0.85rem;color:#334155;">Servicios Cloud</div>
+      <p style="font-size:0.725rem;color:#64748b;">Railway · Vercel · VPS · Stripe · Telnyx</p>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="display:flex;align-items:flex-start;gap:1rem;background:#f8fafc;border-radius:0.75rem;padding:1.25rem;">
+    <div style="font-size:1.5rem;flex-shrink:0;">🔑</div>
+    <div style="font-size:0.85rem;color:#475569;line-height:1.6;">
+      <strong style="color:#0f766e;">Automatización end-to-end.</strong> El paciente envía una foto por WhatsApp. Un webhook en Railway recibe el mensaje. Claude y GPT-4o analizan los códigos médicos. DeepSeek razona pricing regional. El sistema genera cartas de disputa bilingües. Stripe procesa el pago. Todo opera en un VPS propio supervisado por Hermes Agent — un agente de IA autónomo que orquesta cada paso sin intervención humana.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer style="padding:1.5rem 2.5rem;text-align:center;color:#94a3b8;font-size:0.75rem;border-top:1px solid #e2e8f0;margin-top:0.5rem;">
+  MedillaForms · contact@medillaforms.com · medillaforms.com
+</footer>
+
+</body>
+</html>
