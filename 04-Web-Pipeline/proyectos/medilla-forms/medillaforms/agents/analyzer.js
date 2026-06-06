@@ -214,10 +214,47 @@ export class AnalyzerAgent {
 
     // Enrich each detected error
     if (enriched.errores_detectados) {
-      enriched.errores_detectados = enriched.errores_detectados.map((err) => ({
-        ...err,
-        tipo_descripcion: billingErrors?.error_types?.[`${err.tipo}_${this._getErrorTypeName(err.tipo)}`]?.name || err.tipo,
-      }));
+      enriched.errores_detectados = enriched.errores_detectados.map((err) => {
+        const enriched_err = {
+          ...err,
+          tipo_descripcion: billingErrors?.error_types?.[`${err.tipo}_${this._getErrorTypeName(err.tipo)}`]?.name || err.tipo,
+        };
+
+        // ── VALIDATE precio_referencia against CPT codes ──
+        // If the error has an associated item with a CPT code, cross-check
+        // the reference price against our local CPT database.
+        if (enriched.items && enriched.items.length > 0 && err.item_referencia) {
+          const refLower = err.item_referencia.toLowerCase();
+
+          // Try to find matching CPT code from items
+          for (const item of enriched.items) {
+            const code = item.codigo_cpt;
+            if (code && cptCodes?.codes && cptCodes.codes[code]) {
+              const cptEntry = cptCodes.codes[code];
+              const medicareRate = cptEntry.medicare_rate || 0;
+
+              // Check if item description matches the error reference
+              const itemDesc = (item.descripcion || "").toLowerCase();
+              if (medicareRate > 0 && (itemDesc.includes(refLower.slice(0, 15)) || refLower.includes(itemDesc.slice(0, 15)))) {
+                // Medicare rate found — use 2.5x as reasonable reference
+                const reasonableRef = Math.round(medicareRate * 2.5 * 100) / 100;
+                const gptRef = err.precio_referencia || 0;
+
+                // If GPT-4o's reference is wildly off (>5x the reasonable rate), correct it
+                if (gptRef > reasonableRef * 2 || gptRef < medicareRate * 0.5) {
+                  console.log(`⚠️ Correcting precio_referencia for ${code}: GPT=${gptRef} → CPT-based=${reasonableRef} (Medicare=${medicareRate})`);
+                  enriched_err.precio_referencia = reasonableRef;
+                  enriched_err.evidencia = (enriched_err.evidencia || "") +
+                    ` Tarifa Medicare: $${medicareRate}. Referencia ajustada: $${reasonableRef} (2.5× Medicare).`;
+                }
+                break;
+              }
+            }
+          }
+        }
+
+        return enriched_err;
+      });
     }
 
     // Cross-reference CPT codes

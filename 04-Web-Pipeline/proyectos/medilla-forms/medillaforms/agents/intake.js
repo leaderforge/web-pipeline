@@ -51,6 +51,7 @@ export class IntakeAgent {
 
     // --- Price questions ---
     if (this._matches(textLower, ["cuánto", "cuanto", "precio", "cuesta", "costo", "pago",
+                                   "gratis", "free", "cobran", "cobra", "tarifa",
                                    "how much", "price", "cost", "payment", "fee"])) {
       await this._explainPricing();
       return;

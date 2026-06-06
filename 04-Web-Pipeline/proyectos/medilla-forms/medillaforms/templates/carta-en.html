@@ -3,187 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dispute Letter — MedillaForms</title>
+  <title>Dispute Letter</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Georgia', 'Times New Roman', 'DejaVu Serif', serif;
-      max-width: 750px;
-      margin: 50px auto 30px auto;
-      padding: 0 50px;
+      max-width: 720px;
+      margin: 36px auto 28px auto;
+      padding: 0 44px;
       color: #1a1a1a;
-      line-height: 1.65;
-      font-size: 12.5pt;
+      line-height: 1.5;
+      font-size: 12pt;
     }
 
-    /* ── Sender block (patient name only, no address) ── */
-    .sender {
-      margin-bottom: 28px;
-    }
-    .sender .name {
-      font-size: 14pt;
-      font-weight: bold;
-      color: #1a1a1a;
-    }
-    .sender .care-of {
-      font-size: 10pt;
-      color: #555;
-      margin-top: 2px;
-      font-style: italic;
-    }
+    /* ── Sender block ── */
+    .sender { margin-bottom: 16px; }
+    .sender .name { font-size: 13pt; font-weight: bold; color: #1a1a1a; }
+    .sender .care-of { font-size: 9.5pt; color: #555; margin-top: 1px; font-style: italic; }
 
-    /* ── Date line ── */
-    .date-line {
-      margin-bottom: 28px;
-      color: #1a1a1a;
-    }
-
-    /* ── Reference line ── */
-    .ref-line {
-      margin-bottom: 28px;
-      font-size: 11pt;
-    }
-    .ref-line strong {
-      font-weight: 600;
-    }
+    /* ── Date / Ref ── */
+    .date-line { margin-bottom: 18px; color: #1a1a1a; }
+    .ref-line { margin-bottom: 18px; font-size: 10.5pt; }
+    .ref-line strong { font-weight: 600; }
 
     /* ── Salutation ── */
-    .salutation {
-      margin-bottom: 18px;
-    }
+    .salutation { margin-bottom: 12px; }
 
     /* ── Body text ── */
-    .body-text {
-      margin-bottom: 12px;
-      text-align: justify;
-    }
+    .body-text { margin-bottom: 8px; text-align: justify; font-size: 11.5pt; }
 
     /* ── Section heading ── */
     .section-heading {
-      font-size: 11pt;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #1a1a1a;
-      border-bottom: 1px solid #333;
-      padding-bottom: 5px;
-      margin: 24px 0 12px 0;
+      font-size: 10.5pt; font-weight: bold; text-transform: uppercase;
+      letter-spacing: 0.4px; color: #1a1a1a;
+      border-bottom: 1px solid #333; padding-bottom: 4px; margin: 18px 0 12px 0;
     }
 
-    /* ── Tables ── */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 12px 0 18px 0;
-      font-size: 10.5pt;
-    }
-    th {
-      background: #f5f5f5;
-      text-align: left;
-      padding: 7px 9px;
-      border-bottom: 2px solid #333;
-      font-weight: 600;
-      font-size: 9.5pt;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    td {
-      padding: 7px 9px;
-      border-bottom: 1px solid #ddd;
-      vertical-align: top;
-    }
-    .num {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
+    /* ── Error block ── */
+    .error-block { margin-bottom: 12px; }
+    .error-number { font-size: 11.5pt; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; }
+    .error-concept { font-size: 11pt; font-weight: bold; color: #2563eb; margin-bottom: 5px; }
+    .error-detail { font-size: 10.5pt; margin-bottom: 2px; padding-left: 14px; }
+    .error-detail strong { font-weight: 600; }
+    .error-separator { border: none; border-top: 1px dotted #ccc; margin: 10px 0; }
 
     /* ── Summary box ── */
     .summary-box {
-      border: 1px solid #333;
-      padding: 14px 18px;
-      margin: 20px 0 28px 0;
-      font-size: 11pt;
-      line-height: 1.6;
+      border: 1px solid #333; padding: 10px 14px;
+      margin: 14px 0 20px 0; font-size: 10.5pt; line-height: 1.5;
     }
+    .summary-total { font-size: 11.5pt; font-weight: bold; margin-top: 4px; }
 
     /* ── Signature area ── */
-    .signature-area {
-      margin-top: 45px;
-    }
-    .signature-line {
-      width: 280px;
-      border-bottom: 1px solid #999;
-      margin-bottom: 6px;
-    }
-    .signature-label {
-      font-size: 10pt;
-      color: #1a1a1a;
-      font-weight: 600;
-    }
-    .signature-rel {
-      font-size: 9.5pt;
-      color: #666;
-      margin-top: 2px;
-    }
+    .signature-area { margin-top: 32px; }
+    .signature-space { height: 42px; }
+    .signature-line { width: 260px; border-bottom: 1px solid #999; margin-bottom: 4px; }
+    .signature-label { font-size: 10pt; color: #1a1a1a; font-weight: 600; }
+    .signature-rel { font-size: 9pt; color: #666; margin-top: 1px; }
 
-    /* ── Footer ── */
+    /* ── Footer (screen) ── */
     .letter-footer {
-      margin-top: 55px;
-      padding-top: 15px;
+      margin-top: 36px; padding-top: 10px;
       border-top: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      display: flex; align-items: center; gap: 12px;
     }
-    .footer-logo {
-      flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-    }
-    .footer-disclaimer {
-      font-size: 8.5pt;
-      color: #777;
-      line-height: 1.5;
-      flex: 1;
-    }
+    .footer-logo { flex-shrink: 0; width: 48px; height: 48px; }
+    .footer-logo svg { width: 48px; height: 48px; }
+    .footer-disclaimer { font-size: 8pt; color: #777; line-height: 1.4; flex: 1; }
 
-    /* ── Print styles ── */
+    /* ── Print: footer fixed on every page ── */
     @media print {
       body {
-        margin: 40px 30px;
+        margin: 0.5in 0.55in 0.9in 0.55in;
         padding: 0;
       }
-      @page {
-        margin: 0.6in 0.7in;
+      @page { margin: 0.5in 0.55in; size: letter; }
+
+      .letter-footer {
+        position: fixed; bottom: 0; left: 0.55in; right: 0.55in;
+        margin-top: 0; padding-top: 8px;
+        border-top: 1px solid #ccc;
+        background: white;
+        display: flex; align-items: center; gap: 12px;
       }
+      .final-block {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .signature-space { height: 32px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ═══ SENDER ═══ -->
   <div class="sender">
     <div class="name">{customer_name}</div>
     {care_of_line}
   </div>
 
-  <!-- ═══ DATE ═══ -->
   <div class="date-line">{today}</div>
 
-  <!-- ═══ REFERENCE ═══ -->
   <div class="ref-line">
     <strong>Re:</strong> Medical Bill Dispute — {hospital}<br>
     <strong>{factura_id_label}:</strong> {factura_id}
   </div>
 
-  <!-- ═══ SALUTATION ═══ -->
   <div class="salutation">
     <strong>Dear Billing Department:</strong>
   </div>
 
-  <!-- ═══ INTRO ═══ -->
   <p class="body-text">{intro_text}</p>
 
   <p class="body-text">
@@ -192,62 +121,30 @@
   </p>
 
   <p class="body-text">
-    Below I present each of the identified items for your consideration. I would appreciate it if you could review 
-    these charges and make the appropriate adjustments.
+    Below I present each of the identified items for your consideration.
   </p>
 
-  <!-- ═══ ERRORS TABLE ═══ -->
-  <div class="section-heading">1. Identified Errors</div>
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Error</th>
-        <th>Description</th>
-        <th>Billed</th>
-        <th>Reference</th>
-        <th>Est. Savings</th>
-      </tr>
-    </thead>
-    <tbody>
-      {errores_rows}
-    </tbody>
-  </table>
+  <div class="section-heading">Identified Errors</div>
 
-  <!-- ═══ ITEMS TABLE ═══ -->
-  <div class="section-heading">2. Charge Breakdown</div>
-  <table>
-    <thead>
-      <tr>
-        <th>CPT</th>
-        <th>Description</th>
-        <th>Qty</th>
-        <th>Unit Price</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {items_rows}
-    </tbody>
-  </table>
+  {errores_detalle}
 
-  <!-- ═══ SUMMARY ═══ -->
+  <div class="final-block">
   <div class="summary-box">
     <p><strong>Total Billed:</strong> {total_facturado}</p>
-    <p><strong>Total Estimated Savings:</strong> {ahorro_estimado}</p>
+    <p class="summary-total"><strong>Total Estimated Savings:</strong> {ahorro_estimado}</p>
     <p style="margin-top: 8px;">I respectfully request the review and adjustment of the charges mentioned above. 
     Thank you in advance for your attention to this matter. I look forward to your response.</p>
   </div>
 
-  <!-- ═══ SIGNATURE ═══ -->
   <div class="signature-area">
-    <p style="margin-bottom: 8px;">Sincerely,</p>
+    <p style="margin-bottom: 6px;">Sincerely,</p>
+    <div class="signature-space"></div>
     <div class="signature-line"></div>
     <div class="signature-label">{signer_name}</div>
     <div class="signature-rel">{signer_rel}</div>
   </div>
+  </div>
 
-  <!-- ═══ FOOTER ═══ -->
   <div class="letter-footer">
     <div class="footer-logo">
       <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">

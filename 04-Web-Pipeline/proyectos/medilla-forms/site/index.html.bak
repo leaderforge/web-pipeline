@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedillaForms — ¿Factura médica cara? Descúbrelo gratis por WhatsApp</title>
+<meta name="description" content="8 de cada 10 facturas médicas tienen errores. Manda una foto por WhatsApp y te decimos GRATIS si te están cobrando de más. Dos cartas de disputa: español + inglés. $29 USD.">
+
+<link rel="canonical" href="https://medillaforms.com/">
+<link rel="icon" type="image/png" href="assets/images/logomedillaforms1-cropped.png">
+
+<meta property="og:title" content="MedillaForms — ¿Tu factura médica tiene errores?">
+<meta property="og:description" content="8 de cada 10 facturas tienen errores. Manda una foto por WhatsApp. Dos cartas: español + inglés. $29 USD.">
+<meta property="og:image" content="https://medillaforms.com/assets/images/dos-hojas.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://medillaforms.com/">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',300:'#5eead4',400:'#2dd4bf',500:'#14b8a6',600:'#0d9488',700:'#0f766e',800:'#115e59',900:'#134e4a' },
+        warm: '#faf8f5',
+        deep: '#0f172a',
+        wa: '#25D366',
+      },
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"','system-ui','sans-serif'],
+        display: ['"Clash Display"','"Plus Jakarta Sans"','sans-serif'],
+      },
+      animation: {
+        'fade-up': 'fadeUp 0.7s cubic-bezier(0.32,0.72,0,1) forwards',
+        'float': 'float 5s ease-in-out infinite',
+        'pulse-soft': 'pulseSoft 3s ease-in-out infinite',
+        'slide-right': 'slideRight 0.5s ease-out forwards',
+      },
+      keyframes: {
+        fadeUp: { '0%':{opacity:'0',transform:'translateY(20px)'}, '100%':{opacity:'1',transform:'translateY(0)'} },
+        float: { '0%,100%':{transform:'translateY(0px)'}, '50%':{transform:'translateY(-12px)'} },
+        pulseSoft: { '0%,100%':{opacity:'1'}, '50%':{opacity:'0.7'} },
+        slideRight: { '0%':{transform:'translateX(-100%)'}, '100%':{transform:'translateX(0)'} },
+      },
+    }
+  }
+}
+</script>
+
+<style>
+  :root { --ease-spring: cubic-bezier(0.32,0.72,0,1); }
+  * { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  html { scroll-behavior:smooth; }
+
+  .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.7s var(--ease-spring),transform 0.7s var(--ease-spring); }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+  .reveal-d1 { transition-delay:0.1s; } .reveal-d2 { transition-delay:0.2s; } .reveal-d3 { transition-delay:0.3s; } .reveal-d4 { transition-delay:0.4s; }
+
+  .btn-wa {
+    transition: all 0.35s var(--ease-spring);
+    min-height: 52px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .btn-wa:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(13,148,136,0.4); }
+  .btn-wa:active { transform: scale(0.97); }
+
+  .card {
+    background:#fff;
+    border-radius:1.25rem;
+    padding:1.5rem;
+    border:1px solid rgba(0,0,0,0.05);
+    box-shadow:0 1px 2px rgba(0,0,0,0.02),0 4px 12px rgba(0,0,0,0.03);
+    transition:box-shadow 0.4s var(--ease-spring),transform 0.4s var(--ease-spring);
+  }
+  .card:hover { box-shadow:0 4px 24px rgba(0,0,0,0.06); }
+
+  .nav-glass {
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(20px) saturate(180%);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(0,0,0,0.05);
+  }
+
+  @keyframes waPulse { 0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,0.35)} 50%{box-shadow:0 0 0 18px rgba(37,211,102,0)} }
+  .wa-pulse { animation:waPulse 2.5s ease-in-out infinite; }
+
+  @keyframes heartbeat { 0%,100%{transform:scale(1)} 12%{transform:scale(1.12)} 24%{transform:scale(1)} 36%{transform:scale(1.12)} 48%{transform:scale(1)} }
+  .heartbeat { animation:heartbeat 3.5s ease-in-out infinite; }
+
+  .sticky-wa {
+    position:fixed; bottom:20px; right:16px; z-index:50;
+    opacity:0; transform:translateY(20px) scale(0.8); pointer-events:none;
+    transition:opacity 0.5s var(--ease-spring),transform 0.5s var(--ease-spring);
+  }
+  .sticky-wa.on { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+
+  .hero-video-frame {
+    border-radius:1.25rem;
+    overflow:hidden;
+    box-shadow:0 4px 16px rgba(0,0,0,0.06),0 16px 48px rgba(0,0,0,0.08);
+    border:1px solid rgba(0,0,0,0.04);
+  }
+  .hero-video-frame video { display:block; width:100%; height:auto; }
+
+  .stat-number {
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width:767px) {
+    .btn-wa { min-height:48px; font-size:15px; padding-left:1.25rem; padding-right:1.25rem; }
+  }
+
+  .source-tag {
+    font-size:11px;
+    color:#94a3b8;
+    letter-spacing:0.04em;
+  }
+
+  .social-link {
+    width:44px; height:44px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    transition:all 0.3s var(--ease-spring);
+    background:rgba(255,255,255,0.08);
+    color:#94a3b8;
+  }
+  .social-link:hover { background:rgba(255,255,255,0.15); transform:scale(1.15); }
+  .social-link.ig:hover { color:#E4405F; background:rgba(228,64,95,0.15); }
+  .social-link.fb:hover { color:#1877F2; background:rgba(24,119,242,0.15); }
+  .social-link.wa:hover { color:#25D366; background:rgba(37,211,102,0.15); }
+  .social-link.tk:hover { color:#ff0050; background:rgba(255,0,80,0.15); }
+</style>
+
+<!-- Meta Pixel — MedillaForms -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1013474687698574');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1013474687698574&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel -->
+
+</head>
+
+<body class="bg-warm text-deep font-sans antialiased">
+
+<!-- ═══ NAV ═══ -->
+<nav class="fixed top-0 inset-x-0 z-50 flex justify-center pt-3 px-3">
+  <div class="nav-glass rounded-full px-4 md:px-6 py-2.5 flex items-center gap-3 md:gap-5 shadow-sm">
+    <a href="#" class="flex-shrink-0"><img src="assets/images/logomedillaforms1-cropped.png" alt="MedillaForms" class="h-7 md:h-8 w-auto"></a>
+    <a href="#como-funciona" class="hidden md:block text-[13px] font-medium text-slate-500 hover:text-deep px-2 py-1 rounded-full transition-colors">Cómo funciona</a>
+    <a href="#precio" class="hidden md:block text-[13px] font-medium text-slate-500 hover:text-deep px-2 py-1 rounded-full transition-colors">Precio</a>
+    <a href="#faq" class="hidden md:block text-[13px] font-medium text-slate-500 hover:text-deep px-2 py-1 rounded-full transition-colors">FAQ</a>
+    <a href="https://wa.me/12139054680?text=Hola%2C%20tengo%20una%20factura%20m%C3%A9dica" target="_blank" rel="noopener" class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-[13px] font-semibold px-3.5 py-2 rounded-full no-underline whitespace-nowrap transition-colors">
+      <i class="ph ph-whatsapp-logo text-[15px]"></i> Empezar
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<header class="relative min-h-[100dvh] flex items-center pt-16 pb-8 px-4 md:px-8 overflow-hidden">
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute -top-[20%] -right-[30%] w-[90%] h-[90%] rounded-full bg-brand-100/50 blur-[100px]"></div>
+    <div class="absolute -bottom-[15%] -left-[20%] w-[60%] h-[60%] rounded-full bg-amber-50/30 blur-[80px]"></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto w-full">
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-14 items-center">
+
+      <!-- Copy -->
+      <div class="space-y-5 reveal">
+        <div class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50/80 px-3 py-1">
+          <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span></span>
+          <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-700">En español · Por WhatsApp</span>
+        </div>
+
+        <h1 class="font-display font-bold text-[2.2rem] sm:text-[3rem] lg:text-[4.2rem] leading-[1.06] tracking-[-0.02em]">
+          El hospital te cobró de más.<br>
+          <span class="text-brand-600">Y probablemente<br class="sm:hidden"> ni lo sabes.</span>
+        </h1>
+
+        <p class="text-slate-500 text-[15px] sm:text-[17px] leading-relaxed max-w-[480px]">
+          8 de cada 10 facturas médicas tienen errores. Mándanos una foto por <strong class="text-deep">WhatsApp</strong> y en menos de 2 minutos te decimos exactamente cuánto te están cobrando de más.
+        </p>
+
+        <!-- Mobile: Sofia animation -->
+        <div class="lg:hidden hero-video-frame w-full max-w-[380px] mx-auto my-2">
+          <video autoplay muted loop playsinline preload="auto" poster="assets/video/animation-reveal-poster.jpg" class="w-full block">
+            <source src="assets/video/animation-reveal.webm" type="video/webm">
+            <source src="assets/video/animation-reveal.mp4" type="video/mp4">
+          </video>
+
+        </div>
+
+        <div class="space-y-2.5">
+          <a href="https://wa.me/12139054680?text=Hola%2C%20quiero%20revisar%20mi%20factura%20m%C3%A9dica" target="_blank" rel="noopener" class="btn-wa bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-[15px] sm:text-[17px] px-6 py-3.5 rounded-full shadow-[0_4px_24px_rgba(37,211,102,0.3)] no-underline w-full sm:w-auto">
+            <i class="ph ph-whatsapp-logo text-[20px]"></i>
+            Analiza tu factura GRATIS
+            <i class="ph ph-arrow-right text-[14px]"></i>
+          </a>
+          <p class="text-[13px] text-slate-400 text-center sm:text-left"><i class="ph ph-clock inline mr-1"></i>Análisis listo en menos de 2 minutos. Sin compromiso.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 pt-1 text-[12px] font-medium text-slate-400">
+          <span class="flex items-center gap-1.5"><i class="ph ph-shield-check text-brand-500 text-[16px]"></i>Análisis gratuito</span>
+          <span class="hidden sm:block w-px h-5 bg-slate-200"></span>
+          <span class="flex items-center gap-1.5"><i class="ph ph-lock-simple text-brand-500 text-[16px]"></i>Tus datos seguros</span>
+          <span class="hidden sm:block w-px h-5 bg-slate-200"></span>
+
+        </div>
+      </div>
+
+      <!-- Desktop: Sofia animation -->
+      <div class="hidden lg:block reveal reveal-d2 relative">
+        <div class="hero-video-frame relative">
+          <video autoplay muted loop playsinline preload="auto" poster="assets/video/animation-reveal-poster.jpg" class="w-full block">
+            <source src="assets/video/animation-reveal.webm" type="video/webm">
+            <source src="assets/video/animation-reveal.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="absolute -bottom-2 -right-2 bg-white rounded-xl px-3.5 py-2.5 shadow-lg flex items-center gap-2 animate-float border border-slate-100">
+          <div class="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center wa-pulse flex-shrink-0"><i class="ph-fill ph-whatsapp-logo text-white text-[15px]"></i></div>
+          <div><p class="text-[11px] font-semibold text-deep leading-tight">Análisis listo</p><p class="text-[10px] text-slate-400 leading-tight">3 errores encontrados</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<!-- ═══ 80% STAT ═══ -->
+<section class="relative py-16 md:py-24 px-4 md:px-8">
+  <div class="max-w-3xl mx-auto reveal text-center">
+    <span class="inline-block rounded-full bg-amber-50 border border-amber-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-amber-700 mb-4">La realidad</span>
+    <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] lg:text-[3rem] leading-[1.12] tracking-[-0.02em] mb-4">
+      Llegaste al hospital porque<br class="hidden sm:block">no tenías otra opción.
+    </h2>
+    <p class="text-slate-500 text-[16px] sm:text-[18px] leading-relaxed max-w-[560px] mx-auto mb-8">
+      Semanas después, el sobre. <strong>$3,200. $8,500. $24,000.</strong> Números que no entiendes. Y una sola pregunta en tu cabeza: <strong class="text-deep">¿de verdad debo todo esto?</strong>
+    </p>
+
+    <div class="card max-w-md mx-auto text-center py-7 px-6">
+      <p class="text-[13px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Lo que el hospital no te dice</p>
+      <p class="font-display font-bold text-[4.5rem] sm:text-[5.5rem] leading-none tracking-[-0.04em] text-brand-600 mb-2 stat-number">80%</p>
+      <p class="text-[16px] sm:text-[17px] text-slate-600 leading-relaxed">
+        de las facturas médicas en EE.UU. tienen <strong>al menos un error.</strong> En promedio, una factura de más de $10,000 tiene <strong class="text-brand-700">$1,300 en cargos que no pertenecen.</strong>
+      </p>
+      <p class="source-tag mt-3">Fuente: CMS, KFF, estudios de auditoría hospitalaria</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CÓMO FUNCIONA ═══ -->
+<section id="como-funciona" class="relative py-16 md:py-24 px-4 md:px-8 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal text-center mb-12">
+      <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700 mb-4">Así de simple</span>
+      <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] lg:text-[3rem] leading-[1.12] tracking-[-0.02em] mb-3">
+        Tres pasos. Sin apps.<br class="hidden sm:block">Sin llamadas. Sin inglés.
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="reveal"><div class="card h-full">
+        <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center mb-4"><i class="ph ph-whatsapp-logo text-brand-600 text-[20px]"></i></div>
+        <p class="text-[11px] font-bold text-brand-600 uppercase tracking-wider mb-1">Paso 1</p>
+        <h3 class="font-display font-semibold text-[1.2rem] leading-tight mb-2">Manda tu factura</h3>
+        <p class="text-slate-500 text-[15px] leading-relaxed">Tómale una foto por WhatsApp. El mismo que usas con tu familia. Sin descargar nada.</p>
+        <p class="text-[12px] text-slate-400 mt-4 pt-4 border-t border-slate-100 flex items-center gap-1"><i class="ph ph-clock text-brand-500 text-[13px]"></i>30 segundos</p>
+      </div></div>
+
+      <div class="reveal reveal-d1"><div class="card h-full">
+        <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center mb-4"><i class="ph ph-brain text-brand-600 text-[20px]"></i></div>
+        <p class="text-[11px] font-bold text-brand-600 uppercase tracking-wider mb-1">Paso 2</p>
+        <h3 class="font-display font-semibold text-[1.2rem] leading-tight mb-2">La IA la analiza</h3>
+        <p class="text-slate-500 text-[15px] leading-relaxed">Revisa cada código, cargo y medicamento. Busca duplicados, sobreprecios y errores.</p>
+        <p class="text-[12px] text-slate-400 mt-4 pt-4 border-t border-slate-100 flex items-center gap-1"><i class="ph ph-clock text-brand-500 text-[13px]"></i>60 segundos</p>
+      </div></div>
+
+      <div class="reveal reveal-d2"><div class="card h-full">
+        <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center mb-4"><i class="ph ph-file-text text-brand-600 text-[20px]"></i></div>
+        <p class="text-[11px] font-bold text-brand-600 uppercase tracking-wider mb-1">Paso 3</p>
+        <h3 class="font-display font-semibold text-[1.2rem] leading-tight mb-2">Te decimos qué está mal</h3>
+        <p class="text-slate-500 text-[15px] leading-relaxed">Análisis en español claro: cada error, cada cargo, cuánto podrías ahorrar. <strong class="text-brand-700">Gratis.</strong></p>
+        <p class="text-[12px] text-slate-400 mt-4 pt-4 border-t border-slate-100 flex items-center gap-1"><i class="ph ph-check-circle text-brand-500 text-[13px]"></i>Sin compromiso</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LAS DOS CARTAS ═══ -->
+<section class="relative py-16 md:py-24 px-4 md:px-8 bg-gradient-to-b from-warm to-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="reveal text-center mb-10">
+      <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700 mb-4">El producto</span>
+      <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] lg:text-[3rem] leading-[1.12] tracking-[-0.02em] mb-3">
+        Dos cartas. Dos idiomas.<br class="hidden sm:block">Una misión: que no pagues de más.
+      </h2>
+      <p class="text-slate-500 text-[16px] sm:text-[18px] max-w-[600px] mx-auto">
+        El análisis es <strong class="text-deep">gratis.</strong> Si encontramos errores y decides continuar, generamos tus dos cartas de disputa por <strong class="text-deep">$29 USD.</strong>
+      </p>
+    </div>
+
+    <div class="reveal reveal-d1 max-w-[480px] mx-auto mb-6 relative">
+      <div style="border-radius:1.5rem;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06),0 8px 40px rgba(0,0,0,0.08);">
+        <img src="assets/images/dos-hojas.png" alt="Las dos cartas de disputa MedillaForms" class="w-full block" loading="lazy">
+      </div>
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);color:white;padding:8px 20px;border-radius:50px;font-size:13px;font-weight:600;white-space:nowrap;z-index:2;">
+        📄 Español para ti &nbsp;|&nbsp; 📄 English para el hospital
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+      <div class="reveal reveal-d2"><div class="card">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-translate text-amber-600 text-[18px]"></i></div>
+          <div><p class="font-semibold text-[15px]">Carta en español</p><p class="text-[12px] text-slate-400">Para ti</p></div>
+        </div>
+        <p class="text-slate-500 text-[14px] leading-relaxed">Cada error explicado en <strong>tu idioma.</strong> Sabes exactamente qué firmas y por qué. <strong>Es tu copia.</strong></p>
+      </div></div>
+
+      <div class="reveal reveal-d3"><div class="card">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-globe text-blue-600 text-[18px]"></i></div>
+          <div><p class="font-semibold text-[15px]">Carta en inglés</p><p class="text-[12px] text-slate-400">Para el hospital</p></div>
+        </div>
+        <p class="text-slate-500 text-[14px] leading-relaxed">Versión profesional que el hospital procesa en <strong>su idioma.</strong> Lista para imprimir, firmar y enviar.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ANIMATION: SOFÍA RESUELVE ═══ -->
+<section class="relative py-16 md:py-24 px-4 md:px-8 bg-white">
+  <div class="max-w-3xl mx-auto reveal text-center">
+    <span class="inline-block rounded-full bg-amber-50 border border-amber-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-amber-700 mb-4">El resultado</span>
+    <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] leading-[1.12] tracking-[-0.02em] mb-3">
+      Sofía firmó sus cartas.<br class="hidden sm:block">Y el hospital respondió.
+    </h2>
+    <p class="text-slate-500 text-[16px] leading-relaxed max-w-[500px] mx-auto mb-8">
+      Leyó la carta en español. Entendió cada error. Firmó la de inglés. Sesenta días después: <strong class="text-deep">$0.00. SALDO CUBIERTO.</strong>
+    </p>
+
+    <div class="max-w-[480px] mx-auto hero-video-frame">
+      <video autoplay muted loop playsinline preload="auto" poster="assets/video/animation-breakdown-poster.jpg" class="w-full block">
+        <source src="assets/video/animation-breakdown.webm" type="video/webm">
+        <source src="assets/video/animation-breakdown.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ WHAT'S INCLUDED ═══ -->
+<section class="relative py-16 md:py-24 px-4 md:px-8 bg-gradient-to-b from-white to-warm">
+  <div class="max-w-5xl mx-auto">
+    <div class="reveal text-center mb-10">
+      <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700 mb-4">Qué incluye</span>
+      <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] leading-[1.12] tracking-[-0.02em] mb-3">
+        Esto es lo que encuentras<br class="hidden sm:block">cuando revisamos tu factura
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+      <div class="reveal"><div class="card">
+        <i class="ph ph-translate text-brand-500 text-[22px] mb-3 block"></i>
+        <h3 class="font-display font-semibold text-[1.1rem] mb-1.5">Cada cargo explicado en español</h3>
+        <p class="text-slate-500 text-[14px] leading-relaxed">Nada de «CPT 99285». Te decimos: <em>«Sala de emergencias: $2,500. Precio de referencia: $800.»</em></p>
+      </div></div>
+
+      <div class="reveal reveal-d1"><div class="card">
+        <i class="ph ph-magnifying-glass text-brand-500 text-[22px] mb-3 block"></i>
+        <h3 class="font-display font-semibold text-[1.1rem] mb-1.5">Errores con montos exactos</h3>
+        <p class="text-slate-500 text-[14px] leading-relaxed">Duplicados, códigos incorrectos, medicamentos sobrevalorados, procedimientos que no recibiste.</p>
+      </div></div>
+
+      <div class="reveal reveal-d2"><div class="card">
+        <i class="ph ph-hand-heart text-brand-500 text-[22px] mb-3 block"></i>
+        <h3 class="font-display font-semibold text-[1.1rem] mb-1.5">Charity Care — 100 millones califican</h3>
+        <p class="text-slate-500 text-[14px] leading-relaxed">Por ley federal (IRS 501r), hospitales sin fines de lucro <strong>deben</strong> dar asistencia financiera. Te decimos si tu hospital tiene programa.</p>
+      </div></div>
+
+      <div class="reveal reveal-d3"><div class="card">
+        <i class="ph ph-map-pin text-brand-500 text-[22px] mb-3 block"></i>
+        <h3 class="font-display font-semibold text-[1.1rem] mb-1.5">Instrucciones paso a paso</h3>
+        <p class="text-slate-500 text-[14px] leading-relaxed">Imprimir, firmar, correo certificado. Seguimiento si el hospital no responde.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ═══ -->
+<section class="relative py-16 md:py-24 px-4 md:px-8 bg-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="reveal text-center mb-10">
+      <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700 mb-4">Los números</span>
+      <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] leading-[1.12] tracking-[-0.02em]">No lo decimos nosotros.<br>Lo dicen los datos.</h2>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-4xl mx-auto">
+      <div class="reveal"><div class="card text-center py-5 stat-number">
+        <p class="font-display font-bold text-[2.5rem] sm:text-[3rem] leading-none tracking-[-0.03em] text-brand-600">80%</p>
+        <p class="text-[13px] text-slate-500 mt-1">de las facturas tienen errores</p>
+        <p class="source-tag mt-1">CMS, estudios de auditoría</p>
+      </div></div>
+
+      <div class="reveal reveal-d1"><div class="card text-center py-5 stat-number">
+        <p class="font-display font-bold text-[2.5rem] sm:text-[3rem] leading-none tracking-[-0.03em] text-brand-600">$31.7B</p>
+        <p class="text-[13px] text-slate-500 mt-1">en pagos incorrectos de Medicare</p>
+        <p class="source-tag mt-1">CMS Fiscal Year 2024</p>
+      </div></div>
+
+      <div class="reveal reveal-d2"><div class="card text-center py-5 stat-number">
+        <p class="font-display font-bold text-[2.5rem] sm:text-[3rem] leading-none tracking-[-0.03em] text-brand-600">$1,300</p>
+        <p class="text-[13px] text-slate-500 mt-1">sobrecargo promedio por factura</p>
+        <p class="source-tag mt-1">Estudios de auditoría hospitalaria</p>
+      </div></div>
+
+      <div class="reveal reveal-d3"><div class="card text-center py-5 stat-number">
+        <p class="font-display font-bold text-[2.5rem] sm:text-[3rem] leading-none tracking-[-0.03em] text-brand-600">>80%</p>
+        <p class="text-[13px] text-slate-500 mt-1">de apelaciones de pacientes ganan</p>
+        <p class="source-tag mt-1">CMS, KFF, AMA</p>
+      </div></div>
+    </div>
+
+    <div class="reveal reveal-d4 max-w-3xl mx-auto mt-3"><div class="card flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0"><i class="ph ph-newspaper text-amber-600 text-[18px]"></i></div>
+      <div>
+        <p class="font-semibold text-[14px]">«Un paciente ahorró $162,000 al encontrar errores en su factura del hospital.»</p>
+        <p class="text-[12px] text-slate-400 mt-0.5">NBC News, mayo 2025. Factura original: $195,000 → ajustada a $33,000.</p>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="relative py-16 md:py-24 px-4 md:px-8 bg-gradient-to-b from-white to-warm">
+  <div class="max-w-5xl mx-auto">
+    <div class="reveal text-center mb-10">
+      <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700 mb-4">Historias reales</span>
+      <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.6rem] leading-[1.12] tracking-[-0.02em]">Ellos ya recuperaron su dinero.</h2>
+      <p class="text-[13px] text-slate-400 mt-1">Nombres cambiados por privacidad. Casos reales.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="reveal"><div class="card">
+        <div class="flex gap-0.5 mb-3 text-amber-400 text-[14px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="text-[14px] text-slate-600 leading-relaxed mb-4">«Me llegó una factura de $4,200 después de una cirugía. Encontraron 4 errores. El hospital ajustó mi factura a $1,100.»</p>
+        <div class="pt-3 border-t border-slate-100"><p class="font-semibold text-[14px]">María G.</p><p class="text-[12px] text-slate-400">Los Ángeles, CA · Ahorró $3,100</p></div>
+      </div></div>
+
+      <div class="reveal reveal-d1"><div class="card">
+        <div class="flex gap-0.5 mb-3 text-amber-400 text-[14px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="text-[14px] text-slate-600 leading-relaxed mb-4">«Emergencia sin seguro. $8,200. Descubrieron que calificaba para asistencia financiera. Mi factura final: $0.»</p>
+        <div class="pt-3 border-t border-slate-100"><p class="font-semibold text-[14px]">Carlos R.</p><p class="text-[12px] text-slate-400">Houston, TX · Ahorró $8,200</p></div>
+      </div></div>
+
+      <div class="reveal reveal-d2"><div class="card">
+        <div class="flex gap-0.5 mb-3 text-amber-400 text-[14px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+        <p class="text-[14px] text-slate-600 leading-relaxed mb-4">«Ya había pagado $3,500 cuando revisé. Encontraron cargos duplicados. El hospital me reembolsó $980.»</p>
+        <div class="pt-3 border-t border-slate-100"><p class="font-semibold text-[14px]">Ana L.</p><p class="text-[12px] text-slate-400">Miami, FL · Recuperó $980</p></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ OBJECIONES ═══ -->
+<section class="relative py-16 md:py-24 px-4 md:px-8 bg-white">
+  <div class="max-w-2xl mx-auto">
+    <div class="reveal text-center mb-10">
+      <span class="inline-block rounded-full bg-amber-50 border border-amber-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-amber-700 mb-4">Tus dudas</span>
+      <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.4rem] leading-[1.12] tracking-[-0.02em]">Sabemos lo que estás pensando.</h2>
+    </div>
+
+    <div class="space-y-2.5">
+      <div class="reveal"><div class="card">
+        <p class="font-semibold text-[15px] mb-1">«¿Esto es legal?»</p>
+        <p class="text-[14px] text-slate-500">Servicio educativo. Como un libro que te enseña a leer tu factura. Los hospitales procesan miles de disputas cada mes. Es normal.</p>
+      </div></div>
+
+      <div class="reveal reveal-d1"><div class="card">
+        <p class="font-semibold text-[15px] mb-1">«Ya pagué. ¿Puedo hacer algo?»</p>
+        <p class="text-[14px] text-slate-500">Sí. Muchos hospitales ajustan retroactivamente. Si fue hace menos de 90 días, vale la pena.</p>
+      </div></div>
+
+      <div class="reveal reveal-d2"><div class="card">
+        <p class="font-semibold text-[15px] mb-1">«No tengo seguro. ¿Me sirve?»</p>
+        <p class="text-[14px] text-slate-500">Los pacientes sin seguro son los más beneficiados. Hospitales cobran precios más altos a quienes no tienen seguro.</p>
+      </div></div>
+
+      <div class="reveal reveal-d3"><div class="card">
+        <p class="font-semibold text-[15px] mb-1">«Suena demasiado bueno.»</p>
+        <p class="text-[14px] text-slate-500">Por eso el análisis es <strong>gratis.</strong> No pagas hasta ver qué encontramos.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PRECIO ═══ -->
+<section id="precio" class="relative py-16 md:py-24 px-4 md:px-8 bg-white overflow-hidden">
+  <div class="absolute inset-0 pointer-events-none"><div class="absolute top-[20%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-brand-100/30 blur-[100px]"></div></div>
+
+  <div class="relative max-w-3xl mx-auto text-center reveal space-y-5">
+    <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700">Precio simple</span>
+    <h2 class="font-display font-bold text-[2.2rem] sm:text-[3.2rem] lg:text-[3.8rem] leading-[1.06] tracking-[-0.02em]">
+      $29 USD.<br>
+      <span class="text-brand-600">Pago único. Sin suscripciones.</span>
+    </h2>
+    <p class="text-slate-500 text-[16px] sm:text-[18px] max-w-[480px] mx-auto">
+      El análisis es <strong class="text-deep">gratis.</strong> Solo pagas si encontramos errores y quieres tus dos cartas de disputa.
+    </p>
+
+    <div class="flex flex-col sm:flex-row justify-center items-center gap-3 pt-2">
+      <div class="card text-center py-5 px-8 min-w-[160px]"><p class="text-[12px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Tú inviertes</p><p class="font-display font-bold text-[2.2rem] text-brand-600">$29</p><p class="text-[12px] text-slate-400">una sola vez</p></div>
+      <span class="text-[28px] text-slate-300">→</span>
+      <div class="card text-center py-5 px-8 min-w-[160px]"><p class="text-[12px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Ahorro típico</p><p class="font-display font-bold text-[2.2rem] text-emerald-600">$500–<br>$5,000</p><p class="text-[12px] text-slate-400">por factura</p></div>
+    </div>
+
+    <p class="text-[14px] text-slate-400 max-w-[500px] mx-auto">Ahorro típico basado en facturas con errores.</p>
+
+    <div class="pt-3 space-y-3">
+      <a href="https://wa.me/12139054680?text=Hola%2C%20quiero%20revisar%20mi%20factura%20m%C3%A9dica" target="_blank" rel="noopener" class="btn-wa bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-[16px] sm:text-[18px] px-7 py-4 rounded-full shadow-[0_4px_32px_rgba(37,211,102,0.35)] no-underline w-full sm:w-auto">
+        <i class="ph ph-whatsapp-logo text-[22px]"></i>
+        Analiza tu factura GRATIS por WhatsApp
+        <i class="ph ph-arrow-right text-[14px]"></i>
+      </a>
+      <div>
+        <a href="https://buy.stripe.com/9B64gzaXvc1ggWlbVvafS00" target="_blank" rel="noopener" onclick="track('Lead',{content_name:'stripe_checkout_29',content_category:'payment'})" class="btn-wa bg-deep hover:bg-slate-800 text-white font-semibold text-[15px] px-6 py-3 rounded-full shadow-[0_4px_20px_rgba(15,23,42,0.25)] no-underline inline-flex">
+          <i class="ph ph-credit-card text-[18px]"></i>
+          Pagar $29 directo
+        </a>
+        <p class="text-[11px] text-slate-400 mt-1.5">Sin análisis previo. Pago seguro con Stripe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section id="faq" class="relative py-16 md:py-24 px-4 md:px-8 bg-gradient-to-b from-white to-warm">
+  <div class="max-w-2xl mx-auto">
+    <div class="reveal text-center mb-10">
+      <span class="inline-block rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.15em] text-brand-700 mb-4">FAQ</span>
+      <h2 class="font-display font-bold text-[1.8rem] sm:text-[2.4rem] leading-[1.12] tracking-[-0.02em]">¿Algo más?</h2>
+    </div>
+
+    <div class="space-y-2.5">
+      <details class="reveal group"><summary class="card cursor-pointer list-none marker:hidden flex items-center justify-between font-semibold text-[15px]">¿Cómo funciona?<i class="ph ph-plus text-slate-400 group-open:hidden text-[16px]"></i><i class="ph ph-minus text-slate-400 hidden group-open:block text-[16px]"></i></summary>
+        <div class="px-1 pb-3 pt-2"><p class="text-[14px] text-slate-500">Mandas foto de tu factura por WhatsApp. IA analiza en 60 segundos. Recibes resumen en español. <strong>Gratis.</strong></p></div>
+      </details>
+
+      <details class="reveal reveal-d1 group"><summary class="card cursor-pointer list-none marker:hidden flex items-center justify-between font-semibold text-[15px]">¿Cuánto cuesta?<i class="ph ph-plus text-slate-400 group-open:hidden text-[16px]"></i><i class="ph ph-minus text-slate-400 hidden group-open:block text-[16px]"></i></summary>
+        <div class="px-1 pb-3 pt-2"><p class="text-[14px] text-slate-500">Análisis <strong>GRATIS.</strong> Cartas de disputa: <strong>$29 USD. Pago único.</strong> Sin suscripciones.</p></div>
+      </details>
+
+      <details class="reveal reveal-d2 group"><summary class="card cursor-pointer list-none marker:hidden flex items-center justify-between font-semibold text-[15px]">¿Qué facturas analizan?<i class="ph ph-plus text-slate-400 group-open:hidden text-[16px]"></i><i class="ph ph-minus text-slate-400 hidden group-open:block text-[16px]"></i></summary>
+        <div class="px-1 pb-3 pt-2"><p class="text-[14px] text-slate-500">Hospital, emergencia, cirugía, laboratorio, imágenes, especialistas. Si dudas, mándala sin compromiso.</p></div>
+      </details>
+
+      <details class="reveal reveal-d3 group"><summary class="card cursor-pointer list-none marker:hidden flex items-center justify-between font-semibold text-[15px]">¿Protegen mis datos?<i class="ph ph-plus text-slate-400 group-open:hidden text-[16px]"></i><i class="ph ph-minus text-slate-400 hidden group-open:block text-[16px]"></i></summary>
+        <div class="px-1 pb-3 pt-2"><p class="text-[14px] text-slate-500">Factura procesada en servidores seguros. Eliminada después del análisis. Datos nunca compartidos.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="relative py-12 px-4 sm:px-6 bg-deep text-white">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid md:grid-cols-3 gap-8 mb-10">
+      <div>
+        <img src="assets/images/logomedillaforms1-cropped.png" alt="MedillaForms" class="h-7 w-auto brightness-0 invert mb-3">
+        <p class="text-slate-400 text-[13px] leading-relaxed max-w-[240px]">Servicio educativo de análisis de facturas médicas para la comunidad hispana en EE.UU.</p>
+
+        <!-- Social Media -->
+        <div class="flex items-center gap-3 mt-4">
+          <a href="https://www.instagram.com/medillaforms?igsh=NTc4MTIwNjQ2YQ%3D%3D&utm_source=qr" target="_blank" rel="noopener" class="social-link ig" aria-label="Instagram">
+            <i class="ph ph-instagram-logo text-[24px]"></i>
+          </a>
+          <a href="https://www.facebook.com/MedillaForms?mibextid=wwXIfr" target="_blank" rel="noopener" class="social-link fb" aria-label="Facebook">
+            <i class="ph ph-facebook-logo text-[24px]"></i>
+          </a>
+          <a href="https://www.tiktok.com/@medillaforms?_r=1&_t=ZT-96wSNfgwGYX" target="_blank" rel="noopener" class="social-link tk" aria-label="TikTok">
+            <i class="ph ph-tiktok-logo text-[24px]"></i>
+          </a>
+          <a href="https://wa.me/12139054680" target="_blank" rel="noopener" class="social-link wa" aria-label="WhatsApp">
+            <i class="ph ph-whatsapp-logo text-[24px]"></i>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-semibold text-white text-[13px] uppercase tracking-wider mb-3">Contacto</p>
+        <div class="space-y-2.5 text-[13px] text-slate-400">
+          <p class="font-semibold text-white text-[12px] uppercase tracking-wider mb-1">Atención directa al cliente</p>
+          <p class="flex items-center gap-2"><i class="ph ph-phone-call text-teal-400 text-[15px]"></i>+1 (888) 809-0921</p>
+          <p class="flex items-center gap-2"><i class="ph ph-whatsapp-logo text-green-400 text-[15px]"></i>+1 (213) 905-4680</p>
+          <p class="flex items-center gap-2"><i class="ph ph-envelope text-slate-500 text-[15px]"></i>contact@medillaforms.com</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-semibold text-white text-[13px] uppercase tracking-wider mb-3">Legal</p>
+        <div class="space-y-2 text-[13px]">
+          <a href="terminos.html" class="block text-slate-400 hover:text-white transition-colors">Términos y Condiciones</a>
+          <a href="privacidad.html" class="block text-slate-400 hover:text-white transition-colors">Política de Privacidad</a>
+          <a href="reembolso.html" class="block text-slate-400 hover:text-white transition-colors">Política de Reembolso</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-white/10 pt-7">
+      <p class="text-[12px] text-slate-500 leading-relaxed max-w-[720px]">
+        <strong>Disclaimer:</strong> MedillaForms es un servicio de generación de documentos educativos. No somos abogados ni firma legal. Las cartas de disputa son plantillas generadas con asistencia tecnológica que el cliente revisa, firma y envía bajo su propia responsabilidad. No representamos clientes ante hospitales, aseguradoras, ni tribunales. Los resultados varían según cada caso y dependen exclusivamente de las políticas del proveedor médico.
+      </p>
+      <p class="text-[12px] text-slate-600 mt-3">© 2026 MedillaForms. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Sticky WhatsApp -->
+<div class="sticky-wa" id="stickyWa">
+  <a href="https://wa.me/12139054680?text=Hola%2C%20quiero%20revisar%20mi%20factura%20m%C3%A9dica" target="_blank" rel="noopener" class="heartbeat relative z-10 w-[56px] h-[56px] rounded-full bg-[#25D366] shadow-[0_6px_24px_rgba(37,211,102,0.45)] flex items-center justify-center" aria-label="WhatsApp">
+    <i class="ph-fill ph-whatsapp-logo text-white text-[28px]"></i>
+  </a>
+</div>
+
+<script>
+(function(){
+  // Reveal on scroll
+  new IntersectionObserver((e)=>e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0.1,rootMargin:'0px 0px -20px 0px'}).observe(document.querySelector('header'));
+  document.querySelectorAll('.reveal').forEach(el=>new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1,rootMargin:'0px 0px -20px 0px'}).observe(el));
+
+  // Sticky WhatsApp
+  var wa=document.getElementById('stickyWa'),hero=document.querySelector('header');
+  new IntersectionObserver((e)=>{e.forEach(e=>{e.isIntersecting?wa.classList.remove('on'):wa.classList.add('on')})},{threshold:0,rootMargin:'-60px 0px 0px 0px'}).observe(hero);
+
+  // Track WhatsApp clicks
+  function track(n,p){p=p||{};if(typeof gtag=='function')gtag('event',n,p);if(typeof fbq=='function')fbq('track',n,p)}
+  document.querySelectorAll('a[href*="wa.me"]').forEach(l=>l.addEventListener('click',()=>{
+    track('Lead',{content_name:'whatsapp_click',content_category:'lead'});
+    fetch('https://api.medillaforms.com/api/track/landing-click',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({referrer:document.referrer||'directo'}),
+      keepalive:true
+    }).catch(()=>{});
+  }));
+
+  // ═══ EXIT INTENT POPUP ═══
+  var exitShown = false;
+  var exitPopup = document.createElement('div');
+  exitPopup.id = 'exit-popup';
+  exitPopup.innerHTML = '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 0.4s cubic-bezier(0.32,0.72,0,1)"><div style="background:#fff;border-radius:1.5rem;padding:2rem 1.5rem;max-width:380px;width:100%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);transition:transform 0.4s cubic-bezier(0.32,0.72,0,1)"><button onclick="document.getElementById(\'exit-popup\').style.opacity=\'0\';setTimeout(function(){document.getElementById(\'exit-popup\').remove()},400)" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:4px 8px">&times;</button><span style="display:inline-block;background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px">Oferta especial</span><p style="font-family:\'Clash Display\',\'Plus Jakarta Sans\',sans-serif;font-weight:700;font-size:1.6rem;line-height:1.15;color:#0f172a;margin-bottom:8px">¡Espera!</p><p style="color:#64748b;font-size:15px;line-height:1.5;margin-bottom:20px">Llévate tus dos cartas de disputa por <strong style="color:#0d9488">$24 USD</strong> en vez de $29.</p><a href="https://wa.me/12139054680?text=Hola%2C%20vi%20la%20oferta%20de%20%2424%20USD" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:600;font-size:15px;padding:12px 28px;border-radius:50px;text-decoration:none;transition:all 0.3s"><i class="ph ph-whatsapp-logo" style="font-size:20px"></i> Hablar por WhatsApp <span style="font-size:14px">→</span></a><p style="color:#94a3b8;font-size:11px;margin-top:12px">Te atendemos al instante · Sin compromiso</p></div></div>';
+  exitPopup.style.opacity = '0';
+  exitPopup.style.position = 'fixed';
+  exitPopup.style.inset = '0';
+  exitPopup.style.zIndex = '9999';
+  exitPopup.style.pointerEvents = 'none';
+  document.body.appendChild(exitPopup);
+
+  // Desktop exit intent — mouse truly leaves the document (not just a child element)
+  document.addEventListener('mouseout', function(e) {
+    if (exitShown) return;
+    // e.relatedTarget === null → mouse left the entire document
+    // e.clientY <= 5 → exited through the TOP edge
+    if (!e.relatedTarget && e.clientY <= 5) {
+      exitShown = true;
+      track('ViewContent',{content_name:'exit_popup_24',content_category:'offer'});
+      exitPopup.style.pointerEvents = 'auto';
+      exitPopup.style.opacity = '1';
+      var inner = exitPopup.querySelector('div > div');
+      if (inner) inner.style.transform = 'scale(1)';
+    }
+  });
+
+  // Mobile exit intent — scroll-up after scrolling past 40% of page
+  var lastScrollY = 0;
+  var lastScrollTime = Date.now();
+  var deepScrolled = false;
+  var depth50fired = false;
+  var depth75fired = false;
+  var ticking = false;
+  document.addEventListener('scroll', function() {
+    if (exitShown || ticking) return;
+    ticking = true;
+    requestAnimationFrame(function() {
+      var now = Date.now();
+      var sy = window.scrollY;
+      var docH = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = docH > 0 ? sy / docH : 0;
+
+      // Scroll depth events for Meta Pixel
+      if (!depth50fired && pct > 0.50) { depth50fired = true; track('ScrollDepth',{percent:50}); }
+      if (!depth75fired && pct > 0.75) { depth75fired = true; track('ScrollDepth',{percent:75}); }
+
+      if (pct > 0.40) deepScrolled = true;
+
+      if (deepScrolled) {
+        var delta = lastScrollY - sy;       // + = scrolling up
+        var dt = (now - lastScrollTime) / 1000; // seconds
+        var speed = dt > 0.05 ? delta / dt : 0;   // px/s
+
+        // Trigger on noticeable scroll-up (40px+ at 150px/s+)
+        if (delta > 40 && speed > 150) {
+          exitShown = true;
+          track('ViewContent',{content_name:'exit_popup_24_mobile',content_category:'offer'});
+          exitPopup.style.pointerEvents = 'auto';
+          exitPopup.style.opacity = '1';
+          var inner = exitPopup.querySelector('div > div');
+          if (inner) inner.style.transform = 'scale(1)';
+        }
+      }
+
+      lastScrollY = sy;
+      lastScrollTime = now;
+      ticking = false;
+    });
+  }, {passive: true});
+})();</script>
+
+</body>
+</html>

@@ -165,51 +165,20 @@ class WhatsAppService {
   }
 
   // ---------------------------------------------------------------------------
-  // Upload media to Telnyx (for sending images)
-  // Uses raw multipart form to avoid Node.js FormData/Blob compatibility issues
+  // "Upload" media by saving to local disk and returning a public URL.
+  // Telnyx WhatsApp API requires a publicly accessible URL in the `link` field.
+  // We serve these via Express static at /letters/ from /tmp/medillaforms-letters/
   // ---------------------------------------------------------------------------
   async uploadMedia(buffer, mimeType = "image/png") {
-    const boundary = `----FormBoundary${crypto.randomBytes(16).toString("hex")}`;
-    const CRLF = "\r\n";
-
-    const header = [
-      `--${boundary}`,
-      `Content-Disposition: form-data; name="file"; filename="letter.png"`,
-      `Content-Type: ${mimeType}`,
-      "",
-      "",
-    ].join(CRLF);
-
-    const footer = `${CRLF}--${boundary}--`;
-
-    const body = Buffer.concat([
-      Buffer.from(header),
-      buffer,
-      Buffer.from(footer),
-    ]);
-
-    const response = await fetch(`${this.baseUrl}/media`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        "Content-Type": `multipart/form-data; boundary=${boundary}`,
-        "Content-Length": String(body.length),
-      },
-      body: body,
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-      console.error("❌ Media upload response:", JSON.stringify(data).slice(0, 300));
-      throw new Error(`Media upload failed: ${JSON.stringify(data)}`);
-    }
-
-    const url = data?.data?.url || "";
-    if (!url) {
-      console.error("❌ Media upload: no URL in response — response keys:", Object.keys(data));
-      if (data?.data) console.error("  data keys:", Object.keys(data.data));
-    }
-    return url;
+    const { randomUUID } = await import("crypto");
+    const { writeFileSync } = await import("fs");
+    const id = randomUUID();
+    const filename = `${id}.png`;
+    const filepath = `/tmp/medillaforms-letters/${filename}`;
+    writeFileSync(filepath, buffer);
+    const publicUrl = `https://api.medillaforms.com/letters/${filename}`;
+    console.log(`📁 Letter saved: ${filepath} (${buffer.length} bytes) → ${publicUrl}`);
+    return publicUrl;
   }
 
   // ---------------------------------------------------------------------------

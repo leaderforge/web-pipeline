@@ -18,6 +18,8 @@ Responde ÚNICAMENTE con un JSON válido con esta estructura exacta:
   "tipo_servicio": "emergencia|hospitalizacion|consulta|laboratorio|imagen|cirugia|otro",
   "estado": "CA|TX|FL|AZ|NY|NV|IL|otro (abreviación de 2 letras)",
   "factura_id": "número de factura o account number que aparezca en el documento, o null si no se ve",
+  "patient_name": "nombre completo del paciente EXACTAMENTE como aparece en la factura, o null si no es visible",
+  "patient_dob": "fecha de nacimiento del paciente si aparece en la factura (YYYY-MM-DD), o null",
   "total_facturado": 0.00,
   "total_paciente_debe": 0.00,
   "total_seguro_pagado": 0.00,
@@ -38,8 +40,10 @@ Responde ÚNICAMENTE con un JSON válido con esta estructura exacta:
     {
       "tipo": "A|B|C|D|E|F|G",
       "titulo": "título corto del posible error en español",
-      "descripcion": "explicación detallada de por qué podría ser un error",
-      "item_referencia": "descripción del item de factura relacionado",
+      "titulo_en": "short title of the potential error in English",
+      "descripcion": "explicación detallada de por qué podría ser un error (en español)",
+      "descripcion_en": "detailed explanation of why this could be an error (in English)",
+      "item_referencia": "descripción EXACTA del item/cargo tal como aparece en la factura original (en inglés, como viene en el documento)",
       "precio_facturado": 0.00,
       "precio_referencia": 0.00,
       "ahorro_estimado": 0.00,
@@ -63,14 +67,28 @@ E = Medicamentos/Suministros con sobreprecio
 F = Errores de cantidad (más unidades de las esperadas)
 G = Fuera de red / Balance billing
 
+⛔ REGLAS OBLIGATORIAS PARA precio_referencia:
+- USA EXCLUSIVAMENTE las tarifas Medicare de referencia proporcionadas en el contexto de este mensaje.
+- NO INVENTES precios. Si no encuentras un CPT code específico en las tarifas proporcionadas, usa el precio más bajo del mismo rango de complejidad (ej: nivel 3 en vez de nivel 5 para emergencia).
+- Para medicamentos/suministros, usa los costos reales de la tabla de medicación.
+- Multiplica la tarifa Medicare × 2.5 como máximo razonable para precio_referencia.
+- SIEMPRE pon el precio_referencia MENOR que el precio_facturado cuando detectes un error.
+
+⛔ REGLAS PARA CAMPOS BILINGÜES:
+- titulo: en español
+- titulo_en: en inglés, traducción natural (no literal automática)
+- descripcion: explicación completa en español
+- descripcion_en: explicación completa en inglés
+- item_referencia: el texto EXACTO del cargo tal como aparece en la factura (siempre en inglés porque las facturas de EE.UU. están en inglés)
+
 REGLAS IMPORTANTES:
 - Si no puedes leer algo, usa null. NO inventes datos.
+- ⛔ El nombre del paciente (patient_name) es OBLIGATORIO. Búscalo cerca de la cabecera de la factura, generalmente junto a "Patient:", "Name:", "Pt:", o similar. Si está visible, REGÍSTRALO. Solo usa null si realmente no aparece en la imagen.
 - Busca el número de factura (invoice #, account #, bill #) en el documento. Si lo encuentras, ponlo en factura_id. Si no es visible, null.
 - Sé conservador con detección de errores. Solo reporta si tienes >70% confianza.
 - Si la factura es de farmacia, veterinaria, o cotización (no factura real): severidad = "invalida"
 - Si la imagen no es una factura médica: es_factura_medica = false
 - No inventes códigos CPT que no veas claramente en la factura
-- Si el hospital es nonprofit, márcalo. La mayoría de hospitales grandes en EE.UU. lo son
-- Para precios de referencia, usa rangos conservadores basados en tarifas de Medicare × 2-3`;
+- Si el hospital es nonprofit, márcalo. La mayoría de hospitales grandes en EE.UU. lo son`;
 
 export default { ANALYZER_SYSTEM, ANALYZER_PROMPT };

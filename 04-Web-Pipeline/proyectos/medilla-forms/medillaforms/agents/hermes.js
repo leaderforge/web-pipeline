@@ -44,18 +44,25 @@ export class HermesAgent {
 
     const history = buildConversationHistory(this.session.conversation_log);
 
-    // Extract error titles for brief mention in hook
+    // Build error details with original English concept FIRST, then Spanish title
     const errores = analysis.errores_detectados || [];
+    const errorDetails = errores.map((e, i) => {
+      const eng = e.item_referencia || "";
+      const esp = e.titulo || e.tipo || "error";
+      return `${i + 1}. ${eng} — ${esp}`;
+    }).join("\n");
     const errorTitles = errores.map(e => e.titulo || e.tipo || "error").join(", ");
 
     const hookMessage = await this.deepseek.chat(
       "closer_hook",
       history,
-      `DATOS DEL ANÁLISIS (USA EXACTAMENTE ESTOS NÚMEROS Y NOMBRES):\n` +
+      `DATOS DEL ANÁLISIS (USA EXACTAMENTE ESTOS NÚMEROS, NOMBRES Y CONCEPTOS):\n` +
       `- Errores encontrados: ${errorsFound}\n` +
-      `- Tipos detectados: ${errorTitles || "errores de facturación"}\n` +
+      `- Detalle de cada error (concepto original en inglés + descripción en español):\n${errorDetails}\n` +
       `- Ahorro total estimado: $${savings}\n\n` +
-      `El usuario NO ha pagado. Nombra brevemente los tipos de error y menciona el ahorro. Luego ofrece las cartas.` +
+      `El usuario NO ha pagado. Nombra cada error con SU CONCEPTO ORIGINAL EN INGLÉS primero (como aparece en la factura), ` +
+      `seguido de una breve explicación en español. Luego menciona el ahorro total y ofrece las cartas. ` +
+      `Enumera las discrepancias claramente.\n` +
       `NO inventes plazos. NO pidas comprobante. Las reglas completas están en tu sistema.`,
       { errors_found: String(errorsFound), potential_savings: "$" + String(savings), error_types: errorTitles }
     );
@@ -220,6 +227,23 @@ export class HermesAgent {
       this.session = { ...this.session, ...reloaded.rows[0] };
     }
 
+    // ⛔ GUARD: If this session was never set to Zelle pending, 
+    // don't mention Zelle verification at all. This prevents stale
+    // state from leaking into clean sessions.
+    const isZelleFlow = this.session.zelle_pending === true;
+    const textLower = text.toLowerCase();
+
+    // 🧹 SANITY: If state is waiting_zelle but zelle_pending is false,
+    // the session was improperly cleaned. Reset to waiting_payment.
+    if (this.session.state === 'waiting_zelle' && !isZelleFlow) {
+      await pool.query(
+        `UPDATE sessions SET state = 'waiting_payment', payment_method = NULL, updated_at = NOW() WHERE id = $1`,
+        [this.session.id]
+      );
+      this.session.state = 'waiting_payment';
+      this.session.payment_method = null;
+    }
+
     // ✅ Payment was just confirmed (by Daniel via Zelle, or Stripe webhook)
     if (this.session.payment_confirmed || this.session.state === 'paid') {
       // Check if letters were already delivered
@@ -251,8 +275,6 @@ export class HermesAgent {
       );
       return;
     }
-
-    const textLower = text.toLowerCase();
 
     // User says they've paid via Zelle
     if (textLower.includes("ya pagué") || textLower.includes("ya pague") || textLower.includes("envié") ||

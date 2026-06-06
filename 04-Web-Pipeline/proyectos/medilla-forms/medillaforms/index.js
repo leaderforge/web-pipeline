@@ -53,6 +53,15 @@ app.use("/stripe/webhook", express.raw({ type: "application/json" }));
 app.use("/webhook/whatsapp", express.raw({ type: "*/*" }));
 app.use(express.json());
 
+// ── Serve letter images for WhatsApp delivery ──
+// Telnyx WhatsApp requires a public URL for image media (the `link` field).
+// We save PNGs here temporarily and Telnyx fetches them from this endpoint.
+import { mkdirSync } from "fs";
+import { join } from "path";
+const LETTERS_DIR = "/tmp/medillaforms-letters";
+mkdirSync(LETTERS_DIR, { recursive: true });
+app.use("/letters", express.static(LETTERS_DIR, { maxAge: "5m" }));
+
 // =============================================================================
 // Health Check
 // =============================================================================
@@ -869,19 +878,62 @@ async function routeText(phone, text, session, returningContext = "") {
     return;
   }
 
-  // ── ALCANCE: verificar que el mensaje sea sobre facturación médica ─
-  const outOfScopePhrases = [
-    "clima", "weather", "fútbol", "football", "política", "politics",
-    "elecciones", "religión", "religion", "receta", "prescription",
-  ];
+  // ── 🛡️ TOPIC GUARD: solo facturación médica y cartas de disputa ──
+  // Usa DeepSeek para clasificar si el mensaje es sobre el servicio o es off-topic.
+  // Bloquea: preguntas sobre el bot, IA, VPS, diseño, programación, temas personales.
   const textLower = text.toLowerCase();
-  const isOutOfScope = outOfScopePhrases.some(p => textLower.includes(p));
-  if (isOutOfScope) {
+
+  // Quick pre-filter: mensajes muy cortos que claramente NO son billing
+  const hardBlockPhrases = [
+    "quién eres", "quien eres", "cómo funcionas", "como funcionas",
+    "qué eres", "que eres", "eres humano", "eres real",
+    "quién te creó", "quien te creo", "quién te hizo", "quien te hizo",
+    "cómo te llamas", "como te llamas", "cuál es tu nombre", "cual es tu nombre",
+    "dónde vives", "donde vives", "cuántos años tienes", "cuantos años tienes",
+    "estás vivo", "estas vivo", "tienes sentimientos",
+    "cuéntame un chiste", "cuentame un chiste", "dime un chiste",
+    "jugar", "juego",
+  ];
+  const isHardBlock = hardBlockPhrases.some(p => textLower.includes(p));
+  if (isHardBlock) {
     await whatsapp.sendText(phone,
-      "Mi función es ayudarle exclusivamente con su facturación médica. " +
-      "¿Hay algo sobre los cargos de su factura en lo que pueda servirle?"
+      "Estoy aquí exclusivamente para ayudarle con sus facturas médicas y cartas de disputa. 📋\n\n" +
+      "¿Tiene alguna factura que quiera revisar? Envíemela cuando guste."
     );
     return;
+  }
+
+  // DeepSeek classifier for ambiguous cases
+  try {
+    const topicResult = await deepseek.chat(
+      "intake",
+      [],
+      `Clasifica este mensaje como "BILLING" o "OFF_TOPIC".\n\n` +
+      `BILLING = facturas médicas, cargos de hospital, códigos CPT, cartas de disputa, ` +
+      `seguros, pagos, errores de facturación, charity care, asistencia financiera, ` +
+      `leyes estatales sobre deuda médica, instrucciones de envío, proceso de disputa.\n\n` +
+      `OFF_TOPIC = chatbots, IA, inteligencia artificial, programación, servidores, VPS, ` +
+      `diseño, código, base de datos, empresa, dueño, preguntas personales, "quién eres", ` +
+      `"cómo funcionas", chistes, clima, política, deportes, temas no médicos.\n\n` +
+      `Mensaje del usuario: "${text.slice(0, 300)}"\n\n` +
+      `Responde SOLO con "BILLING" o "OFF_TOPIC". Nada más.`,
+      {}
+    );
+
+    const classification = (topicResult || "").trim().toUpperCase();
+    if (classification === "OFF_TOPIC") {
+      console.log(`🛡️ Topic guard BLOCKED: "${text.slice(0, 80)}"`);
+      await whatsapp.sendText(phone,
+        "Mi función es ayudarle exclusivamente con sus facturas médicas y cartas de disputa. 📋\n\n" +
+        "Puedo revisar su factura, identificar errores de cobro, explicarle códigos CPT, " +
+        "y generarle cartas de disputa en español e inglés.\n\n" +
+        "¿Tiene alguna factura médica que quiera revisar?"
+      );
+      return;
+    }
+  } catch (e) {
+    // If classifier fails, let it pass — don't block legitimate users
+    console.warn("⚠️ Topic guard classifier failed:", e.message);
   }
 
   // ── 👤 HUMAN ESCALATION: user wants to talk to a real person ──
