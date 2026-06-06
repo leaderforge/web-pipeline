@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel Ortega Alcántara – Resume</title>
+<style>
+  @page { size: letter; margin: 1.1in 1.1in 1.2in 1.1in; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Calibri", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.15;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 6.3in;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 12pt;
+  }
+  .header h1 {
+    font-size: 22pt;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #111;
+    margin-bottom: 3pt;
+  }
+  .header .tagline {
+    font-size: 11pt;
+    color: #0f4c81;
+    font-weight: 600;
+    margin-bottom: 6pt;
+  }
+  .contact-row {
+    font-size: 10pt;
+    color: #555;
+    line-height: 1.6;
+  }
+  .contact-row span { margin: 0 9px; color: #bbb; }
+
+  hr {
+    border: none;
+    border-top: 1.5px solid #0f4c81;
+    margin: 12pt 0;
+  }
+
+  .summary {
+    font-size: 10.5pt;
+    color: #333;
+    margin-bottom: 12pt;
+    line-height: 1.2;
+  }
+
+  .section-title {
+    font-size: 14pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #0f4c81;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+  }
+
+  .skills-line {
+    font-size: 10.5pt;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 10pt;
+  }
+  .skills-line strong { color: #111; }
+
+  .exp-item { margin-bottom: 10pt; }
+  .exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2pt;
+  }
+  .exp-role { font-weight: 700; font-size: 11pt; color: #111; }
+  .exp-company { font-weight: 600; color: #444; font-size: 10.5pt; }
+  .exp-date { font-size: 10pt; color: #777; white-space: nowrap; }
+  .exp-loc { font-size: 9.5pt; color: #999; font-style: italic; margin-bottom: 3pt; }
+  ul { margin: 2pt 0 0 18px; }
+  li { margin-bottom: 2pt; font-size: 10.5pt; color: #333; }
+
+  .edu-line {
+    font-size: 10.5pt;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2pt;
+  }
+  .edu-degree { font-weight: 700; }
+  .edu-date { font-size: 10pt; color: #777; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Daniel Ortega Alcántara</h1>
+  <div class="tagline">AI Engineer &amp; Technical Lead — Marketing &amp; Automation Specialist</div>
+  <div class="contact-row">
+    3437 Windsong Street, Corona, CA 92883<span>|</span>+1 (951) 733-6105
+  </div>
+  <div class="contact-row">
+    danielortegaalcantara9@gmail.com<span>|</span>linkedin.com/in/danielortega3030<span>|</span>Relocating to Mexico City
+  </div>
+</div>
+
+<hr>
+
+<div class="summary">
+  <strong>AI Engineer and Economist</strong> (UNAM) with 5+ years building production AI systems and high-conversion marketing funnels. Shipped AI receptionists, WhatsApp sales agents, automated SMB outreach platforms, and mass content distribution pipelines. Operates a <strong>Hermes AI agent on VPS</strong> for 24/7 operational support across services. Bilingual English–Spanish. 40 years old. Mexican national, currently in the US.
+</div>
+
+<div class="section-title">Technical Skills</div>
+<div class="skills-line">
+  <strong>AI &amp; LLMs:</strong> ChatGPT 5.5, DeepSeek, prompt engineering, LangChain, multi-agent orchestration, RAG, Hermes agent operations (VPS)&ensp;|&ensp;
+  <strong>MLOps:</strong> model monitoring, automatic fallback, prompt versioning, health checks, Telegram alerting&ensp;|&ensp;
+  <strong>Marketing &amp; Outreach:</strong> email outreach campaigns, social media strategy (Instagram, Facebook, TikTok), mass content distribution, audience segmentation, Meta Pixel &amp; conversion tracking&ensp;|&ensp;
+  <strong>Content &amp; Design:</strong> high-end video generation, graphic design for social &amp; web, copywriting for ads &amp; landing pages, brand identity&ensp;|&ensp;
+  <strong>Automation:</strong> custom webhook pipelines (n8n/Zapier equivalent), Google Sheets API, email/SMS sequencing, CRM integration&ensp;|&ensp;
+  <strong>Backend:</strong> Node.js, Express, Python, REST APIs, Stripe, Telnyx (WhatsApp API), MongoDB, Railway, PM2 (VPS)&ensp;|&ensp;
+  <strong>CI/CD:</strong> GitHub → Vercel, zero-downtime deploys, staged environments
+</div>
+
+<div class="section-title">Experience</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">Founder &amp; Lead AI Engineer</span>
+    <span class="exp-date">Jan 2025 – Present</span>
+  </div>
+  <div class="exp-company">MedillaForms / LeaderForge Digital</div>
+  <div class="exp-loc">Corona, CA</div>
+  <ul>
+    <li>Architected <strong>5 specialized AI agents</strong> (Intake, Analysis, Closer, Educator, Hermes) sharing session state via MongoDB — custom multi-agent orchestration with ChatGPT 5.5 and DeepSeek.</li>
+    <li>Deployed <strong>Hermes AI agent on VPS</strong> for 24/7 operational support, monitoring, and automated task execution across all services.</li>
+    <li>Built end-to-end marketing funnel: Meta Ads → WhatsApp AI agent → Stripe payment → automated delivery. Full Pixel tracking and conversion attribution.</li>
+    <li>Implemented <strong>CI/CD</strong>: GitHub → Vercel auto-deploy + PM2 zero-downtime restarts, reducing deployment errors by 80%.</li>
+  </ul>
+</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">AI Engineer — Conversational AI &amp; Marketing Automation</span>
+    <span class="exp-date">Jun 2024 – Jan 2025</span>
+  </div>
+  <div class="exp-company">LeaderForge Digital</div>
+  <div class="exp-loc">Corona, CA</div>
+  <ul>
+    <li>Built <strong>Sofía</strong>, a multilingual AI receptionist handling calls, qualifying leads, and booking appointments 24/7 — deployed on Railway with 99.9% uptime.</li>
+    <li>Executed <strong>mass content distribution</strong> across social media channels: video production, copywriting, scheduling, and performance analytics for client campaigns.</li>
+    <li>Designed automation workflows equivalent to n8n/Zapier: inbound call → AI processing → SMS confirmation → CRM update.</li>
+  </ul>
+</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">Automation &amp; AI Consultant</span>
+    <span class="exp-date">Mar 2023 – Jun 2024</span>
+  </div>
+  <div class="exp-company">Independent — SMB Outreach &amp; Content Projects</div>
+  <div class="exp-loc">California, USA</div>
+  <ul>
+    <li>Built <strong>Welders CA Batch</strong>: automated lead scraping → personalized demo deploy → 3-touch email outreach. Processed <strong>32 SMBs in 3 days</strong> with zero manual work.</li>
+    <li>Produced <strong>high-end video content</strong> for client social media campaigns, including scriptwriting, editing, and platform-optimized distribution to Instagram, Facebook, and TikTok.</li>
+    <li>Integrated Google Sheets API as lightweight CRM with real-time logging, reply tracking, and conversion dashboards for non-technical clients.</li>
+  </ul>
+</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">Full-Stack Developer &amp; Tech Lead</span>
+    <span class="exp-date">Sep 2021 – Feb 2023</span>
+  </div>
+  <div class="exp-company">Freelance &amp; Agency Projects</div>
+  <div class="exp-loc">Durango, Mexico / Remote</div>
+  <ul>
+    <li>Led technical teams of 2–4 developers delivering web applications for Mexican SMBs across healthcare, retail, and services.</li>
+    <li>Built custom integrations: payment gateways, WhatsApp messaging, CRM sync, analytics dashboards, and social media content scheduling.</li>
+  </ul>
+</div>
+
+<div class="section-title">Education</div>
+<div class="edu-line">
+  <span><span class="edu-degree">B.A. Economics</span> — Universidad Nacional Autónoma de México (UNAM)</span>
+  <span class="edu-date">2003 – 2008</span>
+</div>
+<div style="font-size:10pt; color:#555; margin-bottom:10pt;">Specialization in AI Engineering — self-taught + production experience. Analytical rigor from economics applied to ML systems and marketing analytics.</div>
+
+<div class="section-title">Languages</div>
+<div class="skills-line">
+  <strong>English:</strong> Professional proficiency — written &amp; spoken&ensp;|&ensp;
+  <strong>Spanish:</strong> Native
+</div>
+
+</body>
+</html>

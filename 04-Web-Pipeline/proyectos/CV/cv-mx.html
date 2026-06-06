@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel Ortega Alcántara – CV</title>
+<style>
+  @page { size: letter; margin: 1.1in 1.1in 1.2in 1.1in; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Calibri", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.15;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 6.3in;
+    margin: 0 auto;
+  }
+
+  .top-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 12pt;
+  }
+  .photo {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1.5px solid #d0d5dd;
+  }
+  .top-info { flex: 1; }
+  .top-info h1 {
+    font-size: 22pt;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #111;
+    margin-bottom: 3pt;
+  }
+  .top-info .tagline {
+    font-size: 11pt;
+    color: #0f4c81;
+    font-weight: 600;
+    margin-bottom: 6pt;
+  }
+  .contact-row {
+    font-size: 10pt;
+    color: #555;
+    line-height: 1.6;
+  }
+  .contact-row span { margin: 0 9px; color: #bbb; }
+
+  hr {
+    border: none;
+    border-top: 1.5px solid #0f4c81;
+    margin: 12pt 0;
+  }
+
+  .summary {
+    font-size: 10.5pt;
+    color: #333;
+    margin-bottom: 12pt;
+    line-height: 1.2;
+  }
+
+  .section-title {
+    font-size: 14pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #0f4c81;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+  }
+
+  .skills-line {
+    font-size: 10.5pt;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 10pt;
+  }
+  .skills-line strong { color: #111; }
+
+  .exp-item { margin-bottom: 10pt; }
+  .exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2pt;
+  }
+  .exp-role { font-weight: 700; font-size: 11pt; color: #111; }
+  .exp-company { font-weight: 600; color: #444; font-size: 10.5pt; }
+  .exp-date { font-size: 10pt; color: #777; white-space: nowrap; }
+  .exp-loc { font-size: 9.5pt; color: #999; font-style: italic; margin-bottom: 3pt; }
+  ul { margin: 2pt 0 0 18px; }
+  li { margin-bottom: 2pt; font-size: 10.5pt; color: #333; }
+
+  .edu-line {
+    font-size: 10.5pt;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2pt;
+  }
+  .edu-degree { font-weight: 700; }
+  .edu-date { font-size: 10pt; color: #777; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-row">
+  <img class="photo" src="danielnaranja.png" alt="Daniel Ortega" />
+  <div class="top-info">
+    <h1>Daniel Ortega Alcántara</h1>
+    <div class="tagline">Ingeniero en IA &amp; Líder Técnico — Especialista en Marketing y Automatización</div>
+    <div class="contact-row">
+      3437 Windsong Street, Corona, CA 92883<span>|</span>+1 (951) 733-6105
+    </div>
+    <div class="contact-row">
+      danielortegaalcantara9@gmail.com<span>|</span>linkedin.com/in/danielortega3030<span>|</span>Reubicándose a CDMX
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<div class="summary">
+  <strong>Ingeniero en IA y Economista</strong> (UNAM) con más de 5 años construyendo sistemas de IA en producción y funnels de marketing de alta conversión. Recepcionistas IA, agentes de ventas por WhatsApp, plataformas de outreach para PyMEs y distribución masiva de contenido. Opera un <strong>agente Hermes AI en VPS</strong> como soporte operativo 24/7 para todos sus servicios. Bilingüe inglés–español. 40 años. Mexicano, actualmente en EE.UU.
+</div>
+
+<div class="section-title">Habilidades Técnicas</div>
+<div class="skills-line">
+  <strong>IA &amp; LLMs:</strong> ChatGPT 5.5, DeepSeek, prompt engineering, LangChain, orquestación multiagente, RAG, operaciones con agente Hermes (VPS)&ensp;|&ensp;
+  <strong>MLOps:</strong> monitoreo de modelos, fallback automático, versionado de prompts, alertas vía Telegram&ensp;|&ensp;
+  <strong>Marketing &amp; Outreach:</strong> campañas de email outreach, estrategia de redes sociales (Instagram, Facebook, TikTok), distribución masiva de contenido, segmentación de audiencias, Meta Pixel y tracking de conversiones&ensp;|&ensp;
+  <strong>Contenido &amp; Diseño:</strong> generación de video de alto nivel, diseño gráfico para redes y web, copywriting para anuncios y landing pages, identidad de marca&ensp;|&ensp;
+  <strong>Automatización:</strong> pipelines de webhooks personalizados (equivalente n8n/Zapier), Google Sheets API, secuencias email/SMS, integración CRM&ensp;|&ensp;
+  <strong>Backend:</strong> Node.js, Express, Python, REST APIs, Stripe, Telnyx (WhatsApp API), MongoDB, Railway, PM2 (VPS)&ensp;|&ensp;
+  <strong>CI/CD:</strong> GitHub → Vercel, deploys sin downtime, entornos staging
+</div>
+
+<div class="section-title">Experiencia</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">Founder &amp; Lead AI Engineer</span>
+    <span class="exp-date">Ene 2025 – Presente</span>
+  </div>
+  <div class="exp-company">MedillaForms / LeaderForge Digital</div>
+  <div class="exp-loc">Corona, CA, EE.UU.</div>
+  <ul>
+    <li>Arquitecturó <strong>5 agentes de IA especializados</strong> (Intake, Analysis, Closer, Educator, Hermes) compartiendo estado vía MongoDB — orquestación multiagente personalizada con ChatGPT 5.5 y DeepSeek.</li>
+    <li>Desplegó <strong>agente Hermes AI en VPS</strong> para soporte operativo 24/7, monitoreo y ejecución automatizada de tareas en todos los servicios.</li>
+    <li>Construyó funnel de marketing completo: Meta Ads → agente IA en WhatsApp → pago Stripe → entrega automatizada. Tracking completo con Pixel y atribución de conversiones.</li>
+    <li>Implementó <strong>CI/CD</strong>: GitHub → Vercel auto-deploy + PM2 con reinicio sin downtime, reduciendo errores de deploy en 80%.</li>
+  </ul>
+</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">AI Engineer — IA Conversacional y Marketing Automation</span>
+    <span class="exp-date">Jun 2024 – Ene 2025</span>
+  </div>
+  <div class="exp-company">LeaderForge Digital</div>
+  <div class="exp-loc">Corona, CA, EE.UU.</div>
+  <ul>
+    <li>Construyó <strong>Sofía</strong>, recepcionista IA multilingüe que contesta llamadas, califica leads y agenda citas 24/7 — deploy en Railway con 99.9% uptime.</li>
+    <li>Ejecutó <strong>distribución masiva de contenido</strong> en redes sociales: producción de video, copywriting, calendarización y analíticas de desempeño para campañas de clientes.</li>
+    <li>Diseñó flujos de automatización equivalentes a n8n/Zapier: llamada entrante → procesamiento IA → confirmación SMS → actualización CRM.</li>
+  </ul>
+</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">Consultor en Automatización &amp; IA</span>
+    <span class="exp-date">Mar 2023 – Jun 2024</span>
+  </div>
+  <div class="exp-company">Independiente — Proyectos PyMEs y Contenido</div>
+  <div class="exp-loc">California, EE.UU.</div>
+  <ul>
+    <li>Construyó <strong>Welders CA Batch</strong>: scraping de leads → deploy de demos personalizadas → secuencia email de 3 touches. Procesó <strong>32 PyMEs en 3 días</strong> con cero intervención manual.</li>
+    <li>Produjo <strong>video de alto nivel</strong> para campañas de redes sociales de clientes, incluyendo guionismo, edición y distribución optimizada para Instagram, Facebook y TikTok.</li>
+    <li>Integró Google Sheets API como CRM ligero con registro en tiempo real, tracking de respuestas y dashboards de conversión.</li>
+  </ul>
+</div>
+
+<div class="exp-item">
+  <div class="exp-header">
+    <span class="exp-role">Full-Stack Developer &amp; Tech Lead</span>
+    <span class="exp-date">Sep 2021 – Feb 2023</span>
+  </div>
+  <div class="exp-company">Freelance &amp; Proyectos de Agencia</div>
+  <div class="exp-loc">Durango, México / Remoto</div>
+  <ul>
+    <li>Lideró equipos técnicos de 2–4 desarrolladores entregando aplicaciones web para PyMEs mexicanas en salud, retail y servicios.</li>
+    <li>Construyó integraciones personalizadas: pasarelas de pago, mensajería WhatsApp, sincronización CRM, dashboards analíticos y calendarización de contenido para redes sociales.</li>
+  </ul>
+</div>
+
+<div class="section-title">Formación</div>
+<div class="edu-line">
+  <span><span class="edu-degree">Licenciatura en Economía</span> — Universidad Nacional Autónoma de México (UNAM)</span>
+  <span class="edu-date">2003 – 2008</span>
+</div>
+<div style="font-size:10pt; color:#555; margin-bottom:10pt;">Especialización en Ingeniería de IA — autodidacta + experiencia en producción. Rigor analítico de la economía aplicado a sistemas de ML y analíticas de marketing.</div>
+
+<div class="section-title">Idiomas</div>
+<div class="skills-line">
+  <strong>Inglés:</strong> Competencia profesional — escrito y hablado&ensp;|&ensp;
+  <strong>Español:</strong> Nativo
+</div>
+
+</body>
+</html>
