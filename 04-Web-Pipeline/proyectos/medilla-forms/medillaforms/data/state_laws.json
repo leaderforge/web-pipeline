@@ -1,7 +1,7 @@
 {
   "_description": "State-level patient protections and billing regulations. Reference only — never cite as legal authority. Always recommend consulting a licensed attorney.",
   "_disclaimer": "Esta información es EDUCATIVA únicamente. No constituye asesoría legal.",
-  "_updated": "2026-06-04",
+  "_updated": "2026-06-07",
   "states": {
     "CA": {
       "name": "California",
@@ -152,6 +152,136 @@
         "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
         "itemized_bill": "Must be provided upon request.",
         "important_warning": "ILLINOIS TIENE EL PLAZO MÁS LARGO: 10 AÑOS. Esto significa que pueden demandarlo por facturas médicas de hasta una década. No asuma que una factura vieja 'ya caducó'. Siempre verifique antes de hacer pagos en deudas antiguas."
+      }
+    },
+    "AR": {
+      "name": "Arkansas",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services and out-of-network care at in-network facilities",
+        "Arkansas law protects patients from surprise balance billing in emergencies and at in-network facilities",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r) — 240 days to apply from first post-discharge bill",
+        "Itemized bill available upon request — hospitals must provide clear billing information"
+      ],
+      "charity_care_threshold": "No state minimum — varies by hospital (federal law requires nonprofit hospitals to have financial assistance policies)",
+      "key_agency": "Arkansas Insurance Department",
+      "complaint_url": "https://insurance.arkansas.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "3 years from date of service or last partial payment (AR Code 16-56-106). After 3 years, provider cannot legally collect. IMPORTANTE: cualquier pago parcial REINICIA el plazo de 3 años.",
+        "billing_deadline": "No strict state deadline for initial billing. Providers should bill within a reasonable time (typically 30-90 days).",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review after internal appeal denial.",
+        "charity_care_application": "240 days from first post-discharge bill (state law). Nonprofit hospitals cannot take extraordinary collection actions for 120 days.",
+        "no_surprises_act_idr": "120 days from initial bill to initiate Independent Dispute Resolution under federal No Surprises Act.",
+        "itemized_bill": "Hospitals must provide itemized bill upon request with clear description of charges.",
+        "important_warning": "Arkansas NO tiene ley estatal de charity care — solo aplican protecciones federales. El estatuto de limitaciones es de SOLO 3 años. NUNCA haga un pago parcial en una deuda cercana a los 3 años porque reinicia el plazo. Si el hospital es for-profit (no nonprofit), las protecciones federales de charity care NO aplican."
+      }
+    },
+    "GA": {
+      "name": "Georgia",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Georgia Surprise Billing Law (GA Code 33-20E) — protects against balance billing in emergencies and at in-network facilities",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)",
+        "Hospitals receiving Indigent Care Trust Fund must forgive 100% of debt for patients under 125% FPL, sliding scale 125-200% FPL",
+        "Hospitals serving low-income patients must conduct indigency screening for patients who claim they cannot pay"
+      ],
+      "charity_care_threshold": "125% FPL (full forgiveness, Indigent Care Trust Fund hospitals) — sliding scale 125-200% FPL",
+      "key_agency": "Georgia Office of Insurance and Safety Fire Commissioner",
+      "complaint_url": "https://oci.georgia.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "6 years for written contracts. Clock starts from last payment or service date.",
+        "billing_deadline": "No strict state deadline. Insurance contracts may impose shorter deadlines.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "240 days from first post-discharge bill (nonprofit hospitals). No deadline for Indigent Care Trust Fund hospitals.",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Must be provided upon request. Hospitals must give clear, itemized statements.",
+        "important_warning": "Georgia tiene un estatuto largo (6 años). Si califica para charity care via Indigent Care Trust Fund, requiere ser ciudadano y residente de GA. Consulte siempre con un profesional legal."
+      }
+    },
+    "OH": {
+      "name": "Ohio",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Ohio law protects against surprise billing for emergency services and certain non-emergency out-of-network care",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)",
+        "Itemized bill available upon request"
+      ],
+      "charity_care_threshold": "No state minimum — varies by hospital. Nonprofit hospitals must follow their own financial assistance policies.",
+      "key_agency": "Ohio Department of Insurance",
+      "complaint_url": "https://insurance.ohio.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "6 years for written contracts. Clock starts from last payment or service date.",
+        "billing_deadline": "No strict state deadline. Providers should bill within a reasonable time.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "240 days from first post-discharge bill for nonprofit hospitals.",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Must be provided upon request. Clear, itemized statement required.",
+        "important_warning": "Ohio tiene 6 años de estatuto de limitaciones pero buenas protecciones al consumidor. Pregunte siempre por el programa de asistencia financiera del hospital."
+      }
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Pennsylvania Surprise Billing Law protects against balance billing in emergencies and at in-network facilities",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)",
+        "PA Fair Credit Extension Uniformity Act provides consumer protections against aggressive debt collection",
+        "Itemized bill available upon request"
+      ],
+      "charity_care_threshold": "No state minimum — varies by hospital. Nonprofit hospitals must follow their financial assistance policies.",
+      "key_agency": "Pennsylvania Insurance Department",
+      "complaint_url": "https://www.insurance.pa.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "4 years for written contracts. Clock starts from last payment or service date.",
+        "billing_deadline": "No strict state deadline. Providers should bill within a reasonable time.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "240 days from first post-discharge bill for nonprofit hospitals.",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Must be provided within 30 days of request per PA law.",
+        "important_warning": "PA tiene protecciones al consumidor más fuertes que el promedio. El estatuto de 4 años es razonable. Siempre solicite el programa de asistencia financiera del hospital."
+      }
+    },
+    "NC": {
+      "name": "North Carolina",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "North Carolina Surprise Billing Law protects patients from balance billing in emergencies",
+        "Medical Bill De-Weaponization Act (2025) — hospitals must partner with organizations like Undue Medical Debt for patient relief",
+        "Nonprofit hospitals required to provide charity care per IRS 501(r)",
+        "Itemized bill available upon request"
+      ],
+      "charity_care_threshold": "No state minimum — varies by hospital. State law strengthens protections against aggressive medical debt collection.",
+      "key_agency": "North Carolina Department of Insurance",
+      "complaint_url": "https://www.ncdoi.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "3 years for written contracts. Clock starts from last payment or service date. Uno de los estatutos más cortos del país.",
+        "billing_deadline": "No strict state deadline. Insurance contracts may impose shorter deadlines.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "240 days from first post-discharge bill for nonprofit hospitals.",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Must be provided upon request. Clear, itemized statement required by NC law.",
+        "important_warning": "NC tiene un estatuto de SOLO 3 AÑOS — uno de los más favorables al paciente. Si su deuda tiene más de 3 años, el hospital NO puede demandarlo. NUNCA haga pagos parciales en deudas cercanas a los 3 años — reinicia el plazo."
+      }
+    },
+    "WA": {
+      "name": "Washington",
+      "protections": [
+        "No Surprises Act (federal) applies to emergency services",
+        "Washington Balance Billing Protection Act — comprehensive state law against surprise billing",
+        "Charity care required by STATE LAW for ALL hospitals (including for-profit) — free care under 300% FPL",
+        "Medical debt CANNOT be reported to credit agencies under WA law (2022)",
+        "Itemized bill available upon request"
+      ],
+      "charity_care_threshold": "300% FPL (state law — ALL hospitals, including for-profit). One of the strongest charity care laws in the U.S.",
+      "key_agency": "Washington State Office of the Insurance Commissioner",
+      "complaint_url": "https://www.insurance.wa.gov",
+      "dispute_deadlines": {
+        "statute_of_limitations": "6 years for written contracts. Clock starts from last payment or service date.",
+        "billing_deadline": "No strict state deadline. Providers should bill within a reasonable time.",
+        "insurance_appeal": "180 days from denial for internal appeal (ACA federal requirement). 60 days for external review.",
+        "charity_care_application": "State law requires hospitals to screen patients for charity care eligibility. Application deadline varies by hospital policy.",
+        "no_surprises_act_idr": "120 days from initial bill for Independent Dispute Resolution.",
+        "itemized_bill": "Must be provided upon request within 30 days.",
+        "important_warning": "Washington tiene una de las leyes de charity care MAS FUERTES del pais — aplica a TODOS los hospitales (no solo nonprofits) y cubre hasta 300% FPL. La deuda medica NO puede reportarse a agencias de credito. Si su ingreso es menor a 300% FPL, exija charity care."
       }
     }
   },
