@@ -1,0 +1,37 @@
+{
+  "_description": "FAQ — Preguntas frecuentes de pre-venta. Inyectado por el agente de intake para responder dudas antes de pedir la factura.",
+  "_updated": "2026-06-07",
+  "topics": {
+    "tipos_factura": {
+      "question": "¿Qué tipo de facturas analizan?",
+      "keywords": ["tipo", "tipos", "factura", "facturas", "analizan", "analizar", "revisan", "cubren", "aplican", "aplica", "cuentas", "cobros", "gastos", "bill", "bills", "medical", "médicas", "medicas", "hospital", "hospitalarias", "clínica", "clinica", "doctor", "médico", "medico", "especialista", "dentista", "dental", "ambulancia", "emergencia", "urgencia", "laboratorio", "radiología", "radiologia", "cirugía", "cirugia", "receta", "medicamento", "farmacia", "qué facturas", "que facturas", "cuáles facturas", "cuales facturas"],
+      "answer": "Analizamos TODO tipo de facturas médicas y gastos de salud:\n\n🏥 **Hospitales** — emergencias, cirugías, hospitalización, laboratorio, radiología\n🩺 **Consultas** — médico general, especialista, urgencias, telemedicina\n🦷 **Dentales** — limpiezas, ortodoncia, endodoncia, implantes\n🚑 **Ambulancias** — traslados de emergencia y no emergencia\n💊 **Medicamentos y farmacia** — recetas, medicamentos hospitalarios\n🔬 **Laboratorios y estudios** — análisis clínicos, resonancias, tomografías, rayos X\n🧾 **Cualquier factura médica** en inglés o español, de cualquier estado de EE.UU.\n\nEl análisis de errores es 100% gratis. Solo pagas $29 USD si quieres las cartas de disputa personalizadas.",
+      "what_we_dont": "No analizamos facturas veterinarias (mascotas) ni facturas de servicios NO relacionados con salud (luz, agua, renta, etc.)."
+    },
+    "cobertura_geografica": {
+      "question": "¿En qué estados operan?",
+      "keywords": ["estado", "estados", "cubre", "cubren", "disponible", "dónde", "donde", "ubicación", "ubicacion", "state", "states", "operan", "funciona en", "sirve en", "válido", "valido", "aplica en"],
+      "answer": "MedillaForms funciona en **los 50 estados de EE.UU.** 🇺🇸\n\nTenemos información específica de leyes, protecciones al paciente y plazos de disputa para cada estado en nuestra base de conocimiento. Si su factura es de un hospital en cualquier estado, podemos ayudarle."
+    },
+    "gratis": {
+      "question": "¿Es gratis?",
+      "keywords": ["gratis", "gratuito", "cobran", "cobra", "cobro", "precio", "cuesta", "costo", "pago", "pagar", "tarifa", "free", "cost", "price", "payment", "charge", "fee"],
+      "answer": "✅ El **análisis de errores es 100% GRATIS**.\n\nUsted me manda su factura, la analizo con inteligencia artificial, y le digo exactamente qué errores encontré y cuánto podría ahorrar. Sin compromiso.\n\nSi después del análisis quiere que le prepare las cartas de disputa personalizadas, cuesta **$29 USD** — pago único, sin suscripción. Pero solo si usted quiere. El análisis no cuesta nada."
+    },
+    "tiempos": {
+      "question": "¿Cuánto tardan?",
+      "keywords": ["tarda", "tardan", "demora", "tiempo", "cuánto", "cuanto", "rápido", "rapido", "entrega", "entregar", "envían", "envian", "how long", "timeline", "esperar", "wait", "demorar"],
+      "answer": "⏱️ Estos son nuestros tiempos típicos:\n\n🔍 **Análisis de errores:** 2-5 minutos después de recibir su factura\n📝 **Cartas de disputa:** 5-10 minutos después del pago\n\nEn total, en menos de 15 minutos puede tener sus cartas listas para enviar al hospital."
+    },
+    "proceso": {
+      "question": "¿Cómo funciona el proceso?",
+      "keywords": ["cómo funciona", "como funciona", "proceso", "pasos", "funciona", "explicar", "explicame", "how does it work", "how it works", "explain", "método", "metodo"],
+      "answer": "El proceso es muy simple:\n\n📸 **Paso 1** — Me manda una foto de su factura médica (WhatsApp)\n🔍 **Paso 2** — Analizo la factura con IA y busco errores de facturación *(gratis)*\n📊 **Paso 3** — Le muestro los errores encontrados y cuánto podría ahorrar\n💳 **Paso 4** — Si quiere, paga $29 USD y le preparo DOS cartas de disputa:\n   • Una en **español** (para usted)\n   • Una en **inglés** (para enviar al hospital)\n📤 **Paso 5** — Usted envía las cartas y negocia con el hospital\n\nTodo por WhatsApp, sin instalar apps, sin registrarse."
+    },
+    "garantia": {
+      "question": "¿Garantizan resultados?",
+      "keywords": ["garantía", "garantia", "garantizan", "garantizado", "aseguran", "seguro", "funciona", "resultado", "siempre", "reembolso", "refund", "devolución", "devolucion", "garantizada", "garantizado", "100%", "siempre funciona"],
+      "answer": "No garantizamos resultados específicos — cada factura y cada hospital son diferentes. Lo que SÍ hacemos:\n\n✅ Identificar errores de facturación con IA + validación humana de nuestra base de conocimiento\n✅ Preparar cartas profesionales con argumentos basados en leyes estatales y normas de facturación\n✅ Darle las herramientas para negociar — pero el resultado final depende de su hospital\n\nSomos un servicio educativo, no un despacho de abogados."
+    }
+  }
+}

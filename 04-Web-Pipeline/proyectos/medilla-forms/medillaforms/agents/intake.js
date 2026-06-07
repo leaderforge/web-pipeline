@@ -45,7 +45,7 @@ export class IntakeAgent {
 
     // --- First message (or returning user after 24h+) ---
     if (msgCount <= 1 || returningContext) {
-      await this._sendWelcome(returningContext);
+      await this._sendWelcome(text, returningContext);
       return;
     }
 
@@ -158,9 +158,9 @@ export class IntakeAgent {
   }
 
   // ===========================================================================
-  // Send welcome message
+  // Send welcome message — smart: answers questions before generic welcome
   // ===========================================================================
-  async _sendWelcome(returningContext) {
+  async _sendWelcome(userText, returningContext) {
     if (returningContext) {
       // Returning user — use DeepSeek with context
       const history = [];
@@ -172,18 +172,87 @@ export class IntakeAgent {
       );
       await this.whatsapp.sendText(this.phone, sanitizeAgentResponse(response));
       await appendToConversationLog(this.session.id, "assistant", response);
-    } else {
-      // New user — standard welcome
-      const disclaimer = getFirstMessageDisclaimer("es");
-      const welcomeMsg =
-        `¡Buenas! Bienvenido a MedillaForms. 💙\n\n` +
-        `Soy Hermes, su asistente de análisis de facturas médicas.\n\n` +
-        `*${disclaimer}*\n\n` +
-        `¿Tiene su factura médica a la mano? Mándeme una foto cuando esté listo. 📸`;
-
-      await this.whatsapp.sendText(this.phone, welcomeMsg);
-      await appendToConversationLog(this.session.id, "assistant", welcomeMsg);
+      return;
     }
+
+    // --- Smart detection: is the first message a question? ---
+    // Check for question marks, question keywords, or clear info-seeking intent
+    const textLower = (userText || "").toLowerCase();
+    const isQuestion = (
+      textLower.includes("?") || textLower.includes("¿") ||
+      textLower.startsWith("que ") || textLower.startsWith("qué ") ||
+      textLower.startsWith("como ") || textLower.startsWith("cómo ") ||
+      textLower.startsWith("cuanto ") || textLower.startsWith("cuánto ") ||
+      textLower.startsWith("donde ") || textLower.startsWith("dónde ") ||
+      textLower.startsWith("cual ") || textLower.startsWith("cuál ") ||
+      textLower.startsWith("cuales ") || textLower.startsWith("cuáles ") ||
+      textLower.startsWith("cuando ") || textLower.startsWith("cuándo ") ||
+      textLower.startsWith("quien ") || textLower.startsWith("quiénes ") ||
+      textLower.startsWith("por que ") || textLower.startsWith("por qué ") ||
+      textLower.startsWith("para que ") || textLower.startsWith("para qué ") ||
+      textLower.startsWith("puede ") || textLower.startsWith("pueden ") ||
+      textLower.startsWith("tiene ") || textLower.startsWith("tienen ") ||
+      textLower.startsWith("hay ") || textLower.startsWith("existe ") ||
+      textLower.startsWith("what ") || textLower.startsWith("how ") ||
+      textLower.startsWith("do you ") || textLower.startsWith("does ") ||
+      textLower.startsWith("can you ") || textLower.startsWith("can i ") ||
+      textLower.startsWith("is this ") || textLower.startsWith("is there ") ||
+      textLower.startsWith("where ") || textLower.startsWith("which ")
+    );
+
+    // Also detect if it's a generic greeting (just "hola", "hi", etc.)
+    const isGreeting = (
+      textLower === "hola" || textLower === "hi" || textLower === "hello" ||
+      textLower === "hey" || textLower === "buenas" || textLower === "buenos días" ||
+      textLower === "buenos dias" || textLower === "buenas tardes" ||
+      textLower === "buenas noches" || textLower === "qué tal" ||
+      textLower === "que tal" || textLower === "saludos" || textLower === "hola!" ||
+      textLower === "hi!" || textLower === "hello!" || textLower === "hey!" ||
+      textLower === "👍" || textLower === "👋" || textLower === "hola 👋" ||
+      textLower.startsWith("hola ") && textLower.length < 10
+    );
+
+    if (isQuestion && !isGreeting) {
+      // User sent a question as first message → answer it via KB + DeepSeek
+      console.log(`🔍 Intake: first message is a question → answering via KB: "${userText.slice(0, 80)}"`);
+
+      const kbCtx = getKBContext(userText, {
+        state: this.session.user_state || "",
+      });
+
+      const history = buildConversationHistory(this.session.conversation_log);
+      const context = {
+        user_state: this.session.user_state || "",
+        is_first_contact: true,
+      };
+
+      const prompt = userText + (kbCtx
+        ? `\n\n📚 DATOS OBJETIVOS (USA ESTOS):\n${kbCtx}\n\n⚠️ Responde de forma conversacional y natural. Al final, invita al usuario a enviar su factura para un análisis gratuito.`
+        : `\n\n⚠️ Responde de forma conversacional y natural. Si no sabes la respuesta exacta, sé honesto pero útil. Al final, invita al usuario a enviar su factura para un análisis gratuito.`);
+
+      const response = await this.deepseek.chat("intake", history, prompt, context);
+      const cleaned = sanitizeAgentResponse(response);
+
+      // Append the photo CTA if DeepSeek didn't include one
+      const hasCTA = cleaned.toLowerCase().includes("factura") &&
+                     (cleaned.toLowerCase().includes("foto") || cleaned.toLowerCase().includes("mánd") || cleaned.toLowerCase().includes("enví"));
+      const finalMsg = hasCTA ? cleaned : cleaned + "\n\n¿Tiene su factura médica a la mano? Mándeme una foto cuando esté listo. 📸";
+
+      await this.whatsapp.sendText(this.phone, finalMsg);
+      await appendToConversationLog(this.session.id, "assistant", finalMsg);
+      return;
+    }
+
+    // Default: standard welcome for greetings or non-questions
+    const disclaimer = getFirstMessageDisclaimer("es");
+    const welcomeMsg =
+      `¡Buenas! Bienvenido a MedillaForms. 💙\n\n` +
+      `Soy Hermes, su asistente de análisis de facturas médicas.\n\n` +
+      `*${disclaimer}*\n\n` +
+      `¿Tiene su factura médica a la mano? Mándeme una foto cuando esté listo. 📸`;
+
+    await this.whatsapp.sendText(this.phone, welcomeMsg);
+    await appendToConversationLog(this.session.id, "assistant", welcomeMsg);
   }
 
   // ===========================================================================

@@ -17,6 +17,7 @@ let _charityCare = null;
 let _billingErrors = null;
 let _cptCodes = null;
 let _legalGuardrails = null;
+let _faq = null;
 
 function loadJSON(filename) {
   const p = path.join(DATA_DIR, filename);
@@ -51,6 +52,66 @@ function getCPTCodes() {
 function getLegalGuardrails() {
   if (!_legalGuardrails) _legalGuardrails = loadJSON("legal_guardrails.json");
   return _legalGuardrails;
+}
+
+function getFAQ() {
+  if (!_faq) _faq = loadJSON("faq.json");
+  return _faq;
+}
+
+// =============================================================================
+// FAQ topic keywords and matching
+// =============================================================================
+const FAQ_KEYWORDS = [
+  "tipo", "tipos", "factura", "facturas", "analizan", "analizar", "revisan",
+  "cubren", "aplican", "aplica", "cuentas", "cobros", "gastos",
+  "bill", "bills", "medical", "médicas", "medicas", "hospital",
+  "hospitalarias", "clínica", "clinica", "doctor", "médico", "medico",
+  "especialista", "dentista", "dental", "ambulancia", "emergencia",
+  "urgencia", "laboratorio", "radiología", "radiologia", "cirugía",
+  "cirugia", "receta", "medicamento", "farmacia", "qué facturas",
+  "que facturas", "cuáles facturas", "cuales facturas",
+  "estado", "estados", "cubre", "disponible", "dónde", "donde",
+  "ubicación", "ubicacion", "operan", "funciona en", "sirve en",
+  "gratis", "gratuito", "cobran", "cobra", "precio", "cuesta",
+  "costo", "pago", "pagar", "tarifa", "free", "cost", "price",
+  "tarda", "tardan", "demora", "tiempo", "cuánto", "cuanto",
+  "rápido", "rapido", "entrega", "entregar", "cómo funciona",
+  "como funciona", "proceso", "pasos", "funciona", "explicar",
+  "garantía", "garantia", "garantizan", "garantizado", "aseguran",
+  "reembolso", "refund", "devolución", "devolucion",
+];
+
+function searchFAQ(question) {
+  const lower = question.toLowerCase();
+  const faq = getFAQ();
+  if (!faq || !faq.topics) return null;
+
+  // Score each topic by keyword overlap
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const [topicKey, topic] of Object.entries(faq.topics)) {
+    let score = 0;
+    for (const kw of topic.keywords) {
+      if (lower.includes(kw.toLowerCase())) score++;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = topic;
+    }
+  }
+
+  // Require at least 2 keyword matches for confidence
+  if (bestScore >= 2 && bestMatch) {
+    let result = `## ${bestMatch.question}\n${bestMatch.answer}`;
+    if (bestMatch.what_we_dont) {
+      result += `\n\n⚠️ ${bestMatch.what_we_dont}`;
+    }
+    return result;
+  }
+
+  return null;
 }
 
 // =============================================================================
@@ -277,6 +338,15 @@ export function searchKnowledge(question, context = {}) {
     if (guardrails.disclaimers.no_guarantee) excerpts.push(`- ${guardrails.disclaimers.no_guarantee}`);
   }
 
+  // ═══ FAQ — Pre-sales questions ═══
+  // Only include FAQ if no other KB sections matched (avoids mixing FAQ with billing data)
+  if (excerpts.length === 0) {
+    const faqAnswer = searchFAQ(question);
+    if (faqAnswer) {
+      excerpts.push(faqAnswer);
+    }
+  }
+
   return excerpts.length > 0 ? excerpts.join("\n") : null;
 }
 
@@ -291,4 +361,6 @@ export function getKBContext(question, context = {}) {
   return `\n\n📚 BASE DE CONOCIMIENTO LOCAL (DATOS OBJETIVOS — USA ESTOS DATOS, NO LOS INVENTES):\n${kb}\n\n⚠️ Reglas al usar estos datos:\n- Cítalos como HECHOS, no como consejos.\n- Si los datos cubren la pregunta, responde con ellos.\n- Si los datos NO cubren la pregunta, di "Esa información específica no la tengo en mi base de conocimiento".\n- NUNCA inventes plazos, fechas, ni procedimientos.`;
 }
 
-export default { searchKnowledge, getKBContext };
+export { searchFAQ };
+
+export default { searchKnowledge, getKBContext, searchFAQ };
