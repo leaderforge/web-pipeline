@@ -303,11 +303,13 @@ export class HermesAgent {
       return;
     }
 
-    // ⏳ User asks about wait time or confirmation status
-    if (textLower.includes("cuánto tarda") || textLower.includes("cuánto falta") ||
-        textLower.includes("demora") || textLower.includes("confirmaron") ||
-        textLower.includes("verificaron") || textLower.includes("estatus") ||
-        textLower.includes("status") || textLower.includes("update")) {
+    // ⏳ User asks about payment wait time or confirmation status
+    // MUST be clearly about PAYMENT, not general questions
+    if ((textLower.includes("cuánto tarda") && (textLower.includes("pago") || textLower.includes("verificar") || textLower.includes("zelle") || textLower.includes("transferencia"))) ||
+        (textLower.includes("cuánto falta") && (textLower.includes("pago") || textLower.includes("confirmar") || textLower.includes("carta"))) ||
+        textLower.includes("demora el pago") || textLower.includes("demora la verificación") ||
+        textLower.includes("cuándo confirman el pago") || textLower.includes("cuándo verifican el pago") ||
+        textLower.includes("cuando confirman el pago") || textLower.includes("cuando verifican el pago")) {
       await this.whatsapp.sendText(this.phone,
         "Seguimos verificando su pago. Esto puede tomar unos minutos. Le avisaré en cuanto se confirme. ⏳\n\n" +
         "¡Gracias por su paciencia!"
