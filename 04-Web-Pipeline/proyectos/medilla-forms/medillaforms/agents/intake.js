@@ -43,6 +43,30 @@ export class IntakeAgent {
       }
     }
 
+    // --- User says they only have summary / asks about itemized bill ---
+    if (this._matches(textLower, [
+      "resumen","solo una hoja","solo 1 hoja","solo una pagina","solo 1 pagina",
+      "no tengo la detallada","no tengo el detalle","donde consigo","donde encuentro",
+      "como la pido","como obtener","itemized","desglosada","detallada",
+      "solo tengo el total","no me mandaron","solo me llego"
+    ])) {
+      await this._guideItemizedBill();
+      return;
+    }
+
+    // --- Detects user HAS the itemized bill (multi-page detail) ---
+    if (this._matches(textLower, [
+      "la tengo","ya la tengo","aqui esta","te la mando",
+      "te mando","voy a mandar","ahi va","listo","dale",
+      "ahi te va","tengo la factura","si tengo"
+    ]) && !this._matches(textLower, ["solo una","solo 1","resumen","solo el total"])) {
+      await this.whatsapp.sendText(this.phone,
+        "\u00a1Perfecto! \ud83d\udcf8 M\u00e1ndeme la primera p\u00e1gina de su factura detallada.\n\n" +
+        "Si tiene varias p\u00e1ginas, las manda una por una. Yo le voy confirmando cada una."
+      );
+      return;
+    }
+
     // --- First message (or returning user after 24h+) ---
     if (msgCount <= 1 || returningContext) {
       await this._sendWelcome(text, returningContext);
@@ -279,6 +303,23 @@ export class IntakeAgent {
       "📝 Si quiere, por $29 USD le preparo cartas de disputa personalizadas\n" +
       "📄 Recibe DOS cartas: una en español (para usted) y una en inglés (para el hospital)\n\n" +
       "Es como tener un amigo que sabe de facturación médica. ¿Tiene una factura para revisar?"
+    );
+  }
+
+  // ===========================================================================
+  // Guide user on how to obtain an itemized bill (educational only)
+  // ===========================================================================
+  async _guideItemizedBill() {
+    await this.whatsapp.sendText(this.phone,
+      "Entiendo. Lo que usted tiene es el *resumen de cuenta* \u2014 el hospital se lo manda autom\u00e1ticamente por correo. \ud83d\ude42\n\n" +
+      "Para poder analizar su factura y encontrar errores, necesito la versi\u00f3n *detallada* (en ingl\u00e9s se llama *\u201citemized bill\u201d* o *\u201cfactura desglosada\u201d*). Esta incluye cada cargo por separado con su c\u00f3digo, fecha y precio.\n\n" +
+      "\ud83d\udccb *C\u00f3mo obtenerla:*\n\n" +
+      "1\ufe0f\u20e3 Llame al hospital y diga: _\u201cNecesito mi itemized bill con todos los cargos desglosados.\u201d_ Por ley federal tiene derecho a recibirla.\n\n" +
+      "2\ufe0f\u20e3 El hospital tiene hasta 30 d\u00edas para entreg\u00e1rsela. *Es gratis.*\n\n" +
+      "3\ufe0f\u20e3 Si tiene acceso al portal del paciente en l\u00ednea (MyChart, Patient Portal), puede descargarla ahora mismo. Busque la opci\u00f3n \u201cView Itemized Bill\u201d o \u201cDownload Statement\u201d.\n\n" +
+      "4\ufe0f\u20e3 Tambi\u00e9n puede pedirla por escrito. Muchos hospitales tienen un formulario de \u201cRelease of Information\u201d en su sitio web.\n\n" +
+      "Cuando tenga la factura detallada, regrese aqu\u00ed y con gusto la analizo sin costo. \ud83d\udcf8\n\n" +
+      "\ud83d\udca1 *Tip:* La factura detallada normalmente viene en varias p\u00e1ginas."
     );
   }
 
