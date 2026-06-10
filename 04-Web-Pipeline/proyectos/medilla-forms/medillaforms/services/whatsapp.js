@@ -15,6 +15,31 @@ class WhatsAppService {
   }
 
   // ---------------------------------------------------------------------------
+  // Clean & validate phone number — strip non-digits, ensure + prefix
+  // ---------------------------------------------------------------------------
+  _cleanPhone(phone) {
+    if (!phone || typeof phone !== "string") return null;
+    let cleaned = phone.replace(/[^0-9+]/g, "");
+    // Already has + prefix — assume it's valid
+    if (cleaned.startsWith("+")) {
+      return cleaned.length >= 10 ? cleaned : null;
+    }
+    // US number without country code — add +1
+    if (cleaned.length === 10) {
+      return "+1" + cleaned;
+    }
+    // 11 digits starting with 1 — add +
+    if (cleaned.length === 11 && cleaned.startsWith("1")) {
+      return "+" + cleaned;
+    }
+    // Non-US: fallback to + prefix
+    if (cleaned.length >= 10) {
+      return "+" + cleaned;
+    }
+    return null;
+  }
+
+  // ---------------------------------------------------------------------------
   // Verify Ed25519 webhook signature
   // ---------------------------------------------------------------------------
   verifySignature(payload, signature, timestamp) {
@@ -62,8 +87,15 @@ class WhatsAppService {
   // ---------------------------------------------------------------------------
   async sendText(to, text) {
     if (!this.apiKey || !this.fromNumber) {
-      console.warn(`⚠️ WhatsApp not configured — would send to ${to.slice(-4)}: ${text.slice(0, 60)}...`);
+      console.warn(`⚠️ WhatsApp not configured — would send to ${to?.slice(-4)}: ${text.slice(0, 60)}...`);
       return { ok: false, error: "not_configured" };
+    }
+
+    // Clean and validate phone number
+    const cleanTo = this._cleanPhone(to);
+    if (!cleanTo) {
+      console.warn(`⚠️ Invalid phone number — cannot send: ${to?.slice(-4)}`);
+      return { ok: false, error: "invalid_phone" };
     }
 
     try {
@@ -75,7 +107,7 @@ class WhatsAppService {
         },
         body: JSON.stringify({
           from: this.fromNumber,
-          to,
+          to: cleanTo,
           whatsapp_message: {
             type: "text",
             text: {
@@ -94,7 +126,7 @@ class WhatsAppService {
       }
 
       this.lastSendResponse = { status: response.status, body: data, at: new Date().toISOString() };
-      console.log(`📤 WhatsApp sent to ${to.slice(-4)}: ${text.slice(0, 60)}...`);
+      console.log(`📤 WhatsApp sent to ${cleanTo.slice(-4)}: ${text.slice(0, 60)}...`);
       return { ok: true, data };
     } catch (e) {
       console.error("❌ WhatsApp send exception:", e.message);
@@ -109,8 +141,15 @@ class WhatsAppService {
   // ---------------------------------------------------------------------------
   async sendImage(to, imageUrlOrBuffer, caption = "") {
     if (!this.apiKey || !this.fromNumber) {
-      console.warn(`⚠️ WhatsApp not configured — would send image to ${to.slice(-4)}`);
+      console.warn(`⚠️ WhatsApp not configured — would send image to ${to?.slice(-4)}`);
       return { ok: false, error: "not_configured" };
+    }
+
+    // Clean and validate phone number
+    const cleanTo = this._cleanPhone(to);
+    if (!cleanTo) {
+      console.warn(`⚠️ Invalid phone number — cannot send image: ${to?.slice(-4)}`);
+      return { ok: false, error: "invalid_phone" };
     }
 
     try {
@@ -139,7 +178,7 @@ class WhatsAppService {
         },
         body: JSON.stringify({
           from: this.fromNumber,
-          to,
+          to: cleanTo,
           whatsapp_message: {
             type: "image",
             image: imagePayload,
@@ -155,7 +194,7 @@ class WhatsAppService {
       }
 
       this.lastSendResponse = { status: response.status, body: data, at: new Date().toISOString() };
-      console.log(`📸 WhatsApp image sent to ${to.slice(-4)}`);
+      console.log(`📸 WhatsApp image sent to ${cleanTo.slice(-4)}`);
       return { ok: true, data };
     } catch (e) {
       console.error("❌ WhatsApp image send exception:", e.message);

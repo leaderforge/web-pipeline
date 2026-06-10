@@ -27,7 +27,10 @@ export class AnalyzerAgent {
   // ===========================================================================
   // Analyze bill image using GPT-4o Vision + cross-reference with local KB
   // ===========================================================================
-  async analyze(imageBuffer) {
+  async analyze(imageBuffers) {
+    // Normalize: single buffer or array — both accepted
+    const buffers = Array.isArray(imageBuffers) ? imageBuffers : [imageBuffers];
+
     // Mark session as analyzing
     await pool.query(
       `UPDATE sessions SET state = 'analyzing', updated_at = NOW() WHERE id = $1`,
@@ -38,9 +41,9 @@ export class AnalyzerAgent {
       // Build CPT reference lookup for the AI
       const cptRef = this._buildCptReference();
 
-      // Step 1: GPT-4o Vision analysis — include user's state for better reference pricing
+      // Step 1: GPT-4o Vision analysis — pass ALL pages
       const userState = this.session.user_state || "CA";
-      const result = await this.openai.analyzeBill(imageBuffer, cptRef, userState);
+      const result = await this.openai.analyzeBill(buffers, cptRef, userState);
 
       if (result.error) {
         await this._handleAnalysisError(result.error);

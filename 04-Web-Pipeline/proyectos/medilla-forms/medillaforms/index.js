@@ -803,10 +803,10 @@ async function processAllPhotos(phone, session) {
   }
 
   try {
-    // Run analyzer on the first photo (GPT-4o can only handle one image per call currently)
-    // TODO: multi-image stitching for truly multi-page analysis
+    // Pass ALL buffered photos to analyzer for multi-page bill analysis
+    const buffers = allPhotos.map(p => p.buffer);
     const analyzer = new AnalyzerAgent(whatsapp, openai, session);
-    await analyzer.analyze(allPhotos[0].buffer);
+    await analyzer.analyze(buffers);
 
     // Clean up buffer after successful analysis
     clearStoredPhotos(phone);

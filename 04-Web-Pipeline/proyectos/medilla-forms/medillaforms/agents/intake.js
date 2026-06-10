@@ -337,8 +337,9 @@ export class IntakeAgent {
     }
 
     try {
+      const buffers = allPhotos.map(p => p.buffer);
       const analyzer = new AnalyzerAgent(this.whatsapp, openai, this.session);
-      await analyzer.analyze(allPhotos[0].buffer);
+      await analyzer.analyze(buffers);
 
       // Clean up buffer after successful analysis
       clearStoredPhotos(this.phone);

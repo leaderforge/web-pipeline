@@ -16,19 +16,39 @@ class OpenAIService {
   // ---------------------------------------------------------------------------
   // GPT-4o Vision — Analyze medical bill image
   // ---------------------------------------------------------------------------
-  async analyzeBill(imageBuffer, cptReference = "", userState = "CA") {
+  async analyzeBill(imageBuffers, cptReference = "", userState = "CA") {
     if (!process.env.OPENAI_API_KEY) {
       console.warn("⚠️ OPENAI_API_KEY not set — returning mock analysis");
       return this._mockAnalysis();
     }
 
-    const base64 = imageBuffer.toString("base64");
+    // Normalize: accept single buffer or array
+    const buffers = Array.isArray(imageBuffers) ? imageBuffers : [imageBuffers];
+    const totalPages = buffers.length;
 
     // Build prompt with CPT reference rates and state injected
     const promptWithRates = cptReference
       ? cptReference + "\n\n---\n\n" + ANALYZER_PROMPT
       : ANALYZER_PROMPT;
-    const promptWithState = promptWithRates + `\n\nESTADO DEL PACIENTE: ${userState}. Usa las protecciones al consumidor y tarifas de referencia de este estado para tu análisis.`;
+    const multiPageNote = totalPages > 1
+      ? `\n\nFACTURA DE MÚLTIPLES PÁGINAS: Estás viendo ${totalPages} páginas de una misma factura médica. Cada página está etiquetada como "--- PÁGINA X ---". Analiza TODAS las páginas como UN SOLO documento. No asumas que la primera página contiene todos los cargos.`
+      : "";
+    const promptWithState = promptWithRates + multiPageNote + `\n\nESTADO DEL PACIENTE: ${userState}. Usa las protecciones al consumidor y tarifas de referencia de este estado para tu análisis.`;
+
+    // Build content array: text prompt + all images labeled by page
+    const imageContents = buffers.map((buf, i) => [
+      { type: "text", text: `--- PÁGINA ${i + 1} de ${totalPages} ---` },
+      {
+        type: "image_url",
+        image_url: {
+          url: `data:image/jpeg;base64,${buf.toString("base64")}`,
+          detail: "high",
+        },
+      },
+    ]).flat();
+
+    // Dynamic max_tokens: more pages = more output needed
+    const outputTokens = Math.min(4000 + (totalPages - 1) * 500, 16000);
 
     try {
       const response = await this.client.chat.completions.create({
@@ -39,20 +59,16 @@ class OpenAIService {
             role: "user",
             content: [
               { type: "text", text: promptWithState },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:image/jpeg;base64,${base64}`,
-                  detail: "high",
-                },
-              },
+              ...imageContents,
             ],
           },
         ],
-        max_tokens: 4000,
+        max_tokens: outputTokens,
         temperature: 0.1,
         response_format: { type: "json_object" },
       });
+
+      console.log(`🤖 Analyzer analyzed ${totalPages} page(s) — ${outputTokens} max output tokens`);
 
       const raw = response.choices[0]?.message?.content || "{}";
       console.log(`🤖 Analyzer output: ${raw.length} chars`);
