@@ -67,6 +67,24 @@ export class IntakeAgent {
       return;
     }
 
+    // --- User asks if 30 days have passed / deadline confusion ---
+    if (this._matches(textLower, [
+      "30 dias","30 d\u00edas","ya pasaron","ya vencio","ya venci\u00f3",
+      "todavia puedo","todav\u00eda puedo","muy tarde","demasiado tarde",
+      "se vencio","se venci\u00f3","plazo","deadline","fecha limite",
+      "fecha l\u00edmite","aun puedo","a\u00fan puedo","prescribio","prescribi\u00f3",
+      "cuanto tiempo tengo","cu\u00e1nto tiempo tengo","hace meses","hace tiempo"
+    ])) {
+      await this.whatsapp.sendText(this.phone,
+        "\u00a1S\u00ed! No se preocupe. \ud83d\ude4c\n\n" +
+        "Los *30 d\u00edas* no son desde que usted recibi\u00f3 su factura resumida. Son el plazo que tiene el hospital para entregarle la versi\u00f3n detallada *una vez que usted la solicita*.\n\n" +
+        "El reloj empieza cuando usted la pide, no antes. \u23f0\n\n" +
+        "Puede pedir su factura detallada hoy mismo, sin importar cu\u00e1nto tiempo haya pasado desde que recibi\u00f3 el resumen. El hospital tiene 30 d\u00edas *desde hoy* para d\u00e1rsela. Es su derecho bajo la ley federal HIPAA.\n\n" +
+        "\u00bfQuiere que le explique c\u00f3mo solicitarla?"
+      );
+      return;
+    }
+
     // --- First message (or returning user after 24h+) ---
     if (msgCount <= 1 || returningContext) {
       await this._sendWelcome(text, returningContext);
