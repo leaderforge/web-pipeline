@@ -381,7 +381,7 @@ export class HermesAgent {
     } else if (hasAnalysis && hasErrors) {
       recovery = "Ya analic\u00e9 su factura y encontr\u00e9 posibles errores. \ud83d\udd0d\n\n" +
         "\u00bfQuiere que le explique lo que encontr\u00e9? " +
-        "O si prefiere, puedo prepararle sus cartas de disputa por $49 USD.";
+        "O si prefiere, puedo prepararle sus cartas de disputa por $29 USD.";
     } else if (hasPhotos) {
       recovery = "Recib\u00ed su(s) foto(s). \ud83d\udcf8\n\n" +
         "Deme un momento para terminar de analizar su factura. " +
