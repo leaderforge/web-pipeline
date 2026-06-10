@@ -962,6 +962,7 @@ async function routeText(phone, text, session, returningContext = "") {
 
   const state = session.state || "intake";
 
+  try {
   switch (state) {
     case "new":
     case "intake": {
@@ -1087,6 +1088,22 @@ async function routeText(phone, text, session, returningContext = "") {
     default: {
       const hermes = new HermesAgent(whatsapp, deepseek, session);
       await hermes.handleFallback(text);
+    }
+  }
+  } catch (routeErr) {
+    console.error("\u274c routeText crashed for state", state, ":", routeErr.message);
+    // HERMES SAFETY NET: Never leave user in silence
+    try {
+      await whatsapp.sendText(phone,
+        "Disculpe, tuve un problema t\u00e9cnico. \ud83d\udd27\n\n" +
+        "No se preocupe, toda su informaci\u00f3n est\u00e1 guardada. " +
+        "\u00bfPodr\u00eda repetirme su \u00faltimo mensaje? Estoy aqu\u00ed para ayudarle."
+      );
+      await appendToConversationLog(session.id, "assistant",
+        "[Hermes safety net] El agente fall\u00f3. Se envi\u00f3 respuesta de recuperaci\u00f3n."
+      );
+    } catch (doubleFault) {
+      console.error("\u274c Even routeText safety net failed:", doubleFault.message);
     }
   }
 }

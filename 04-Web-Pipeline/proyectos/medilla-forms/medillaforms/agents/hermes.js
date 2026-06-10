@@ -365,9 +365,34 @@ export class HermesAgent {
   // Fallback for unknown states
   // ===========================================================================
   async handleFallback(text) {
-    await this.whatsapp.sendText(this.phone,
-      "Estoy aquí para ayudarle con sus facturas médicas. ¿En qué etapa del proceso estaba?"
-    );
+    // Hermes safety net: context-aware recovery response
+    // Check what stage the user is at and respond accordingly
+    const hasAnalysis = this.session.analysis_result != null;
+    const hasPaid = this.session.payment_confirmed;
+    const hasPhotos = (this.session.photos || "").length > 2;
+    const hasErrors = (this.session.errors_found || 0) > 0;
+
+    let recovery;
+    if (hasPaid) {
+      recovery = "Gracias por su paciencia. \ud83d\ude4f\n\n" +
+        "Estoy revisando su caso. Recuerde que sus cartas est\u00e1n listas y " +
+        "tenemos toda la informaci\u00f3n de su factura guardada.\n\n" +
+        "\u00bfEn qu\u00e9 puedo ayudarle puntualmente?";
+    } else if (hasAnalysis && hasErrors) {
+      recovery = "Ya analic\u00e9 su factura y encontr\u00e9 posibles errores. \ud83d\udd0d\n\n" +
+        "\u00bfQuiere que le explique lo que encontr\u00e9? " +
+        "O si prefiere, puedo prepararle sus cartas de disputa por $49 USD.";
+    } else if (hasPhotos) {
+      recovery = "Recib\u00ed su(s) foto(s). \ud83d\udcf8\n\n" +
+        "Deme un momento para terminar de analizar su factura. " +
+        "\u00bfTiene m\u00e1s p\u00e1ginas para enviarme o son todas?";
+    } else {
+      recovery = "Estoy aqu\u00ed para ayudarle con su factura m\u00e9dica. \ud83d\udc99\n\n" +
+        "\u00bfYa tiene su factura detallada (itemized bill) a la mano? " +
+        "Si solo tiene el resumen de 1 hoja, puedo explicarle c\u00f3mo obtener la versi\u00f3n completa.";
+    }
+
+    await this.whatsapp.sendText(this.phone, recovery);
   }
 }
 

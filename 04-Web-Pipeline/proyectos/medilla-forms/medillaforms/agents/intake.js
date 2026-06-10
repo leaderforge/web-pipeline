@@ -179,24 +179,46 @@ export class IntakeAgent {
       return;
     }
 
-    // --- General questions → DeepSeek + KB ---
-    const history = buildConversationHistory(this.session.conversation_log);
-    const context = {
-      user_state: this.session.user_state || "",
-      returning_context: returningContext,
-    };
-    const kbCtx = getKBContext(text, {
-      state: this.session.user_state || "",
-    });
-    const response = await this.deepseek.chat(
-      "intake",
-      history,
-      text + (kbCtx ? `\n\n📚 DATOS OBJETIVOS: ${kbCtx}` : ""),
-      context
-    );
-    const cleaned = sanitizeAgentResponse(response);
-    await this.whatsapp.sendText(this.phone, cleaned);
-    await appendToConversationLog(this.session.id, "assistant", cleaned);
+    // --- General questions u2192 DeepSeek + KB + Hermes safety net ---
+    try {
+      const history = buildConversationHistory(this.session.conversation_log);
+      const context = {
+        user_state: this.session.user_state || "",
+        returning_context: returningContext,
+      };
+      const kbCtx = getKBContext(text, {
+        state: this.session.user_state || "",
+      });
+
+      // Inject business context so responses feel personal, not automated
+      const bizContext = `Eres Hermes, el asistente de MedillaForms (medillaforms.com). MedillaForms es un servicio educativo por WhatsApp que analiza facturas medicas de hospitales en USA, detecta errores de facturacion (upcoding, cargos duplicados, unbundling, sobreprecios) y genera cartas de disputa en espanol e ingles por $49 USD (pago unico). El analisis es GRATIS. Los clientes son latinos en USA, muchos sin seguro o con seguro insuficiente. NO somos abogados. NO damos asesoria legal. Lenguaje: cercano, claro, en espanol. NUNCA prometas resultados. NUNCA digas "ilegal" o "tienes derecho a". Usa "podria", "es posible que", "muchas personas han logrado".`;
+
+      const prompt = text + (kbCtx ? `\n\n📚 DATOS OBJETIVOS (USA ESTOS): ${kbCtx}` : "") + `\n\n📋 CONTEXTO DEL NEGOCIO: ${bizContext}`;
+
+      const response = await this.deepseek.chat(
+        "intake",
+        history,
+        prompt,
+        context
+      );
+      const cleaned = sanitizeAgentResponse(response);
+      await this.whatsapp.sendText(this.phone, cleaned);
+      await appendToConversationLog(this.session.id, "assistant", cleaned);
+    } catch (err) {
+      console.error("\u274c Intake general question handler failed:", err.message);
+      // SAFETY NET: never leave the user without a response
+      const fallback = "Gracias por su mensaje. \ud83d\ude4f\n\n" +
+        "Para poder ayudarle mejor, necesito saber: \n" +
+        "\u2022 \u00bfTiene su factura m\u00e9dica detallada a la mano? \n" +
+        "\u2022 \u00bfO solo tiene el resumen de 1 hoja con el total?\n\n" +
+        "Estoy aqu\u00ed para ayudarle. Escr\u00edbame sin pena.";
+      try {
+        await this.whatsapp.sendText(this.phone, fallback);
+        await appendToConversationLog(this.session.id, "assistant", fallback);
+      } catch (sendErr) {
+        console.error("\u274c Even safety net failed:", sendErr.message);
+      }
+    }
   }
 
   // ===========================================================================
