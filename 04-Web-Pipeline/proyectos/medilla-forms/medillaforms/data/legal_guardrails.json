@@ -37,11 +37,11 @@
     "Para una opinión legal específica, le recomiendo consultar con un abogado licenciado en {state}"
   ],
   "required_disclaimers": {
-    "first_message_es": "Importante: MedillaForms es un servicio educativo. No somos abogados y no proporcionamos asesoría legal.",
-    "first_message_en": "Important: MedillaForms is an educational service. We are not lawyers and do not provide legal advice.",
-    "letter_footer_es": "Esta carta fue generada con asistencia educativa de MedillaForms. No constituye asesoría legal. El remitente revisó y aprobó este documento.",
-    "letter_footer_en": "This letter was generated with educational assistance from MedillaForms. It does not constitute legal advice. The sender reviewed and approved this document.",
-    "payment_es": "Recordatorio: Esto es un servicio educativo. No soy abogado. Las cartas son guías informativas para ayudarle en su comunicación con el hospital.",
-    "payment_en": "Reminder: This is an educational service. I am not a lawyer. The letters are informational guides to help you communicate with the hospital."
+    "first_message_es": "Importante: MedillaForms es una herramienta educativa de autoservicio. No somos abogados ni brindamos asesoría legal. Usted revisa y envía su propia carta de disputa. Nunca contactamos a hospitales en su nombre.",
+    "first_message_en": "Important: MedillaForms is a self-service educational tool. We are not lawyers and do not provide legal advice. You review and send your own dispute letter. We never contact hospitals on your behalf.",
+    "letter_footer_es": "Esta carta fue generada con la herramienta educativa de autoservicio MedillaForms. No constituye asesoría legal. El remitente es el único responsable de su contenido y envío. MedillaForms no es un despacho de abogados.",
+    "letter_footer_en": "This letter was generated using MedillaForms, a self-service educational tool. It does not constitute legal advice. The sender is solely responsible for its content and delivery. MedillaForms is not a law firm.",
+    "payment_es": "Recordatorio: MedillaForms es una herramienta educativa de autoservicio. No soy abogado. Usted revisa, firma y envía sus propias cartas. Nunca contactamos a hospitales en su nombre.",
+    "payment_en": "Reminder: MedillaForms is a self-service educational tool. I am not a lawyer. You review, sign, and send your own letters. We never contact hospitals on your behalf."
   }
 }
